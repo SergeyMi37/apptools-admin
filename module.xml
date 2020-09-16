@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+  <Document name="apptools-admin.ZPM">
+    <Module>
+      <Name>apptools-admin</Name>
+      <Version>1.0.12</Version>
+      <Packaging>module</Packaging>
+      <SourcesRoot>src</SourcesRoot>
+		<Resource Name="apptools.core.PKG"/>
+		<Resource Name="apptools.core.INC"/>
+        <Resource Name="apptools.Chart.PKG"/>
+        <Resource Name="apptools.Form.PKG"/>
+        <Resource Name="apptools.Tabs.PKG"/>
+        <Resource Name="apptools.Uikit.PKG"/>
+		<Resource Name="appcachemsg.GBL"/>
+        
+        <CSPApplication 
+            SourcePath="/web"
+            DeployPath="${cspdir}/apptools"
+            Url="/apptools" 
+            ServeFiles="1"
+            CookiePath="/apptools/"
+            PasswordAuthEnabled="1"
+            AuthenticationMethods="32" 
+            MatchRoles=":%DB_${Namespace}"
+            Recurse="1"/>
+        
+        <CSPApplication
+            Url="/apptoolsrest"
+            CookiePath="/apptools/"
+            PasswordAuthEnabled="1"
+            AuthenticationMethods="32" 
+            MatchRoles=":%DB_${Namespace}"
+            DispatchClass="apptools.core.rest"/>
+            
+    </Module>
+  </Document>
+</Export>
