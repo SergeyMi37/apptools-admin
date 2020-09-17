@@ -97,14 +97,14 @@ IRISAPP>zn "%sys"
 %SYS>do ##class(apptools.core.sys).SaveQuery("SYS.Database:FreeSpace")
  
 %SYS>zw ^%App.Task
-^%App.Task("SYS.Database:FreeSpace","2020-03-22 09:36:49",0,1)="DatabaseName"
-^%App.Task("SYS.Database:FreeSpace","2020-03-22 09:36:49",0,2)="Directory"
-^%App.Task("SYS.Database:FreeSpace","2020-03-22 09:36:49",0,3)="MaxSize"
-^%App.Task("SYS.Database:FreeSpace","2020-03-22 09:36:49",0,4)="Size"
-^%App.Task("SYS.Database:FreeSpace","2020-03-22 09:36:49",0,5)="ExpansionSize"
+^%apptools.Task("SYS.Database:FreeSpace","2020-03-22 09:36:49",0,1)="DatabaseName"
+^%apptools.Task("SYS.Database:FreeSpace","2020-03-22 09:36:49",0,2)="Directory"
+^%apptools.Task("SYS.Database:FreeSpace","2020-03-22 09:36:49",0,3)="MaxSize"
+^%apptools.Task("SYS.Database:FreeSpace","2020-03-22 09:36:49",0,4)="Size"
+^%apptools.Task("SYS.Database:FreeSpace","2020-03-22 09:36:49",0,5)="ExpansionSize"
 ...
 ```
-%SYS>do ##class(App.sys).SaveSQL("select NameLowerCase,Description,Name FROM Security.Roles where Name['DB'", "^logMSW2")
+%SYS>do ##class(apptools.core.sys).SaveSQL("select NameLowerCase,Description,Name FROM Security.Roles where Name['DB'", "^logMSW2")
  ```
 %SYS>zw ^logMSW2                                                               
 ^logMSW2(-3,"sql")=$lb("select NameLowerCase,Description,Name FROM Security.Roles where Name'DB'")
@@ -119,12 +119,12 @@ IRISAPP>zn "%sys"
 ```
 If you determine JDBC-DSN, then you can connect to an external database
 ```
-// do ##class(App.sys).SqlToDSN("SELECT * FROM xxmv.xx_t359_pzn","JDBC-DSN","^tmpMSWq"))
+// do ##class(apptools.core.sys).SqlToDSN("SELECT * FROM xxmv.xx_t359_pzn","JDBC-DSN","^tmpMSWq"))
 ```
 
 Function to call from a regular tasks
 ```
-%SYS>do ##class(App.sys).RunCmd("sudo du -sm /usr/irissys/mgr/*| sort -nr",$na(^%App.Cmd("mgr",$zd($h,3))),1,"/tmp/")
+%SYS>do ##class(apptools.core.sys).RunCmd("sudo du -sm /usr/irissys/mgr/*| sort -nr",$na(^%App.Cmd("mgr",$zd($h,3))),1,"/tmp/")
 
 %SYS>zw ^%App.Cmd
 ^%App.Cmd("mgr","2020-03-22","2020-03-22_17:27:03",1)="388"_$c(9)_"/usr/irissys/mgr/irislib"
@@ -134,13 +134,13 @@ Function to call from a regular tasks
 ^%App.Cmd("mgr","2020-03-22","2020-03-22_17:27:03",5)="90"_$c(9)_"/usr/irissys/mgr/IRIS.DAT"
 ...
 
-// do ##class(App.sys).RunTask("snmpwalk -v 1 server.ru -c public 1.3.6.1.4.1.16563.1.1.1.1.10","^%App.TaskLic","%SYSTEM.License:Counts","/tmp/")
+// do ##class(apptools.core.sys).RunTask("snmpwalk -v 1 server.ru -c public 1.3.6.1.4.1.16563.1.1.1.1.10","^%App.TaskLic","%SYSTEM.License:Counts","/tmp/")
 
 ```
 
 ## To count in journal which globals as modifierade for a specific date
 ```
-%SYS>do ##class(App.files).OneDayJournalCount("/usr/irissys/mgr/journal/"_$tr($zd($h,3),"-"),"^tmpJRN")
+%SYS>do ##class(apptools.core.files).OneDayJournalCount("/usr/irissys/mgr/journal/"_$tr($zd($h,3),"-"),"^tmpJRN")
 
 /usr/irissys/mgr/journal/20200322.001
 Processed /usr/irissys/mgr/journal/20200322.001% 2 written in ^tmpJRN
@@ -159,7 +159,7 @@ Processed /usr/irissys/mgr/journal/20200322.002% 2 written in ^tmpJRN
 ```
 Export to report CSV file 
 ```
-%SYS>do ##class(App.files).Export2CSV("/tmp/JrnCount*.csv","^tmpJRN")
+%SYS>do ##class(apptools.core.files).Export2CSV("/tmp/JrnCount*.csv","^tmpJRN")
 
 Written to the file /tmp/JrnCount20200322173446.csv
 ```
@@ -167,7 +167,7 @@ Written to the file /tmp/JrnCount20200322173446.csv
 ## Group product management in various namespaces
 Initialize interoperability and create a new test product ([thanks Dias](https://openexchange.intersystems.com/package/IRIS-Interoperability-Message-Viewer)) in IRISAPP.
 ```
-IRISAPP>do ##class(App.Production).CreateProduction("IRISAPP", "Test.TestProd", "Ens.MonitorService,Ens.Alerting.AlertManager,Ens.Activity.Operation.REST")
+IRISAPP>do ##class(apptools.core.Production).CreateProduction("IRISAPP", "Test.TestProd", "Ens.MonitorService,Ens.Alerting.AlertManager,Ens.Activity.Operation.REST")
 
 IRISAPP>do ##class(Ens.Director).StartProduction("Test.TestProd")
 ```
@@ -175,7 +175,7 @@ IRISAPP>do ##class(Ens.Director).StartProduction("Test.TestProd")
 Initialize interoperability and create a new test product in USER.
 ```
 zn "user"
-USER>do ##class(App.Production).CreateProduction("USER", "Test.TestProd2", "Ens.MonitorService,Ens.Alerting.AlertManager,Ens.Activity.Operation.REST")
+USER>do ##class(apptools.core.Production).CreateProduction("USER", "Test.TestProd2", "Ens.MonitorService,Ens.Alerting.AlertManager,Ens.Activity.Operation.REST")
 
 IRISAPP>do ##class(Ens.Director).StartProduction("Test.TestProd2")
 ```
@@ -183,18 +183,18 @@ When you administer more than 2 products, the scheduled server restart turns int
 
 Preserve statuse and stop products in all namespace.
 ```
-IRISAPP>do ##class(App.Production).SaveAndStop()
+IRISAPP>do ##class(apptools.core.Production).SaveAndStop()
 ```
 
 All products are stopped, you can restart the server.
 After starting the DBMS, you can start all the products that were launched before.
 ```
-IRISAPP>do ##class(App.Production).StartAll()
+IRISAPP>do ##class(apptools.core.Production).StartAll()
 ```
 
 Get a class description, optionally with a superclass
 ```
-IRISAPP>do ##class(App.LogInfoPane).GetClassDef("Test.TestProd2","",.def,1)
+IRISAPP>do ##class(apptools.core.LogInfoPane).GetClassDef("Test.TestProd2","",.def,1)
 
 IRISAPP>zw def
 def("ClassName","Ens.Production")=""
@@ -208,7 +208,7 @@ def("Methods","ApplySettings","Description") = "Apply multiple settings to a"
 
 Create html format documentation in the form of tables for all products, including BS. BP BO and all classes that they meet
 ```
-IRISAPP>do ##class(App.Production).GenDoc("/usr/irissys/csp/user/gen-doc.html")
+IRISAPP>do ##class(apptools.core.Production).GenDoc("/usr/irissys/csp/user/gen-doc.html")
 ```
 
 All other features of the interface part of the software solution can be found in the 
