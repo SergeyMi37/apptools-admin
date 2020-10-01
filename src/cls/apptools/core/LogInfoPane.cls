@@ -3,6 +3,8 @@ Include apptools.core
 Class apptools.core.LogInfoPane Extends %CSP.Util.Pane [ DependsOn = apptools.core.msg ]
 {
 
+Parameter XMLTYPE = "apptools.core";
+
 ClassMethod GetLink()
 {
 	if $$$JSLibLocal {
@@ -307,7 +309,7 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 	set nsp=%request.Get("NSP")
 	set what=$zstrip(%request.Get("WHAT"),"<>WC")
 	if nsp'="" try {zn nsp set NSpace=nsp } catch e {}
-	set NSpace=$zu(5)
+	set NSpace=$Namespace
 	set Next=%request.Get("Next"),Filtr=%request.Get("Filtr")
 	set:Next="" Next=1
 	set MaxNode=%request.Get("MaxNode") 
@@ -355,7 +357,7 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 	elseif $p($zconvert(what,"L")," ",1)="obj" { ;,$zconvert($e(what,1,2),"L")="##"||($zconvert($e(what,1,2),"L")="=#") {
 		set classname=$p($p(what,"(",2),")",1)
 		set id=$p($p(what,"%OpenId(",2),")",1) set:id[$c(34) id=$tr(id,$c(34))
-		s Message=$$$aText("Class description","")_classname_"<br> "_$$$aText("An example of obtaining an array of descriptions","")_"<br>"_$zu(5)_">do ##class(apptools.core.LogInfoPane).GetClassDef("""_classname_""",,.out)"
+		s Message=$$$aText("Class description","")_classname_"<br> "_$$$aText("An example of obtaining an array of descriptions","")_"<br>"_$Namespace_">do ##class(apptools.core.LogInfoPane).GetClassDef("""_classname_""",,.out)"
 		try { if id="" set Obj=$classmethod(classname,"%New"),id=0 
 			  else  set Obj=$classmethod(classname,"%OpenId",id)
 			if $isobject(Obj) {
@@ -410,15 +412,15 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 		</tr>
 		<tr>
 			<td>
-				#(selectNS)# #(selectDSN)#
-				 | <a name='Hist' href='#("apptools.core.LogInfo.cls?NSP="_$zu(5)_"&Next=-1&WHAT="_$zconvert($$$HISTORYGN,"O","URL")_"")#' id='Hist'>#($$$aText("History",""))#</a>
-				 | <a target='Explore' name='Explore' href='#("apptools.Form.Exp.cls?NSP="_$zu(5))#' id='Explorer'>#($$$aText("Selection Classes",""))#</a>
-				 | <a target='ExploreTab' name='ExploreTab' href='#("apptools.Form.Exp.cls?panel=AccordionExp&NSP="_$zu(5))#'  id='ExplorerTab'>#($$$aText("Explorer tables",""))#</a>
-				 | <a target='Param' name='Param' href='#("apptools.Form.Exp.cls?NSP="_$zu(5)_"&SelClass=apptools.core.Parameter")#' title='#($$$aText("Go to the options table",""))#' id='Param'>#($$$aText("Parameters",""))#</a>
+				#(selectNS)# #(selectDSN)# 
+				 | <a name='Hist' href='#("apptools.core.LogInfo.cls?NSP="_$Namespace_"&Next=-1&WHAT="_$zconvert($$$HISTORYGN,"O","URL")_"")#' id='Hist'>#($$$aText("History",""))#</a>
+				 | <a target='Explore' name='Explore' href='#("apptools.Form.Exp.cls?NSP="_$Namespace)#' id='Explorer'>#($$$aText("Selection Classes",""))#</a>
+				 | <a target='ExploreTab' name='ExploreTab' href='#("apptools.Form.Exp.cls?panel=AccordionExp&NSP="_$Namespace)#'  id='ExplorerTab'>#($$$aText("Explorer tables",""))#</a>
+				 | <a target='Param' name='Param' href='#("apptools.Form.Exp.cls?NSP="_$Namespace_"&SelClass=apptools.core.Parameter")#' title='#($$$aText("Go to the options table",""))#' id='Param'>#($$$aText("Parameters",""))#</a>
 				 | <a target='Tabs' name='Tabs' href='#("apptools.Tabs.PanelSample.cls")#' id='Param'>#($$$aText("Sample Tabs Application",""))#</a>
 				 
-				 | <a target='Chart' name='Chart'  id='Chart' href='#("apptools.Chart.Chart.cls?panel=class(apptools.Chart.ChartPanel).ChartDbSize&NSP="_$zu(5))#'>#($$$aText("Database growth Chart",""))#</a>
-				 | <a target='ChartAlert' name='ChartAlert'  id='ChartAlert' href='#("apptools.Chart.Chart.cls?panel=class(apptools.Chart.ChartPanel).ChartAlert&NSP="_$zu(5))#'>#($$$aText("Event Chart",""))#</a>
+				 | <a target='Chart' name='Chart'  id='Chart' href='#("apptools.Chart.Chart.cls?panel=class(apptools.Chart.ChartPanel).ChartDbSize&NSP="_$Namespace)#'>#($$$aText("Database growth Chart",""))#</a>
+				 | <a target='ChartAlert' name='ChartAlert'  id='ChartAlert' href='#("apptools.Chart.Chart.cls?panel=class(apptools.Chart.ChartPanel).ChartAlert&NSP="_$Namespace)#'>#($$$aText("Event Chart",""))#</a>
  			 | 
  			</td>
 		</tr>
@@ -427,7 +429,6 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 				#($$AddExp(title,what,$g(Next),$g(Filtr),$g(MaxNode)))#
 			</td>
 		</tr>
-			#(##class(apptools.core.LogInfoPane).AddProdQuery($g(SDNum)))#
 		<tr>
 			<td>
 				<span class='ui-icon ui-icon-play' name="show" id="show" onclick="document.forms['loginfo'].submit();" >#($$$aText("Execute",""))#</span>
@@ -443,6 +444,13 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 		</tr>
 		<tr> 
 			<td>
+				#(..ListExtensionNamespace()_..ListExtensionProjects())#
+			</td>
+		</tr>
+		#(##class(apptools.core.LogInfoPane).AddProdQuery($g(SDNum)))#
+		<tr> 
+			<td>
+			<!-- $$$DRAWAllApp -->
 				#($$$DRAWAllApp)#
 			</td>
 		</tr>	
@@ -539,8 +547,36 @@ errors
  	quit $$$OK
 }
 
-// d ##class(apptools.core.LogInfoPane).AddC1310("")
+ClassMethod ListExtensionNamespace()
+{
+	set ns=""
+	for { set ns=$order(@$$$GNExtentions@(ns)) quit:ns=""  
+		if ns["%All"||(ns=$Namespace) {
+			set extname=""
+			for { set extname=$order(@$$$GNExtentions@(ns,extname)) quit:extname=""  
+				if '$GET(already) write "<br><b>Extensions namespace</b><br>" set already=1
+				set name=$listget(@$$$GNExtentions@(ns,extname,"Name"),1)
+				set xec=$GET(@$$$GNExtentions@(ns,extname,"Xecute"))
+				write "<br>"_$$$addAppLog(name,"",xec,"target"_$h)
+			}
+			write "<br><br>"
+		}
+	}
+ q ""
+}
 
+ClassMethod ListExtensionProjects()
+{
+	set ns=""
+	for { set ns=$order(@$$$PROJGN@(ns)) quit:ns=""  
+		if ns["%All"||(ns=$Namespace) {
+		write "<br><br>"
+		}
+	}
+ q ""
+}
+
+/// d ##class(apptools.core.LogInfoPane).AddC1310("")
 ClassMethod AddC1310(a)
 {
  q:a[$c(13)||($p(a," ")'="select") a
@@ -556,7 +592,7 @@ ClassMethod DrawGN(a)
 	s $lb(gn, MaxNode, NSpace, Next, Message ,exp, Filtr, ExecuteDraw, exportXLS, exportXLSfile, exportXLSfileEmail)=a
 		if gn["*" {
 			set mask=$e(gn,2,*)
-			set ExecuteDraw="##class(apptools.core.LogInfoPane).AddRefViewEditGlob(.%AppLogInfoVal, %AppLogInfoCol, %AppLogInfoHead, .%AppLogInfoTemp,"""_$zu(5)_""")"
+			set ExecuteDraw="##class(apptools.core.LogInfoPane).AddRefViewEditGlob(.%AppLogInfoVal, %AppLogInfoCol, %AppLogInfoHead, .%AppLogInfoTemp,"""_$Namespace_""")"
 		 	s sql="%SYS.GlobalQuery:NameSpaceList "_NSpace_" "_$s(mask="*":"",1:mask)
 		 	s GN="^||tmpGList" k @GN
 		 	d ##class(apptools.core.sys).SaveQuery(sql,GN,0)
@@ -649,7 +685,7 @@ ClassMethod AddRefViewEditGlob(Val, Col, Head, Temp, nspace, DSN)
 }
 
 /// Output a list of array elements
-/// set st=##class(apptools.core.LogInfoPane).DrawArray(res,100,$zu(5),"Output a list 1111")
+/// set st=##class(apptools.core.LogInfoPane).DrawArray(res,100,$Namespace,"Output a list 1111")
 ClassMethod DrawArray(gn As %String = "", MaxNode = {$$$MAXSHOW}, NSpace = "", Next = "1", msg = "", exp = "", Filtr = "", Execute = "", fileXLS = "") As %Status
 {
 		; Check if there is a record of the stack
@@ -708,7 +744,7 @@ ClassMethod DrawArray(gn As %String = "", MaxNode = {$$$MAXSHOW}, NSpace = "", N
 			s data=..AddExecute(Execute,data, 3, NSpace = "",.countEx) 
 		}
 			&html<
-			<h1>#($s(msg="":$$$aText("View array","")_" : "_gn_" "_$$$aText("in namespace","")_" "_$zu(5),1:msg))#</h1>
+			<h1>#($s(msg="":$$$aText("View array","")_" : "_gn_" "_$$$aText("in namespace","")_" "_$Namespace,1:msg))#</h1>
 			<table width="90%" style="border-radius: 10px; border: 1px solid #72a7cf" cellpadding="2" cellspacing="0" class="DetailTable" bgcolor="#c4d6d6" ><tbody>
 			<tr>
 				<th title='Edit nodes and values global' align="left" width="1%">#(num)#</th>
@@ -1031,7 +1067,7 @@ ClassMethod CloseXLSfile(fileXLS, ByRef exportXLSfileEmail, ByRef exportXLSfile,
 	;i 'sc ;s $$$AppL("APP","CloseXLSfile-zipFile")=$System.Status.GetErrorText(sc) 
 	// Send file to e-mail
 	i exportXLSfileEmail'="" {
-		s sc=##class(apptools.core.LogInfo).SendEmail(exportXLSfileEmail, $$$aText("Send file","")_" "_exportXLSfile, $g(msg)_"<br> "_$$$aText("Namespace","")_" :"_$zu(5)_"<br> "_$$$aText("Query","")_": "_SQL, exportXLSfile)
+		s sc=##class(apptools.core.LogInfo).SendEmail(exportXLSfileEmail, $$$aText("Send file","")_" "_exportXLSfile, $g(msg)_"<br> "_$$$aText("Namespace","")_" :"_$Namespace_"<br> "_$$$aText("Query","")_": "_SQL, exportXLSfile)
 		;i 'sc ;s $$$AppL("APP","CloseXLSfile-SendEmail")=$System.Status.GetErrorText(sc) 
 		}
 	write !,"<br><h3>"_$$$aText("Query result","")_" ("_(+count)_" "_$$$aText("lines) uploaded to file","")_" "_exportXLSfile_"</h3>"
@@ -1297,7 +1333,7 @@ ClassMethod GetClassDef(aClassName As %String = "", doc, ByRef out, inSuper = 1)
 ClassMethod GetSysinfo(color, code = "") As %String
 {
 	set sys=" <a target='license' href=""/csp/sys/op/UtilDashboard.csp?$NAMESPACE=%25SYS""> "_$$$aText("System Dashboard","")_"</a>"
-	set sysinfo="<font color="_color_">"_##class(apptools.core.LogInfo).GetImgJqUi("tools")_"</font> "_$$$aText("Server","")_": <font color="_color_">"_$zu(110)_"</font> "_$$$aText("NameSpace","")_": <font color="_color_">"_$zu(5)_"</font> $JOB: <font color="_color_">"_$j_"</font> "_$g(sys)
+	set sysinfo="<font color="_color_">"_##class(apptools.core.LogInfo).GetImgJqUi("tools")_"</font> "_$$$aText("Server","")_": <font color="_color_">"_$zu(110)_"</font> "_$$$aText("NameSpace","")_": <font color="_color_">"_$Namespace_"</font> $JOB: <font color="_color_">"_$j_"</font> "_$g(sys)
 	if $$$MultiLang {
 		set lang=$g(@$$$GNEnsConf@("Language"))
 		if lang="" s lang=##class(%MessageDictionary).GetSessionLanguage()
@@ -1341,11 +1377,11 @@ ClassMethod AddProdQuery(SDNum, csp = "csp")
 {
 	&html< <tr style='vertical-align: middle;' >
 	<td> 
-	 | <a uk-icon="m-dashboard" target="ensprod"#($zu(5))# href='#("/"_csp_"/"_$zconvert($zu(5),"L")_"/EnsPortal.ProductionConfig.zen?$NAMESPACE="_$zu(5))#' > #($$$aText("Production",""))#</a> 
-	 | <a uk-icon='m-assignment-late' target="ensproderr"#($zu(5))# href='#("/"_csp_"/"_$zconvert($zu(5),"L")_"/EnsPortal.EventLog.zen?$NAMESPACE="_$zu(5))#' > #($$$aText("Production Errors",""))#</a> 
-	 | <a uk-icon='m-assignment' target="ensqueues"#($zu(5))# href='#("/"_csp_"/"_$zconvert($zu(5),"L")_"/EnsPortal.Queues.zen?$NAMESPACE="_$zu(5))#' > #($$$aText("Production Queues",""))#</a> 
-	 | <a uk-icon='m-chevron-right' target="query"#($zu(5))# href='#("/csp/sys/exp/%25CSP.UI.Portal.SQL.Home.zen?$NAMESPACE="_$zu(5))#' > #($$$aText("Query",""))# </a> 
-	 | <a uk-icon='m-expand-less' target="globals"#($zu(5))# href='#("/csp/sys/exp/%25CSP.UI.Portal.GlobalList.zen?$NAMESPACE="_$zu(5))#' > #($$$aText("Globals",""))# </a> 
+	 | <a uk-icon="m-dashboard" target="ensprod"#($Namespace)# href='#("/"_csp_"/"_$zconvert($Namespace,"L")_"/EnsPortal.ProductionConfig.zen?$NAMESPACE="_$Namespace)#' > #($$$aText("Production",""))#</a> 
+	 | <a uk-icon='m-assignment-late' target="ensproderr"#($Namespace)# href='#("/"_csp_"/"_$zconvert($Namespace,"L")_"/EnsPortal.EventLog.zen?$NAMESPACE="_$Namespace)#' > #($$$aText("Production Errors",""))#</a> 
+	 | <a uk-icon='m-assignment' target="ensqueues"#($Namespace)# href='#("/"_csp_"/"_$zconvert($Namespace,"L")_"/EnsPortal.Queues.zen?$NAMESPACE="_$Namespace)#' > #($$$aText("Production Queues",""))#</a> 
+	 | <a uk-icon='m-chevron-right' target="query"#($Namespace)# href='#("/csp/sys/exp/%25CSP.UI.Portal.SQL.Home.zen?$NAMESPACE="_$Namespace)#' > #($$$aText("Query",""))# </a> 
+	 | <a uk-icon='m-expand-less' target="globals"#($Namespace)# href='#("/csp/sys/exp/%25CSP.UI.Portal.GlobalList.zen?$NAMESPACE="_$Namespace)#' > #($$$aText("Globals",""))# </a> 
 	#($s(##class(apptools.core.sys).ClassExist("WebTerminal.Engine"):" | "_$$$addAppLog($$$aText("WebTerminal",""),$$$aText("Load WebTerminal",""),"trm",""),1:""))#
 	 | 
 	</td></tr>>
@@ -1362,12 +1398,16 @@ ClassMethod GetHelp(help)
 	#define sH(%msg) set help($i(help))=%msg
 	$$$sH($$$aText("Call examples",""))
 	$$$sH(" ")
-	$$$sH(" "_$$$addAppLog("^%apptools.Setting","","^%apptools.Setting","")_" --- "_$$$aText("View global with the basic settings panel",""))
+	$$$sH(" "_$$$addAppLog("^%apptools.Setting","","^%apptools.Setting","")_" --- "_$$$aText("View and edit global with the basic settings panel",""))
+	for gn=##class(apptools.core.Production).#SettingsGN,$$$PROJGN,$$$GNExtentions {
+		$$$sH(" "_$$$addAppLog(gn,"",gn,"")_" --- "_$$$aText("View and edit global",""))
+	}
+	$$$sH(" ")
 	$$$sH(" "_$$$addAppL("obj ##class(apptools.core.Log).%New()")_" --- "_$$$aText("To obtain information on the class",""))
 	$$$sH(" "_$$$addAppL("obj ##class(apptools.core.Log).%OpenId(2)")_" --- "_$$$aText("To obtain information on class and object",""))
 	$$$sH(" "_$$$addAppL("obj =##class(apptools.core.Log).%OpenId(2)")_" --- "_$$$aText("To obtain information only on the object values",""))
 	$$$sH(" ")
-	$$$sH(" "_$$$addAppL("xec set obj=##class(apptools.core.Log).%OpenId(2) write ""<pre>"" zw obj w ""</pre>"" ")_"--- "_$$$aText("Execute command : to Show dump of the object ",""))
+	; $$$sH(" "_$$$addAppL("xec set obj=##class(apptools.core.Log).%OpenId(2) write ""<pre>"" zw obj w ""</pre>"" ")_"--- "_$$$aText("Execute command : to Show dump of the object ",""))
 	$$$sH(" "_$$$addAppL("xec do ##class(apptools.core.sys).SaveQuery(""%SYSTEM.License:Counts"",""^GN"",0)")_"--- "_$$$aText("Run the command : Save the query result in the global ^GN",""))
 	$$$sH(" "_$$$addAppL("result ^GN(""%SYSTEM.License:Counts"",0)")_" --- "_$$$aText("Bring recorded in the global result of the query","")_" ##class(apptools.core.sys).SaveQuery")
 	$$$sH(" ")

@@ -108,8 +108,8 @@ ClassMethod CreateTasksPurgeMess(days = 90) As %Status
 }
 
 /// Create a task to clean productions messages
-///  w ##class(apptools.core.Production).CreateTaskPurge("Cleaning production messages "_$zu(5),$zu(5),7) }
-ClassMethod CreateTaskPurge(Name As %String = "", ns = {$zu(5)}, days = 90)
+///  w ##class(apptools.core.Production).CreateTaskPurge("Cleaning production messages "_$Namespace,$Namespace,7) }
+ClassMethod CreateTaskPurge(Name As %String = "", ns = {$Namespace}, days = 90)
 {
 		Set Task=##Class(%SYSTEM.Task).%New()
 		Set Task.Name=Name 
@@ -152,11 +152,12 @@ ClassMethod Init(nsList = "") As %Status
 /// ex= "start"  - run the ones that were started, restore from #SettingsGN(ns)
 /// ex= "status" - output statuses
 /// ex= "info" - output of additional information about products and services with parameters d ##class(apptools.core.Production).EnsAction("info",,.out)
-/// out - result ;d ##class(apptools.core.Production).EnsAction("status",$zu(5),.out)
+/// out - result ;d ##class(apptools.core.Production).EnsAction("status",$Namespace,.out)
 ClassMethod EnsAction(ex = "", nsOnly = "", out) As %Status [ PublicList = (tProductionName, inf) ]
 {
 	;get all namespace with ensemble
 	s listns=##class(apptools.core.sys).ListNS(.inf,"NotPref,Ens")
+	#define NotSaveStat " settings not saved, to do ##class(apptools.core.Production).SaveStat(1) "
 	$$$forAll(ns,inf)
 	i nsOnly'="",nsOnly'=ns continue
 	$$$NspGoto(curN,ns)
@@ -175,7 +176,7 @@ ClassMethod EnsAction(ex = "", nsOnly = "", out) As %Status [ PublicList = (tPro
 		i 'sc w $System.Status.DisplayError(sc)
 	}
 	elseif ex="start" {
-		i '$d(@GN@(ns,"Ens")) w !," settings not saved, skip"
+		i '$d(@GN@(ns,"Ens")) w !,$$$NotSaveStat
 		$$$forAll(tProductionName,@GN@(ns,"Ens"))
 			continue:$lg(@GN@(ns,"Ens",tProductionName),1)'[$$$EnsProductStatusRun
 			w !,ns," ",tProductionName
@@ -184,14 +185,14 @@ ClassMethod EnsAction(ex = "", nsOnly = "", out) As %Status [ PublicList = (tPro
 		$$$forEnd	
 	}
 	if ex="auto0" {
-		i '$d(@GN@(ns,"Ens")) w !," settings not saved, skip"
+		i '$d(@GN@(ns,"Ens")) w !,$$$NotSaveStat
 			$$$NspGoto(curNs,ns)
 			Set sc = ##class(Ens.Director).SetAutoStart("")
 			i 'sc w $System.Status.DisplayError(sc)
 			e  w " clean auto start"
 			$$$NspReturn(curNs)
 	} elseif ex="auto1" {
-		i '$d(@GN@(ns,"Ens")) w !," settings not saved, skip"
+		i '$d(@GN@(ns,"Ens")) w !,$$$NotSaveStat
 		$$$forAll(tProductionName,@GN@(ns,"Ens"))
 			continue:'$lg(@GN@(ns,"Ens",tProductionName),4)
 			$$$NspGoto(curNs,ns)
@@ -201,7 +202,7 @@ ClassMethod EnsAction(ex = "", nsOnly = "", out) As %Status [ PublicList = (tPro
 			$$$NspReturn(curNs)
 		$$$forEnd		
 	} elseif ex="status"||(ex="info") {
-		i '$d(@GN@(ns,"Ens")) w !," settings not saved, skip"
+		i '$d(@GN@(ns,"Ens")) w !,$$$NotSaveStat
 		Set sc = ##class(Ens.Director).GetProductionSummary(.pInfo, ns)	if ex'="info" w ! zw pInfo
 		Set sc = ##class(Ens.Director).GetProductionSettings("",.tSettings)	if ex'="info" w ! zw tSettings
 		$$$forAll(tProductionName,@GN@(ns,"Ens"))
@@ -373,6 +374,57 @@ ClassMethod GenDoc(filename = "", namespacelist = "", title = "Productions ", Ca
 	q $$$OK
 NoRepit(a,b)
 	q a_$s(a=b:"",1:", "_b)
+}
+
+///  d ##class(apptools.core.Production).FindAndDrawAllErr("Select * from Ens_Util.Log where Type='2' and TimeLogged>'2020-09-29 21:00' order by id desc",##class(apptools.core.sys).ListNS(.info,"NotPre,Ens"), .result)
+ClassMethod FindAndDrawAllErr(sql, nspaces, result) As %String
+{
+	set GN=..#SettingsGN
+	if '$Data(@GN) do ##class(apptools.core.Production).SaveStat(1)
+	for i=1:1:$l(nspaces,",") { continue:$p(nspaces,",",i)=""
+		$$$NspGoto(curNs,$p(nspaces,",",i))
+		set NS=$p(nspaces,",",i)
+		if '$D(@GN@(NS)) continue ; there is no namespace in the system, skip
+		set PN=""
+		set p="" for { set p=$o(@GN@(NS,"Ens",p)) quit:p=""
+			if $lg($g(@GN@(NS,"Ens",p)),1)[$$$EnsProductStatusRun s PN=p quit
+		}
+		set onclicknone="$('.taberrors').css('display','none'); "
+		set url="<b><a target='ensprod2"_($Namespace)_"' href='/csp/"_$zconvert($Namespace,"L")_"/EnsPortal.ProductionConfig.zen?$NAMESPACE="_$Namespace_"' >"_NS_"</a></b>"
+		if PN="" write !,"<li>"_url_" no running products" continue
+		if $Namespace'=NS s result(NS,"Err")="<br><font color=red>Go to error "_url_"</font>" w result(NS,"Err") continue
+		
+		set sql2=$replace(sql,"*","count(*)")
+		set gn="tmpErrEns"
+		do ##class(apptools.core.sys).SaveSQL(sql2,gn)
+		set (ec,result(NS,"Count"))=$lg(@gn@(1),1)
+		if ec {
+			s onclick=onclicknone_"$('#div"_NS_"').css('display','block'); "
+			s ec="<b><font color=red style='cursor:hand' onclick="""_onclick_""">Found "_ec_" errors</font></b>"
+		} else { 
+			set ec="<b><font color=green style='cursor:hand' onclick="""_onclicknone_"""> No errors found </font></b>"
+		}
+		write !,"<li>"_url_" "_ec_" <div class='taberrors' id='div"_NS_"' style='display:none'>"
+		set exec="##class("_..%ClassName(1)_").AddTraceUrl(.%AppLogInfoVal, %AppLogInfoCol, %AppLogInfoHead, .%AppLogInfoTemp)"
+		set st=##class(apptools.core.LogInfoPane).DrawSQL(sql,$g(Max,10000),$Namespace," Ensemble Errors ",exec)
+		write !,"</div>"
+		$$$NspReturn(curNs)
+	}
+}
+
+/// Procedure for ##class(apptools.core.LogInfoPane).DrawSQL 5 Argument
+ClassMethod AddTraceUrl(Val, Col, Head, Temp, Del = 0) As %String
+{
+	set res=Val
+	if $g(Head) {
+		i $g(Val)="SessionId" s Temp("SessionId",Col)=""
+	}
+	else {
+		if $D(Temp("SessionId",Col)) {
+			set res="<a target=Trace"_Val_" title='Go to Visual Trace' href='"_"/csp/"_$Namespace_"/EnsPortal.VisualTrace.zen?SESSIONID="_Val_"' >"_Val_"</a>"
+		}
+	}
+	quit res
 }
 
 }

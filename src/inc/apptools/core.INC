@@ -5,14 +5,15 @@ ROUTINE apptools.core [Type=INC]
 #;App. -> apptools.
 #;apptools.core.LogMacro -> apptools.core
 
-#; Escape sequence for coloring the font in terminal (do ##class(apptools.MSW.Test).EscColor())
+#; Escape sequence for coloring the font in terminal do ##class(apptools.core.msg).EscColor()
 #define escClear $c(27)_"[0m"
-#define escGreen(%t) $c(27)_"[1;32;40m"_%t_$$$escClear
-#define escBlue(%t) $c(27)_"[1;36;40m"_%t_$$$escClear
-#define escWhite(%t) $c(27)_"[1;37;40m"_%t_$$$escClear
-#define escYellow(%t) $c(27)_"[1;33;40m"_%t_$$$escClear
-#define escViolet(%t) $c(27)_"[1;35;40m"_%t_$$$escClear
-#define escSeq(%e,%t) $c(27)_"["_%e_"m"_%t_$$$escClear
+#define escBg $Case(##class(apptools.core.msg).ZPMColorScheme(),"white":47,"dark":40,:0)
+#define escGreen(%t) $Select($$$escBg=0:%t,1:$c(27)_"[1;32;"_$$$escBg_"m"_%t_$$$escClear)
+#define escBlue(%t) $Select($$$escBg=0:%t,1:$c(27)_"[1;36;"_$$$escBg_"m"_%t_$$$escClear)
+#define escDefault(%t) $Select($$$escBg=0:%t,1:$c(27)_"[1;3"_$Select($$$escBg:0,1:7)_";"_$$$escBg_"m"_%t_$$$escClear)
+#define escYellow(%t) $Select($$$escBg=0:%t,1:$c(27)_"[1;33;"_$$$escBg_"m"_%t_$$$escClear)
+#define escViolet(%t) $Select($$$escBg=0:%t,1:$c(27)_"[1;35;"_$$$escBg_"m"_%t_$$$escClear)
+#define escSeq(%e,%t) $Select($$$escBg=0:%t,1:$c(27)_"["_%e_"m"_%t_$$$escClear)
 
 #;Include %msql $$$MaxStringLength
 #;		;2016.2<= set title={}.%FromJSON(json).title 
@@ -227,6 +228,7 @@ ROUTINE apptools.core [Type=INC]
 #define TEMPORYGN "^mtempAppData"
 /// Global projects in the system
 #define PROJGN "^%apptools.Proj"
+#define GNExtentions "^%apptools.Exten"
 /// Global tempory data for Journals
 #define TEMPJRNL "^%apptools.JRNL"
 /// Limiting the number of nodes in a global or query result for output

@@ -43,6 +43,9 @@ ClassMethod CreateProjection(cls As %String, ByRef params) As %Status
 	 set @$$$GNEnsConf@("EXPORTPROJPATH")="c:\temp\source\"
 	 set @$$$GNEnsConf@("Language")="en"
 	 set @$$$GNEnsConf@("PATHCSP")="/"_..#AppCSP_"/"
+	 ;set @$$$GNEnsConf@("EnsProductStatusRun")="Run" 
+	do ..AddExtentions()
+			
 	}
     set @$$$GNEnsConf@("HomeNamespace") = ns
     write !, "Installing "_..#AppName_" application to " _ ns
@@ -117,17 +120,36 @@ ClassMethod CreateProjection(cls As %String, ByRef params) As %Status
             ..#ResourceName_":RWU")
     }
 
-	s Status=##Class(Config.Startup).Get(.Properties)
-	i Status s ServerPort="http://"_$zu(110)_":"_$g(Properties("WebServerPort"),57772)
-	w !
-   d ..AddAndWriteFavorite(..#AppName,"/"_..#AppCSP_"/apptools.core.LogInfo.cls",$g(ServerPort))
-   d ..AddAndWriteFavorite(..#AppName_" Permission Matrx","/"_..#AppCSP_"/apptools.Tabs.PanelUikitPermissMatrx.cls?autoload=Matrix",$g(ServerPort))
-   d:$$$JSLibLocal ..AddAndWriteFavorite(..#AppName_" Samples Admin Panel","/"_..#AppCSP_"/apptools.Tabs.PanelUikitAdmin.cls?autoload=Matrix",$g(ServerPort))
-   d:$$$JSLibLocal ..AddAndWriteFavorite(..#AppName_" REST service Admin Panel","/"_..#AppCSP_"rest/get-html/apptools.Tabs.PanelUikitAdmin.cls?autoload=Find",$g(ServerPort))
-   	w !
+	do ..AddFavorites()
 	$$$NspReturn(curNs)
-    ;d:$$$JSLibLocal ##class(apptools.core.net).ImportCSPFromGitHub("https://codeload.github.com/SergeyMi37/"_..#Repository_"/zip/master",..#Repository,@$$$GNEnsConf@("CSP-Path"))
+    ;do:$$$JSLibLocal ##class(apptools.core.net).ImportCSPFromGitHub("https://codeload.github.com/SergeyMi37/"_..#Repository_"/zip/master",..#Repository,@$$$GNEnsConf@("CSP-Path"))
     return st
+}
+
+/// Add Extentions
+/// do ##class(apptools.core.Installer).AddExtentions()
+ClassMethod AddExtentions() As %Status
+{
+	 set @$$$GNExtentions@("%All","FindAndDrawAllErr","Name")=$lb("Sample extension for all namespaces. Monitoring products in all areas with rapid transition to visual tracing")
+	 set @$$$GNExtentions@("%All","FindAndDrawAllErr","Xecute")="xec d ##class(apptools.core.Production).FindAndDrawAllErr(""Select * from Ens_Util.Log where Type='2' and TimeLogged>'""_$zd($h-1,3)_"" 21:00' order by id desc"",##class(apptools.core.sys).ListNS(.info,""NotPre,Ens""))"
+	 set @$$$GNExtentions@("DOCBOOK","Query DocBook.articl","Name")=$lb("Sample extension for DOCBOOK namespaces. Query DocBook.articl")
+	 set @$$$GNExtentions@("DOCBOOK","Query DocBook.articl","Xecute")="select * From DocBook.article"
+}
+
+/// Add Favorites
+/// do ##class(apptools.core.Installer).AddFavorites()
+ClassMethod AddFavorites() As %Status
+{
+	new $namespace
+	set $namespace="%SYS"
+	set Status=##Class(Config.Startup).Get(.Properties)
+	if Status s ServerPort="http://"_$zu(110)_":"_$g(Properties("WebServerPort"),52773)
+	write !
+  	do ..AddAndWriteFavorite(..#AppName,"/"_..#AppCSP_"/apptools.core.LogInfo.cls?WHAT=%3F",$g(ServerPort))
+  	do ..AddAndWriteFavorite(..#AppName_" Permission Matrx","/"_..#AppCSP_"/apptools.Tabs.PanelUikitPermissMatrx.cls?autoload=Matrix",$g(ServerPort))
+  	do:$$$JSLibLocal ..AddAndWriteFavorite(..#AppName_" Samples Admin Panel","/"_..#AppCSP_"/apptools.Tabs.PanelUikitAdmin.cls?autoload=Matrix",$g(ServerPort))
+  	do:$$$JSLibLocal ..AddAndWriteFavorite(..#AppName_" REST service Admin Panel","/"_..#AppCSP_"rest/get-html/apptools.Tabs.PanelUikitAdmin.cls?autoload=Find",$g(ServerPort))
+   	write !
 }
 
 /// AddFavorite

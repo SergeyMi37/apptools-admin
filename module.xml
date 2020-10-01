@@ -6,6 +6,9 @@
       <Version>1.0.12</Version>
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
+	  <Invokes>
+        <Invoke Class="apptools.core.Installer" Method="AddFavorites"></Invoke>
+      </Invokes>
 		<Resource Name="apptools.core.PKG"/>
 		<Resource Name="apptools.core.INC"/>
         <Resource Name="apptools.Chart.PKG"/>
