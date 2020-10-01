@@ -44,7 +44,6 @@ ClassMethod CreateProjection(cls As %String, ByRef params) As %Status
 	 set @$$$GNEnsConf@("Language")="en"
 	 set @$$$GNEnsConf@("PATHCSP")="/"_..#AppCSP_"/"
 	 ;set @$$$GNEnsConf@("EnsProductStatusRun")="Run" 
-	do ..AddExtentions()
 			
 	}
     set @$$$GNEnsConf@("HomeNamespace") = ns
@@ -119,7 +118,7 @@ ClassMethod CreateProjection(cls As %String, ByRef params) As %Status
             "AppTools user role which may grant access to /"_..#AppCSP_" application if set up.",
             ..#ResourceName_":RWU")
     }
-
+	do ..AddExtentions()
 	do ..AddFavorites()
 	$$$NspReturn(curNs)
     ;do:$$$JSLibLocal ##class(apptools.core.net).ImportCSPFromGitHub("https://codeload.github.com/SergeyMi37/"_..#Repository_"/zip/master",..#Repository,@$$$GNEnsConf@("CSP-Path"))
