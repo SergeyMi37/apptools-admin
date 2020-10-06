@@ -381,7 +381,7 @@ ClassMethod FindAndDrawAllErr(sql, nspaces, result) As %String
 {
 	set GN=..#SettingsGN
 	if '$Data(@GN) do ##class(apptools.core.Production).SaveStat(1)
-	for i=1:1:$l(nspaces,",") { continue:$p(nspaces,",",i)=""
+	for i=1:1:$l(nspaces,",") { continue:$p(nspaces,",",i)=""||("%All"[$p(nspaces,",",i))
 		$$$NspGoto(curNs,$p(nspaces,",",i))
 		set NS=$p(nspaces,",",i)
 		if '$D(@GN@(NS)) continue ; there is no namespace in the system, skip
@@ -425,6 +425,46 @@ ClassMethod AddTraceUrl(Val, Col, Head, Temp, Del = 0) As %String
 		}
 	}
 	quit res
+}
+
+///  do ##class(apptools.core.Production).FindAndDrawAllQueue(##class(apptools.core.sys).ListNS(.info,"NotPre,Ens"))
+ClassMethod FindAndDrawAllQueue(nspaces) As %String
+{
+	write $$$appTable3("Namespace","Service","Query")
+	for i=1:1:$l(nspaces,",") { continue:$p(nspaces,",",i)=""||("%All"[$p(nspaces,",",i))
+		$$$NspGoto(curNs,$p(nspaces,",",i))
+		if $Namespace'=$p(nspaces,",",i) continue
+		if $DATA(^Ens.Queue) {
+			set serv="",total=0
+			set ns=$p(nspaces,",",i)
+			for { 	set serv=$order(^Ens.Queue(serv)) quit:serv=""
+					set count=$get(^Ens.Queue(serv,0,"count"))
+					if count {
+						write $$$appTableTrTd3(nspaces,serv,count)
+						set total=$g(total)+count
+					}
+				}
+			set csp="csp"
+			set url="/"_csp_"/"_$zconvert(ns,"L")_"/EnsPortal.Queues.zen?$NAMESPACE="_ns
+			write $$$appTableTrTd3("<a target=Que"_ns_" href='"_url_"'>"_ns_"</a>","Total :",total)
+		}
+		$$$NspReturn(curNs)
+	}
+	set %DrawArray=1
+	write $$$appTableEnd3
+}
+
+/// do ##class(apptools.core.Production).ShowGlobals("^tmp**",##class(apptools.core.sys).ListNS(.info,"NotPre,Ens"))
+ClassMethod ShowGlobals(gn, nspaces) As %String
+{
+	for i=1:1:$l(nspaces,",") { continue:$p(nspaces,",",i)=""||("%All"[$p(nspaces,",",i))
+		$$$NspGoto(curNs,$p(nspaces,",",i))
+		if $Namespace'=$p(nspaces,",",i) continue
+		set a=$lb(gn,1000,$Namespace,1,"<b>"_$namespace_"</b> globals "_gn,$g(exp),$g(Filtr),$g(ExecuteDraw))
+		write "<br><br>"
+		set st=##class(apptools.core.LogInfoPane).DrawGN(a)
+		$$$NspReturn(curNs)
+	}
 }
 
 }
