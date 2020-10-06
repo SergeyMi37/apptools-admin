@@ -44,7 +44,7 @@ zpm:USER>install apptools-admin
 
 ## Panel for admins & developers
 
- Load http://your-host:your-port/apptools/apptools,core.LogInfo.cls
+ Load http://your-host:your-port/apptools/apptools.core.LogInfo.cls
  - view the list of globals by mask with count blocks occupied by them.
  - viewing global and direct and reverse with a possible filter by links and node data. Edit global nodes. Export a selection of nodes and global data to an XLS file and send the archive to an email.
  - execution of queries and SQL statements with the ability to connect via JDBC / ODBC. Export the results to an XLS file and send the archive to an email.

@@ -1,0 +1,29 @@
+; run installer to create namespace
+do $SYSTEM.OBJ.Load("/opt/irisapp/Installer.cls", "ck")
+set sc = ##class(App.Installer).setup() 
+
+zn "IRISAPP"
+do $System.OBJ.LoadDir("/opt/irisapp/src","ck",,1)
+
+zn "%SYS"
+Do ##class(Security.Users).UnExpireUserPasswords("*")
+write "Create web application ..." 
+set webName = "/apptools" 
+set webProperties("NameSpace") = "IRISAPP" 
+set webProperties("Enabled") = 1 
+set webProperties("AutheEnabled") = 32 
+set sc = ##class(Security.Applications).Create(webName, .webProperties)
+write sc 
+write "Web application "_webName_" has been created!" 
+write "Create web application ..." 
+set webName = "/apptoolsrest" 
+set webProperties("DispatchClass") = "App.rest" 
+set webProperties("NameSpace") = "IRISAPP" 
+set webProperties("Enabled") = 1 
+set webProperties("AutheEnabled") = 32 
+set sc = ##class(Security.Applications).Create(webName, .webProperties) 
+write sc 
+write "Web application "_webName_" has been created!"
+
+; call your initial methods here
+halt
