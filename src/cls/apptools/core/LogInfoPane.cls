@@ -556,7 +556,7 @@ ClassMethod ListExtensionNamespace()
 			for { set extname=$order(@$$$GNExtentions@(ns,extname)) quit:extname=""  
 				if '$GET(already) write "<br><b>Favorites commands</b><br>" set already=1
 				try {
-					set name=@$$$GNExtentions@(ns,extname,"Name")
+					set name=$GET(@$$$GNExtentions@(ns,extname,"Desc"),"NoDesc")
 					set xec=$GET(@$$$GNExtentions@(ns,extname,"Xecute"))
 					write "<li>"_$$$addAppLog(name,"",xec,"target"_$h)
 				} catch e {

@@ -17,9 +17,17 @@ USER irisowner
 COPY  Installer.cls .
 COPY  src src
 COPY  web web
-COPY iris.script /tmp/iris.script
+COPY irissession.sh /
+SHELL ["/irissession.sh"]
 
-# run iris and initial 
-RUN iris start IRIS \
-    && iris session IRIS < /tmp/iris.script \
-    && iris stop IRIS quietly
+RUN \
+  do $SYSTEM.OBJ.Load("Installer.cls", "ck") \
+  set sc = ##class(App.Installer).setup() \
+  zn "%SYS" \
+  zpm "install zpm" \
+  ;zn "IRISAPP" \
+  ;write !," $Username: ",$username,! \
+  ;zpm "install apptools-admin"
+# bringing the standard shell back
+SHELL ["/bin/bash", "-c"]
+CMD [ "-l", "/usr/irissys/mgr/messages.log" ]

@@ -3,6 +3,8 @@ Include apptools.core
 Class apptools.Chart.ChartPanel Extends apptools.core.LogInfoPane
 {
 
+Parameter XMLTYPE = "apptools.Chart.ChartPanel";
+
 /// Drawing graphs
 Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what, field, value, type, typeclass, caption) ]
 {
@@ -127,7 +129,7 @@ ClassMethod ChartDbSize(arg, days, res, list, mm)
 {
 	s method="class(apptools.core.files).ExpansionDB" 
 	d ##class(apptools.core.files).FindContextInLog(days,method,.res) //to disassemble the Protocol to calculate the monthly growth of the database in megabytes
-	d ##class(apptools.Rest.Metrics).getDBsize("dbsize",.list) //to calculate the current database size in gigabytes
+	d ##class(apptools.core.rest).getDBsize("dbsize",.list) //to calculate the current database size in gigabytes
 	//let's go back in time taking masany growth
 	s df=$p(res," ",1)
 	s dt=$p(res," ",2)
