@@ -17,7 +17,7 @@
         <Resource Name="apptools.Tabs.PKG"/>
         <Resource Name="apptools.Uikit.PKG"/>
 	<Resource Name="appcachemsg.GBL"/>
-````    <CSPApplication 
+    <CSPApplication 
             SourcePath="/web"
             DeployPath="${cspdir}/apptools"
             Url="/apptools" 
