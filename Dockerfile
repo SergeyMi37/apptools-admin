@@ -11,13 +11,14 @@ USER root
 
 WORKDIR /opt/irisapp
 RUN chown ${ISC_PACKAGE_MGRUSER}:${ISC_PACKAGE_IRISGROUP} /opt/irisapp
+COPY irissession.sh /
+RUN chmod +x /irissession.sh
 
 USER irisowner
 
 COPY  Installer.cls .
 COPY  src src
 COPY  web web
-COPY irissession.sh /
 SHELL ["/irissession.sh"]
 
 RUN \
