@@ -49,12 +49,18 @@ zpm:USER>install apptools-admin
  Load http://your-host:your-port/apptools/apptools.core.LogInfo.cls?WHAT=%3F
   
  - view the list of globals by mask with count blocks occupied by them.
+  ![EDIT](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_7-glb-view.gif)
  - viewing global and direct and reverse with a possible filter by links and node data. Edit global nodes. Export a selection of nodes and global data to an XLS file and send the archive to an email.
- - execution of queries and SQL statements with the ability to connect via JDBC / ODBC. Export the results to an XLS file and send the archive to an email.
- - code execution by XECUTE command in the interface panel.
+  ![EDIT](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_6-edit-glb.gif)
  
- ![XECUTE](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_3-zw-sys.png)
+ - execution of queries and SQL statements with the ability to connect via JDBC / ODBC. Export the results to an XLS file and send the archive to an email.
+ ![SQL](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_6-jdbc.png)
+ 
+ - code execution by XECUTE command in the interface panel.
+  ![XECUTE](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_3-zw-sys.png)
+ 
  - saving commands and queries in the program history with the ability to run them again.
+ ![QUERY](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_8-glb-save.gif)
  
 ## REST-API
 In this solution, I use REST-API adapted from the [Webterminal](https://github.com/intersystems-community/webterminal) and [metrics ^mgstat](https://habr.com/ru/company/intersystems/blog/318940/)
