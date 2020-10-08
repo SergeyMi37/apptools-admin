@@ -62,6 +62,9 @@ zpm:USER>install apptools-admin
  - saving commands and queries in the program history with the ability to run them again.
  ![QUERY](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_8-glb-save.gif)
  
+ - All executed commands are remembered in history for the opportunity to repeat again. Frequently executed commands can be saved as favorites.
+ ![HISTORY](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_9-history.gif)
+ 
 ## REST-API
 In this solution, I use REST-API adapted from the [Webterminal](https://github.com/intersystems-community/webterminal) and [metrics ^mgstat](https://habr.com/ru/company/intersystems/blog/318940/)
 
