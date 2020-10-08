@@ -52,6 +52,8 @@ zpm:USER>install apptools-admin
  - viewing global and direct and reverse with a possible filter by links and node data. Edit global nodes. Export a selection of nodes and global data to an XLS file and send the archive to an email.
  - execution of queries and SQL statements with the ability to connect via JDBC / ODBC. Export the results to an XLS file and send the archive to an email.
  - code execution by XECUTE command in the interface panel.
+ 
+ ![XECUTE](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_3-zw-sys.png)
  - saving commands and queries in the program history with the ability to run them again.
  
 ## REST-API
