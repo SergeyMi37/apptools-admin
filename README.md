@@ -3,6 +3,7 @@
 [![Gitter](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/apptools-admin-1)
 
 Application tools for technical support and DBMS administrator. View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files. A few simple graphs on the protocols of the system.
+This solution can be installed in earlier versions of Cache and Ensemble (tested 2016.1+). This can be done by importing xml.
 
 ## Installation with ZPM
 

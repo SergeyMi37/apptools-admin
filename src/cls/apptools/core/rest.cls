@@ -29,9 +29,10 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 <Route Url="/db" Method="GET" Call="getDBsize"/>
 <Route Url="/dirsize/:path" Method="GET" Call="getDirSize"/>
 
+<Route Url="/products/:mode" Method="GET" Call="getProductions"/>
+<Route Url="/productslist/:ns" Method="GET" Call="getListErrProducts"/>
+
 <Route Url="/proj/:proj/:metrics/:mode" Method="GET" Call="apptools.MVK.Metrics:getProj"/>
-<Route Url="/products/:mode" Method="GET" Call="apptools.MVK.Metrics:getProductions"/>
-<Route Url="/productslist/:ns" Method="GET" Call="apptools.MVK.Metrics:getListErrProducts"/>
 </Routes>
 }
 
@@ -385,6 +386,23 @@ ClassMethod getDBsize(prefix = {..#ISCPREFIX_"_dbsize"}, dbname, int = 1, all = 
 	zn curNs
 	write nl
 	quit $$$OK
+}
+
+ClassMethod getListErrProducts(nspace) As %Status
+{
+	d ##class(apptools.core.Production).GetListErrProducts(1,nspace)
+	q $$$OK
+}
+
+ClassMethod getProductions(day = "1") As %Status
+{
+	d ##class(apptools.core.Production).GetStatusProducts(day,.errors)
+	s ns=""
+	for { s ns=$o(errors(ns)) q:ns=""
+		s co=+$g(errors(ns,"CountErrors"))
+		w $s(co:"/",1:"\")_"server_"_$zu(110)_"_"_ns_" Errors: "_co_$$$NL
+	}
+	q $$$OK
 }
 
 XData Themecache

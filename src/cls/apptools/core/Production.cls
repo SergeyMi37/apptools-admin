@@ -430,7 +430,7 @@ ClassMethod AddTraceUrl(Val, Col, Head, Temp, Del = 0) As %String
 ///  do ##class(apptools.core.Production).FindAndDrawAllQueue(##class(apptools.core.sys).ListNS(.info,"NotPre,Ens"))
 ClassMethod FindAndDrawAllQueue(nspaces) As %String
 {
-	write $$$appTable3("Namespace","Service","Query")
+	write "<Table>"
 	for i=1:1:$l(nspaces,",") { continue:$p(nspaces,",",i)=""||("%All"[$p(nspaces,",",i))
 		$$$NspGoto(curNs,$p(nspaces,",",i))
 		if $Namespace'=$p(nspaces,",",i) continue
@@ -440,18 +440,16 @@ ClassMethod FindAndDrawAllQueue(nspaces) As %String
 			for { 	set serv=$order(^Ens.Queue(serv)) quit:serv=""
 					set count=$get(^Ens.Queue(serv,0,"count"))
 					if count {
-						write $$$appTableTrTd3(nspaces,serv,count)
 						set total=$g(total)+count
 					}
 				}
 			set csp="csp"
 			set url="/"_csp_"/"_$zconvert(ns,"L")_"/EnsPortal.Queues.zen?$NAMESPACE="_ns
-			write $$$appTableTrTd3("<a target=Que"_ns_" href='"_url_"'>"_ns_"</a>","Total :",total)
+			write "<tr><td><a target=Que"_ns_" href='"_url_"'>"_ns_"</a></td><td>"_total_"</td></tr>"
 		}
 		$$$NspReturn(curNs)
 	}
-	set %DrawArray=1
-	write $$$appTableEnd3
+	write "</Table>"
 }
 
 /// do ##class(apptools.core.Production).ShowGlobals("^tmp**",##class(apptools.core.sys).ListNS(.info,"NotPre,Ens"))
@@ -464,6 +462,54 @@ ClassMethod ShowGlobals(gn, nspaces) As %String
 		write "<br><br>"
 		set st=##class(apptools.core.LogInfoPane).DrawGN(a)
 		$$$NspReturn(curNs)
+	}
+}
+
+/// Get a list of product errors per day or more for one namespace
+/// d ##class(apptools.core.Production).GetListErrProducts(1,"USER".res)
+ClassMethod GetListErrProducts(day, NS, r) As %String
+{
+
+	new $namespace
+	set sql="select ConfigName,Text,TimeLogged from Ens_Util.Log where Type='2' and TimeLogged>'"_##class(apptools.core.type).getYYYYMMDD($h-day)_" 21:00' order by id desc"
+	set GN=##class(apptools.core.Production).#SettingsGN
+	if $D(@GN@(NS)) {
+		zn NS
+		if $Namespace'=NS quit ""
+		set PN=""
+		set p="" for { s p=$o(@GN@(NS,"Ens",p)) q:p=""
+			if $lg($g(@GN@(NS,"Ens",p)),1)[$$$EnsProductStatusRun s PN=p quit
+		}
+		if PN="" q ""
+		set gn="^||tmpErrEnsam" kill @gn
+		do ##class(apptools.core.sys).SaveSQL(sql,gn)
+		for i=1:1:10 {  if $d(@gn@(i)) k r m r(1)=@gn@(i)	zw r
+		}
+	}
+ q $$$OK
+}
+
+/// Get the status of products for a day or more
+/// d ##class(apptools.core.Production).GetStatusProducts(0,.res)
+ClassMethod GetStatusProducts(day, result) As %String
+{
+	if day=0 s result="OK" w "OK" quit 1 ;
+	set sql="select * from Ens_Util.Log where Type='2' and TimeLogged>'"_##class(apptools.core.type).getYYYYMMDD($h-day)_" 21:00' order by id desc"
+	set GN=##class(apptools.core.Production).#SettingsGN
+	set NS=""
+	for { s NS=$o(@GN@(NS)) q:NS=""
+		$$$NspGoto(curNs,NS)
+		if $Namespace'=NS  continue
+		if '$D(@GN@(NS)) continue
+		set PN=""
+		set p="" for { s p=$o(@GN@(NS,"Ens",p)) q:p=""
+			if $lg($g(@GN@(NS,"Ens",p)),1)[$$$EnsProductStatusRun s PN=p quit
+		}
+		if PN="" continue
+		set sql2=$replace(sql,"*","count(*)")
+		set gn="^||tmpErrEns"
+		do ##class(apptools.core.sys).SaveSQL(sql2,gn)
+		set result(NS,"CountErrors")=$lg(@gn@(1),1)
 	}
 }
 

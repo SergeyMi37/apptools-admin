@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="IRIS" version="26" zv="IRIS for UNIX (Red Hat Enterprise Linux for x86-64) 2019.1.1 (Build 612U)" ts="2020-04-22 09:50:46">
+<Export generator="IRIS" version="26" zv="IRIS for UNIX (Red Hat Enterprise Linux for x86-64) 2019.1.1 (Build 612U)" ts="2020-10-08 16:48:30">
 <Global>
 <Node><Sub>^%AppCacheMsg</Sub>
 <Node><Sub>AppTools</Sub>
@@ -27,6 +27,9 @@
 </Node>
 <Node><Sub>165761057</Sub>
 <Data>Beispiel-Anwendung Access Matrix</Data>
+</Node>
+<Node><Sub>177948320</Sub>
+<Data>Anzeigen und Bearbeiten von globalen mit dem Grundeinstellungen-Bedienfeld</Data>
 </Node>
 <Node><Sub>230775901</Sub>
 <Data>Daten</Data>
@@ -732,6 +735,9 @@
 <Node><Sub>165761057</Sub>
 <Data>Sample Application Access Matrix</Data>
 </Node>
+<Node><Sub>177948320</Sub>
+<Data>View and edit global with the basic settings panel</Data>
+</Node>
 <Node><Sub>230775901</Sub>
 <Data>Data</Data>
 </Node>
@@ -779,6 +785,9 @@
 </Node>
 <Node><Sub>660207301</Sub>
 <Data>show the list globalaw mask</Data>
+</Node>
+<Node><Sub>707099017</Sub>
+<Data>apptoolsExtentions</Data>
 </Node>
 <Node><Sub>733512369</Sub>
 <Data>Sample Tabs Application</Data>
@@ -969,6 +978,9 @@
 <Node><Sub>1693440333</Sub>
 <Data>Query result</Data>
 </Node>
+<Node><Sub>1727553715</Sub>
+<Data>View and edit global</Data>
+</Node>
 <Node><Sub>1732649165</Sub>
 <Data>July</Data>
 </Node>
@@ -1020,6 +1032,9 @@
 <Node><Sub>2034467270</Sub>
 <Data>review</Data>
 </Node>
+<Node><Sub>2040999553</Sub>
+<Data>table apptools.core.Log pojawia new record</Data>
+</Node>
 <Node><Sub>2095380537</Sub>
 <Data>Load and run command</Data>
 </Node>
@@ -1052,6 +1067,9 @@
 </Node>
 <Node><Sub>2339408822</Sub>
 <Data>Title separated by a comma or by context</Data>
+</Node>
+<Node><Sub>2349168050</Sub>
+<Data>Global SOAP (on the prod should be removed) </Data>
 </Node>
 <Node><Sub>2359244304</Sub>
 <Data>file</Data>
@@ -1097,6 +1115,9 @@
 </Node>
 <Node><Sub>2699698566</Sub>
 <Data>Globals</Data>
+</Node>
+<Node><Sub>2702365481</Sub>
+<Data>apptoolsProduct</Data>
 </Node>
 <Node><Sub>2735373045</Sub>
 <Data>To obtain information on the class</Data>
@@ -1160,6 +1181,9 @@
 </Node>
 <Node><Sub>3033466483</Sub>
 <Data>Filter: command argument if</Data>
+</Node>
+<Node><Sub>3056905290</Sub>
+<Data>apptoolsProjects</Data>
 </Node>
 <Node><Sub>3067590558</Sub>
 <Data>View global with the basic settings panel</Data>
@@ -1260,6 +1284,9 @@
 <Node><Sub>3467896543</Sub>
 <Data>Object with id = %1 Does not exist</Data>
 </Node>
+<Node><Sub>3479635508</Sub>
+<Data>Global Product</Data>
+</Node>
 <Node><Sub>3496394395</Sub>
 <Data>not the same</Data>
 </Node>
@@ -1349,6 +1376,9 @@
 </Node>
 <Node><Sub>3951820451</Sub>
 <Data>To run in the background scanning logs to collect information about modifiable globalaw yesterday</Data>
+</Node>
+<Node><Sub>3979112220</Sub>
+<Data>apptoolsSetting</Data>
 </Node>
 <Node><Sub>3999187681</Sub>
 <Data>To obtain information only on the object values</Data>
@@ -4153,6 +4183,9 @@
 </Node>
 <Node><Sub>3951820451</Sub>
 <Data>は走査ログの収集に関する情報を変更可能globalaw昨日</Data>
+</Node>
+<Node><Sub>3979112220</Sub>
+<Data>apptoolsSetting</Data>
 </Node>
 <Node><Sub>3999187681</Sub>
 <Data>情報を得るためだけのオブジェクトの値</Data>
@@ -7981,6 +8014,9 @@
 </Node>
 <Node><Sub>1693440333</Sub>
 <Data>查询结果</Data>
+</Node>
+<Node><Sub>1727553715</Sub>
+<Data>图和编辑的全球</Data>
 </Node>
 <Node><Sub>1732649165</Sub>
 <Data>七月</Data>

@@ -924,7 +924,7 @@ ClassMethod WinOpenEditNode(Par) As %String
 	set Node=$$$appText(PrefixIdDIV_"Node","size=80",gn)
 	set Value=@gn
 	set:$lv(Value) Value=##class(%Global).Quote(Value)
-	set Value=$$$appTextarea(PrefixIdDIV_"Value","rows=6 cols=80",Value)
+	set Value=$$$appTextarea(PrefixIdDIV_"Value","rows=6 cols=78",Value)
 	
 	set onclick="ActionJs('"_PrefixIdDIV_"MainForm','"_PrefixIdDIV_"MainContent','"_..%ClassName(1)_"','WinOpenNodeSaveOrKill','~mode=*');"
 
@@ -935,11 +935,11 @@ ClassMethod WinOpenEditNode(Par) As %String
 	<form id='#(PrefixIdDIV_"MainForm")#'>
 		<table>
 			<tr>
-				<td style='text-align: right;'>Node</td>
+				<td style='text-align: right;'>Globals Node</td>
 				<td style='text-align: left;'>#(Node)#</td>
 			</tr>
 			<tr>
-				<td style='text-align: right;'>Data</td>
+				<td style='text-align: right;'>Value</td>
 				<td style='text-align: left;'>#(Value)#</td>
 			</tr>
 			<tr>
@@ -947,28 +947,43 @@ ClassMethod WinOpenEditNode(Par) As %String
 				<td style='text-align: left;'>#(bkill)#</td>
 			</tr>
 			>
-		if 0,gn[$$$HISTORYGN||(gn[$$$GNExtentions) {
-			set gnF=$$$GNExtentions
-			set nodef=$i(@$$$GNExtentions@($namespace))
-			set code=""
-			set nodeFavor=$$$appText(PrefixIdDIV_"NodeF","size=80",nodef)
-			set desc="desc"
-			set descFavor=$$$appTextarea(PrefixIdDIV_"Desc","rows=6 cols=80",desc)
-			set bsaveS=$$$appButton(PrefixIdDIV_"idButtSaveS","onclick="""_$replace(onclick,"*","SYS")_"""","Save as Favorite to %SYS")
-			set bsaveN=$$$appButton(PrefixIdDIV_"idButtSaveN","onclick="""_$replace(onclick,"*","NS:"_$namespace)_"""","Save as Favorite to "_$namespace)
-			
+		if gn[$$$HISTORYGN||(gn[$$$GNExtentions) {
+			if (gn[$$$GNExtentions) {
+				set node=$qs(gn,2)
+				set old=$qs(gn,1)
+				set ref=$na(@$qs(gn,0)@($qs(gn,1),$qs(gn,2)))
+				set desc=$G(@ref@("Desc"))
+				set code=$G(@ref@("Xecute"))
+				
+			} else { //History
+				set node=$e($tr($lg(@gn,1)," "),1,10) ;_$i(@$$$GNExtentions)
+				set desc="Description "_$e($lg(@gn,1),1,100)
+				set code=$lg(@gn,1)
+				set old=$lg(@gn,2)
+			}
+			set nodeFavor=$$$appText(PrefixIdDIV_"NodeF","size=80",$g(node))
+			set descFavor=$$$appTextarea(PrefixIdDIV_"DescF","rows=6 cols=78",$g(desc))
+			set code=$$$appTextarea(PrefixIdDIV_"CodeF","rows=6 cols=78",$g(code))
+			set bkillF=$$$appButton(PrefixIdDIV_"idButtKillF","onclick=""if (prompt('Delete you sure ?','Yes')) {"_$replace(onclick,"*","KillF")_"}""","Delete favorite")
+			set bsaveS=$$$appButton(PrefixIdDIV_"idButtSaveS","onclick="""_$replace(onclick,"*","ns:%All")_"""","Save Favorite to %ALL")
+			set bsaveN=$$$appButton(PrefixIdDIV_"idButtSaveN","onclick="""_$replace(onclick,"*","ns:"_$namespace)_"""","Save Favorite to "_$namespace)
+			set:old'=""&&(old'=$namespace) bsaveO=$$$appButton(PrefixIdDIV_"idButtSaveO","onclick="""_$replace(onclick,"*","ns:"_old)_"""","Save Favorite to "_old)
 			&html<
 			<tr>
-				<td style='text-align: right;'>Node Favorite</td>
-				<td style='text-align: left;'>#(nodeFavor)#</td>
-			</tr>
-			<tr>
-				<td style='text-align: right;'>Description Favorite</td>
+				<td style='text-align: right;'>Favorite description </td>
 				<td style='text-align: left;'>#(descFavor)#</td>
 			</tr>
 			<tr>
-				<td style='text-align: right;'>#(bsaveS)#</td>
-				<td style='text-align: left;'>#(bsaveN)#</td>
+				<td style='text-align: right;'>Favorite node </td>
+				<td style='text-align: left;'>#(nodeFavor)#</td>
+			</tr>
+			<tr>
+				<td style='text-align: right;'>Favorite code </td>
+				<td style='text-align: left;'>#(code)#</td>
+			</tr>
+			<tr>
+				<td style='text-align: right;'></td>
+				<td style='text-align: left;'>#(bkillF)# #(bsaveN)# #(bsaveS)# #($g(bsaveO))#</td>
 			</tr>
 		>
 		}
@@ -992,12 +1007,21 @@ ClassMethod WinOpenNodeSaveOrKill(Par) As %String
 		kill @gn	
 		write $$$appMsg("Killed") quit
 	}
-	elseif $g(Par("mode"))="SYS" {
-		write $$$appMsg("Saved to SYS") quit
+	elseif $g(Par("mode"))="KillF" {
+		set ref=$na(@$qs(gn,0)@($qs(gn,1),$qs(gn,2)))
+		kill @ref
+		write $$$appMsg("Killed favorite") quit
 	}
-	elseif $e($g(Par("mode")),1,3)="NS:" {
+	elseif $e($g(Par("mode")),1,3)="ns:" {
+		set node=$g(Par("%request.Data","WinOpenEditNodeF"))
+		set desc=$g(Par("%request.Data","WinOpenEditDescF"))
+		set code=$g(Par("%request.Data","WinOpenEditCodeF"))
 		set ns=$e($g(Par("mode")),4,*)
-		write $$$appMsg("Saved to "_ns) quit
+		if node="" write $$$appError("Node is empty!") quit
+		if desc="" write $$$appError("Description is empty!") quit
+		set @$$$GNExtentions@(ns,node,"Desc")=desc
+		set ^("Xecute")=code
+		write $$$appMsg("Saved favorite to "_ns) quit
 	}
 }
 
@@ -1477,7 +1501,6 @@ ClassMethod GetHelp(help)
 	$$$sH("--- "_$$$aText("If this macro is to insert in the test program","")_" $$$LogDebug(""Debug info"") "_$$$aText("table apptools.core.Log pojawia new record",""))
 	$$$sH("---  $$$AppL("""_fio_""",""node"")=$$$AppObJs(object) "_$$$aText("will record in global","")_" "_gn_" "_$$$aText("an object in the format","")_" json")
 	
-	$$$sH("--- "_$$$aText("To run in the background scanning logs to collect information about modifiable globalaw yesterday",""))
 	$$$sH(" "_$$$addAppL("xec job ##class(apptools.core.files).OneDayJournalCount()::0 if $test write ""Processing""")_" --- "_$$$aText("Attention! The process can be long. Information about globalo default written in ","")_$$$TEMPJRNL)
 	$$$sH(" "_$$$addAppL("xec do ##class(apptools.core.files).Export2CSV()")_" --- "_$$$aText("Display information about globalo of","")_" "_$$$TEMPJRNL_" in "_$$$EMAILXLSPATH_"JrnCount*.csv")
 	$$$sH(" "_$$$addAppL("xec Set tSC = ##class(%SYS.Portal.Users).%AddFavorite(""apptools"",""/apptools/apptools.core.LogInfo.cls?WHAT=%3F"") zwrite tSC")_" --- "_$$$aText("Add a link to AppTools in the management portal",""))

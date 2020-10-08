@@ -130,10 +130,17 @@ ClassMethod CreateProjection(cls As %String, ByRef params) As %Status
 ClassMethod AddExtentions() As %Status
 {
 	// @$$$GNExtentions@( Namespace , FavoriteNode , Description )
+	 for prep="tmp","log" {
+	 	set @$$$GNExtentions@("%All","ShowGlobals^"_prep_"**","Desc")="ShowGlobals ^"_prep_"**"
+	 	set ^("Xecute")="xec do ##class(apptools.core.Production).ShowGlobals(""^"_prep_"**"",##class(apptools.core.sys).ListNS(.info,""NotPre,Ens""))"
+	 }
+ 	set @$$$GNExtentions@("%All","FindAndDrawAllQueue","Desc")="Watch all queues"
+ 	set ^("Xecute")="xec do ##class(apptools.core.Production).FindAndDrawAllQueue(##class(apptools.core.sys).ListNS(.info,""NotPre,Ens""))"
+
 	 set @$$$GNExtentions@("%All","FindAndDrawAllErr","Desc")="Sample extension for all namespaces. Monitoring products in all namespaces with rapid transition to visual tracing"
-	 set @$$$GNExtentions@("%All","FindAndDrawAllErr","Xecute")="xec d ##class(apptools.core.Production).FindAndDrawAllErr(""Select * from Ens_Util.Log where Type='2' and TimeLogged>'""_$zd($h-1,3)_"" 21:00' order by id desc"",##class(apptools.core.sys).ListNS(.info,""NotPre,Ens""))"
+	 set ^("Xecute")="xec d ##class(apptools.core.Production).FindAndDrawAllErr(""Select * from Ens_Util.Log where Type='2' and TimeLogged>'""_$zd($h-1,3)_"" 21:00' order by id desc"",##class(apptools.core.sys).ListNS(.info,""NotPre,Ens""))"
 	 set @$$$GNExtentions@("DOCBOOK","Query DocBook.articl","Desc")=$lb("Sample extension for DOCBOOK namespaces. Query DocBook.articl")
-	 set @$$$GNExtentions@("DOCBOOK","Query DocBook.articl","Xecute")="select * From DocBook.article"
+	 set ^("Xecute")="select * From DocBook.article"
 }
 
 /// Add Favorites
