@@ -69,11 +69,11 @@ zpm:USER>install apptools-admin
 In this solution, I use REST-API adapted from the [Webterminal](https://github.com/intersystems-community/webterminal) and [metrics ^mgstat](https://habr.com/ru/company/intersystems/blog/318940/)
 
 ## Class explorer
- Load http://your-host:your-port/apptools/apptools.Form.FormExp.cls?panel=AccordionExp
+ Load http://your-host:your-port/apptools/apptools.Form.Exp.cls?panel=AccordionExp
   - Navigation by namespaces, class, and class instance. Create, edit, and delete class instances in the on-screen form interface.
 
 ##  Matrix permissions
- Load http://your-host:your-port/apptools/apptools.Tabs.TabsPanelUikitPermissMatrx.cls?autoload=Matrix
+ Load http://your-host:your-port/apptools/apptools.Tabs.PanelUikitPermissMatrx.cls?autoload=Matrix
   - Group assignment of roles to users by selecting them by filter in the screen panel
   ![Matrix permissions](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_5-acc-matrix.gif)
 
