@@ -78,20 +78,19 @@ In this solution, I use REST-API adapted from the [Webterminal](https://github.c
   ![Matrix permissions](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_5-acc-matrix.gif)
 
 ## Templates & Samples  
- Load http://your-host:your-port/apptools/apptools.Tabs.TabsPanelSample.cls   
+ Load http://your-host:your-port/apptools/apptools/apptools.Tabs.PanelSample.cls
  - jQuery-Ui.js based application template.
+![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_pansam.gif)
   
  Load http://your-host:your-port/apptools/apptools.Tabs.TabsPanelUikit.cls
  - UiKit.js based application template
+ ![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_pansam.gif)
    
- Load http://your-host:your-port/apptools/apptools.Tabs.TabsPanelUikitAdmin.cls
-  - UiKit.js based application template for admin panels
-
-## Charts admins
+ ## Charts admins
 
  Load http://your-host:your-port/apptools/apptools.Chart.Chart.cls?panel=class(apptools.Chart.ChartPanel).ChartAlert
   - output of the DBMS events using the iris.log protocol (cconsole.log)
-
+ 
  Load http://your-host:your-port/apptools/apptools.Chart.Chart.cls?panel=class(apptools.Chart.ChartPanel).ChartAlert
   - output of the growth dynamics of DBMS database files using the messages.log protocol (cconsole.log)
 
