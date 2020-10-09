@@ -75,7 +75,7 @@ In this solution, I use REST-API adapted from the [Webterminal](https://github.c
 ##  Matrix permissions
  Load http://your-host:your-port/apptools/apptools.Tabs.TabsPanelUikitPermissMatrx.cls?autoload=Matrix
   - Group assignment of roles to users by selecting them by filter in the screen panel
-  ![Matrix permissions](https://github.com/SergeyMi37/apptools-admin/master/doc/acc-matrix.gif)
+  ![Matrix permissions](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/acc-matrix.gif)
 
 ## Templates & Samples  
  Load http://your-host:your-port/apptools/apptools.Tabs.TabsPanelSample.cls   
