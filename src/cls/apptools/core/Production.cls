@@ -513,5 +513,36 @@ ClassMethod GetStatusProducts(day, result) As %String
 	}
 }
 
+/// Stoped production and dismount. Later mounted 
+/// d ##class(apptools.core.Production).StopProdAndDismount("AAA")
+/// w $System.Status.GetErrorText(##class(apptools.core.sys).MountListDB("AAA"))
+ClassMethod StopProdAndDismount(ns) As %String
+{
+	new $namespace
+	try {
+		set $namespace=ns
+		s sc=##class(Ens.Director).StopProduction(..#TIMEOUTSTOP)
+		if 'sc {
+			s sc2=##class(Ens.Director).StopProduction(..#TIMEOUTSTOP,1) 
+			if 'sc2 write $System.Status.DisplayError(sc2) q
+			set sc=$$$OK
+		}
+		set $namespace="%SYS"
+		set sc=##class(apptools.core.sys).DismountListDB(ns)
+		if 'sc {
+			write $System.Status.DisplayError(sc) q
+		}
+		else {
+			write !,"Dismount "_ns
+		}
+	} catch ex {
+	   Set sc = $g(%objlasterror, $$$OK)
+	   Set sc = $$$ADDSC(sc, ex.AsStatus())
+	   write "Error type   "_ex.Name,!
+	   write "Error code   "_ex.Code,!
+	   write "Error location "_ex.Location,!
+ 	}
+}
+
 }
 

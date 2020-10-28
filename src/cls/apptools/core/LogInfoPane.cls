@@ -320,9 +320,9 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 	if $p(what,"-p",2)?1n.n set exp=$p(what,"-p",2),what=$p(what,"-p")
 	set (%DSN,DSN)=%request.Get("selectDSN")
 	set SDNum=%request.Get("SDNum")
-
+	
 	//code to use when displaying tables
-	set ExecuteDraw=%request.Get("ExecuteDraw") 
+	set ExecuteDraw=%request.Get("ExecuteDraw")
 	set:$e(ExecuteDraw,1)="(" ExecuteDraw="##class"_ExecuteDraw_"(.%AppLogInfoVal,%AppLogInfoCol,%AppLogInfoHead,.%AppLogInfoTemp,"""_NSpace_""","""_DSN_""")"
 
 	// Preparing variables for export to Excel
@@ -459,7 +459,10 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 	>
 	do ##class(apptools.core.LogInfoPane).AddJS(NSpace) 
 	if $g(execute)'="" {
-		write "<H3>"_$$$aText("Executing the command","")_" "_execute_"</H3>"
+		write "<H5>"_$$$aText("Executing the command","")_" "_execute_"</H5>"
+		if ..GetCodeExtensionNamespace(execute,.code) {
+			set execute=code
+		}
 		x execute
 		quit $$$OK
 	}
@@ -545,6 +548,16 @@ AddExp(title,gn,Next="",Filtr="",MaxNode)
 errors
  	write !,$ze
  	quit $$$OK
+}
+
+/// do ##class(apptools.core.LogInfoPane).GetCodeExtensionNamespace("ShowGlobals^log**",.code)
+ClassMethod GetCodeExtensionNamespace(Node, ByRef code) As %Status
+{
+	set code=""
+	set Node=$E(Node,1,200)
+	if $D(@$$$GNExtentions@("%All",Node)) set code=$e($G(@$$$GNExtentions@("%All",Node,"Xecute")),5,*) quit $$$OK
+	if $D(@$$$GNExtentions@($namespace,Node)) set code=$e($G(@$$$GNExtentions@($namespace,Node,"Xecute")),5,*) quit $$$OK
+	quit $$$ERROR($$$GeneralError,"No find")
 }
 
 ClassMethod ListExtensionNamespace()
@@ -1136,7 +1149,7 @@ ClassMethod CloseXLSfile(fileXLS, ByRef exportXLSfileEmail, ByRef exportXLSfile,
 		s sc=##class(apptools.core.LogInfo).SendEmail(exportXLSfileEmail, $$$aText("Send file","")_" "_exportXLSfile, $g(msg)_"<br> "_$$$aText("Namespace","")_" :"_$Namespace_"<br> "_$$$aText("Query","")_": "_SQL, exportXLSfile)
 		;i 'sc ;s $$$AppL("APP","CloseXLSfile-SendEmail")=$System.Status.GetErrorText(sc) 
 		}
-	write !,"<br><h3>"_$$$aText("Query result","")_" ("_(+count)_" "_$$$aText("lines) uploaded to file","")_" "_exportXLSfile_"</h3>"
+	write !,"<br><h5>"_$$$aText("Query result","")_" ("_(+count)_" "_$$$aText("lines) uploaded to file","")_" "_exportXLSfile_"</h5>"
 	quit
 }
 

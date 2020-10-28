@@ -14,27 +14,27 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 	if nsp'="" try {zn nsp set NSpace=nsp } catch e {}
 	set NSpace=$zu(5)
 
-	s arg("header")="Error"
-	s arg("labels")="[""Error""]"
-	s arg("type")="bar" ;line
-	s arg("datasets")="{   label: """_$$$aText("Error display on the graph","")_""", borderColor: 'rgb(255, 199, 132)',  data: [30],  }"
+	set arg("header")="Error"
+	set arg("labels")="[""Error""]"
+	set arg("type")="bar" ;line
+	set arg("datasets")="{   label: """_$$$aText("Error display on the graph","")_""", borderColor: 'rgb(255, 199, 132)',  data: [30],  }"
 
-	s days=1000
-	i %request.Get("days") S days=%request.Get("days")
+	set days=1000
+	if %request.Get("days") S days=%request.Get("days")
 	
 	if %request.Get("panel")'="" {
-		s class=$p($p(%request.Get("panel"),"(",2),")"),method=$p($p(%request.Get("panel"),")",2),".",2)
-		s st=$classmethod(class,method,.arg,days)
+		set class=$p($p(%request.Get("panel"),"(",2),")"),method=$p($p(%request.Get("panel"),")",2),".",2)
+		set st=$classmethod(class,method,.arg,days)
 	}
 	&html< <canvas id="Chart"></canvas>
 	>
 	$$$jsstart
- 	w "var ctx = document.getElementById('Chart').getContext('2d');"
- 	w "var chart = new Chart(ctx, {   type: '"_$g(arg("type"),"bar")_"',"
+ 	write "var ctx = document.getElementById('Chart').getContext('2d');"
+ 	write "var chart = new Chart(ctx, {   type: '"_$g(arg("type"),"bar")_"',"
     // The data for our dataset
-    w "data: {  labels: "_$g(arg("labels"))_","   // ["January", "February", "March", "April", "May", "June", "July"],
-    w "   datasets: ["_$g(arg("datasets"))
-    w " ] },  options: {    hover: { mode: 'index' }, tooltips: { mode: 'index' }	, title: { display: true, text: '"_$tr($g(arg("header")),"'""")_"'  }    } });"
+    write "data: {  labels: "_$g(arg("labels"))_","   // ["January", "February", "March", "April", "May", "June", "July"],
+    write "   datasets: ["_$g(arg("datasets"))
+    write " ] },  options: {    hover: { mode: 'index' }, tooltips: { mode: 'index' }	, title: { display: true, text: '"_$tr($g(arg("header")),"'""")_"'  }    } });"
 	$$$jsstop
 	quit $$$OK
 errors
@@ -46,34 +46,34 @@ errors
 ClassMethod ColorRGBa(num, alfa = 1)
 {
  
-	s c=$e(+num,*)
+	set c=$e(+num,*)
 	;i +num>9 
 	;the same light alfa=1 because the opacity: 100% *
-	i c=0 q "rgba(255, 0, 0, "_alfa_")" ;pure red
-	i c=1 q "rgba(255, 99, 132, "_alfa_")" ;red
-    i c=2 q "rgba(255, 159, 64, "_alfa_")" ;orange
-    i c=3 q "rgba(255, 206, 86, "_alfa_")" ;yellow
-    i c=4 q "rgba(0, 255, 0, "_alfa_")" ;pure green
-    i c=5 q "rgba(75, 192, 192, "_alfa_")" ;green
-    i c=6 q "rgba(12, 164, 240, "_alfa_");" ;blue
-    i c=7 q "rgba(0, 0, 255, "_alfa_")" ;clear blue
-    i c=8 q "rgba(54, 162, 235, "_alfa_")" ;blue
-    i c=9 q "rgba(153, 102, 255, "_alfa_")" ;purple
+	if c=0 quit "rgba(255, 0, 0, "_alfa_")" ;pure red
+	if c=1 quit "rgba(255, 99, 132, "_alfa_")" ;red
+    if c=2 quit "rgba(255, 159, 64, "_alfa_")" ;orange
+    if c=3 quit "rgba(255, 206, 86, "_alfa_")" ;yellow
+    if c=4 quit "rgba(0, 255, 0, "_alfa_")" ;pure green
+    if c=5 quit "rgba(75, 192, 192, "_alfa_")" ;green
+    if c=6 quit "rgba(12, 164, 240, "_alfa_");" ;blue
+    if c=7 quit "rgba(0, 0, 255, "_alfa_")" ;clear blue
+    if c=8 quit "rgba(54, 162, 235, "_alfa_")" ;blue
+    if c=9 quit "rgba(153, 102, 255, "_alfa_")" ;purple
 }
 
 /// Complete the chart objects
 ClassMethod FinishArg(res, data, labels, arg)
 {
-	s datasets=""
-	s a="" f num=1:1 { s a=$o(res(a)) q:a=""
-		s data(a)=$e(data(a),1,*-1)_"], }"
-		s datasets=datasets_data(a)_","
+	set datasets=""
+	set a="" for num=1:1 { set a=$o(res(a)) quit:a=""
+		set data(a)=$e(data(a),1,*-1)_"], }"
+		set datasets=datasets_data(a)_","
 	}
-	s datasets=$e(datasets,1,*-1)
-	s labels=$e(labels,1,*-1)_"]"
-	s arg("datasets")=datasets
-	s arg("labels")=labels
-	q 1
+	set datasets=$e(datasets,1,*-1)
+	set labels=$e(labels,1,*-1)_"]"
+	set arg("datasets")=datasets
+	set arg("labels")=labels
+	quit 1
 }
 
 /// Dynamics of consumption of license on the basis of regular job 
@@ -81,15 +81,15 @@ ClassMethod FinishArg(res, data, labels, arg)
 /// d ##class(apptools.Chart.ChartPanel).ChartLicUsed(.arg,1200,.res)
 ClassMethod ChartLicUsed(arg, days, res, gn = "^%apptools.Task")
 {
- s par=$p(days,",",2,999)
- s days=+days
- s ToDay=$zd($h,3),FromDay=$zd($h-days,3)
- s arg("header")=$$$aText("The dynamics of license spending based on a regular job in a date range ","")_FromDay_" - "_ToDay
- s arg("type")="line"
- s GN=$na(@gn@("%SYSTEM.License:Counts"))
- s dt=""
- f i=1:1:10 { s dt=$o(@GN@(dt),1) q:dt=""
- 	w !,dt," ",$g(@GN@(dt,4,2))
+ set par=$p(days,",",2,999)
+ set days=+days
+ set ToDay=$zd($h,3),FromDay=$zd($h-days,3)
+ set arg("header")=$$$aText("The dynamics of license spending based on a regular job in a date range ","")_FromDay_" - "_ToDay
+ set arg("type")="line"
+ set GN=$na(@gn@("%SYSTEM.License:Counts"))
+ set dt=""
+ for i=1:1:10 { set dt=$o(@GN@(dt),1) quit:dt=""
+ 	write !,dt," ",$g(@GN@(dt,4,2))
  }
 }
 
@@ -97,39 +97,39 @@ ClassMethod ChartLicUsed(arg, days, res, gn = "^%apptools.Task")
 /// d ##class(apptools.Chart.ChartPanel).ChartAlert(.arg,1200,.res)
 ClassMethod ChartAlert(arg, days, res, list, mm)
 {
- 	s method="class(apptools.core.files).Alert" 
-	d ##class(apptools.core.files).FindContextInLog(days,method,.res) // to parse a Protocol to calculate important events
-	s df=$p(res," ",1)
-	s dt=$p(res," ",2)
-	s arg("header")=$$$aText("Important system events in the date range ","")_df_" - "_dt
-	s arg("type")="line"
-	s labels="["
-	f yyyy=$p(df,".",3):1:$p(dt,".",3) {
+ 	set method="class(apptools.core.files).Alert" 
+	do ##class(apptools.core.files).FindContextInLog(days,method,.res) // to parse a Protocol to calculate important events
+	set df=$p(res," ",1)
+	set dt=$p(res," ",2)
+	set arg("header")=$$$aText("Important system events in the date range ","")_df_" - "_dt
+	set arg("type")="line"
+	set labels="["
+	for yyyy=$p(df,".",3):1:$p(dt,".",3) {
 		for m=1:1:12 {
-			i yyyy=$p(df,".",3),m<$p(df,".",2)  continue
-			i yyyy=$p(dt,".",3),m>$p(dt,".",2)  continue
-			i m?1n s mm="0"_m
-			e  s mm=m
-			s labels=labels_""""_##class(apptools.core.type).GetTextMonth(mm)_"."_yyyy_""","
-			s a="" f num=1:1 { s a=$o(res(a)) q:a=""
-				i '$d(color(a)) s color(a)=num
-				i '$d(data(a)) s data(a)="{  label: """_a_""", borderColor: '"_..ColorRGBa(color(a),1)_"',  data: ["
-				s data(a)=data(a)_+$g(res(a,yyyy,mm))_","
+			if yyyy=$p(df,".",3),m<$p(df,".",2)  continue
+			if yyyy=$p(dt,".",3),m>$p(dt,".",2)  continue
+			if m?1n s mm="0"_m
+			else  s mm=m
+			set labels=labels_""""_##class(apptools.core.type).GetTextMonth(mm)_"."_yyyy_""","
+			set a="" f num=1:1 { s a=$o(res(a)) q:a=""
+				if '$d(color(a)) s color(a)=num
+				if '$d(data(a)) s data(a)="{  label: """_a_""", borderColor: '"_..ColorRGBa(color(a),1)_"',  data: ["
+				set data(a)=data(a)_+$g(res(a,yyyy,mm))_","
 			}
 
 		}
 	}
- d ..FinishArg(.res, .data, .labels, .arg)
- q $$$OK
+ do ..FinishArg(.res, .data, .labels, .arg)
+ quit $$$OK
 }
 
 /// Retrospective database sizes
 /// d ##class(apptools.Chart.ChartPanel).ChartDbSize(.arg,1200,.res,.list,.mm)
 ClassMethod ChartDbSize(arg, days, res, list, mm)
 {
-	s method="class(apptools.core.files).ExpansionDB" 
-	d ##class(apptools.core.files).FindContextInLog(days,method,.res) //to disassemble the Protocol to calculate the monthly growth of the database in megabytes
-	d ##class(apptools.core.rest).getDBsize("dbsize",.list) //to calculate the current database size in gigabytes
+	set method="class(apptools.core.files).ExpansionDB" 
+	do ##class(apptools.core.files).FindContextInLog(days,method,.res) //to disassemble the Protocol to calculate the monthly growth of the database in megabytes
+	do ##class(apptools.core.rest).getDBsize("dbsize",.list) //to calculate the current database size in gigabytes
 	//let's go back in time taking masany growth
 	s df=$p(res," ",1)
 	s dt=$p(res," ",2)

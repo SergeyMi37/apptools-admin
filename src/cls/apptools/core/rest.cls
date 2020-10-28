@@ -354,13 +354,13 @@ ClassMethod getDirSize(path = "", ByRef res, minsize = 10) As %Status
 ClassMethod getDBsize(prefix = {..#ISCPREFIX_"_dbsize"}, dbname, int = 1, all = 0) As %Status
 {
 	set nl = $c(10)
-	set curNs=$zu(5)
-	zn "%sys"
-	set st=##class(apptools.core.sys).SaveQuery("SYS.Database:FreeSpace","^||db")
-	set r=$q(^||db("")) ;to the first link
-	set r=$na(^||db($qs(r,1),$qs(r,2))) ;take the first 2 of the index in the link
-	set listDb=$$$DBCACHESizeMon
-	if listDb="" s listDb=##class(apptools.core.sys).ListDB(.info,"NotPre,NotTemp")
+	new $namespace
+	set $namespace="%sys"
+	set gn="^||db"
+	set st=##class(apptools.core.sys).SaveQuery("SYS.Database:FreeSpace",gn)
+	set r=$q(@gn@("")) ;to the first link
+	set r=$na(@gn@($qs(r,1),$qs(r,2))) ;take the first 2 of the index in the link
+	s listDb=##class(apptools.core.sys).ListDB(.info,"NotPre,NotTemp")
 	for i=1:1 { q:'$d(@r@(i))   ;pass the loop through the entire report
 		continue:$g(@r@(i,1))=""
 		;by default, we give all sizes to Gigabytes
@@ -383,7 +383,6 @@ ClassMethod getDBsize(prefix = {..#ISCPREFIX_"_dbsize"}, dbname, int = 1, all = 
 		write:'int prefix_"_"_name_" "_size_nl
 		write:'int prefix_"_"_name_"_DiskFreeSpace "_(+free)_nl
 	}
-	zn curNs
 	write nl
 	quit $$$OK
 }

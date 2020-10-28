@@ -250,8 +250,6 @@ ROUTINE apptools.core [Type=INC]
 #define  EMAILXLSPATH $G(@$$$GNEnsConf@("EMAILXLSPATH"))
 #; Path to storing project sources
 #define  EXPORTPROJPATH $G(@$$$GNEnsConf@("EXPORTPROJPATH")) 
-#; List of databases to monitor free space in apptools..Chart.cls?panel=class(apptools.Chart.ChartPanel).ChartDbSize
-#define DBCACHESizeMon $G(@$$$GNEnsConf@("DBCACHESizeMon"))
 
 #; --------------- Application section
 #define GNmessages "^%apptools.cconsolelog"
