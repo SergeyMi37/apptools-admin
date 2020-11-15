@@ -3,6 +3,8 @@ Include apptools.core
 Class apptools.core.LogInfoPane Extends %CSP.Util.Pane [ DependsOn = apptools.core.msg ]
 {
 
+Parameter version = "1.0.24";
+
 Parameter XMLTYPE = "apptools.core";
 
 ClassMethod GetLink()
@@ -1520,6 +1522,12 @@ ClassMethod GetHelp(help)
 	;$$$sH(" "_$$$addAppL("post http://User:pass@localhost:57772/apptoolsrest/jsonrpc"_$c(13,10)_"{""jsonrpc"":""2.0"",""method"":""server.shutdown"",""params"":{""server"":""42""},""id"":1}")_" --- Perform http request with POST method with a JSON body")
 	;$$$sH(" "_$$$addAppL("get https://openexchange.intersystems.com/index.html")_" --- to Perform http request with POST method with a JSON body")
 	$$$sH(" ")
+	
+	/*
+	##;3. Prevent page refresh at session end - #;YSD2224 
+	%SYS> -  %CSP.Util.AutoPage).DrawAutoLogout()  
+	;	If %request.URL '[ "UtilSqlQuery.csp" && ( %request.URL '[ "/apptools.") && ( %request.URL '[ "/App.") { ##; MSW
+	*/
 }
 
 }
