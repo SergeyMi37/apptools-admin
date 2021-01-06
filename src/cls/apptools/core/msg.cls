@@ -28,41 +28,5 @@ ClassMethod man(ClassNameItem, ByRef d) As %String
 	q $g(ret)
 }
 
-/// write ##class(apptools.core.msg).ZPMColorScheme()
-ClassMethod ZPMColorScheme() As %String
-{
-	try {
-		set scheme=##class(%ZPM.PackageManager.Client.Settings).GetValue("ColorScheme")
-	} 
-	catch e {
-		set scheme=0
-	}
-	quit scheme
-}
-
-/// Output color escape sequence
-/// do ##class(apptools.core.msg).EscColor()
-ClassMethod EscColor(mode = "") As %String
-{
-	if mode="" { //write all colors
-		write ..EscColor(0)
-		//brightness
-		for b=1,2 {
-			for f=30:1:37 {  //font
-				for i=40:1:47 {  //background
-					s code=b_";"_f_";"_i
-					s txt=" write $Char(27)_""["_code_"m Any text""_$c(27)_""[0m"""
-					w !,$$$escSeq(code,txt)
-				}
-			}
-		}
-	
-	} elseif mode=0 { //cleaning
-		q $c(27)_"[0m"
-	} else {
-		q $c(27)_"["_mode_"m"
-	}
-}
-
 }
 

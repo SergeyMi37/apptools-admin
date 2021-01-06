@@ -8,8 +8,6 @@ Parameter CONTENTTYPE = "application/json";
 
 Parameter CHARSET = "UTF-8";
 
-Parameter ISCPREFIX = "isc_cache";
-
 XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 {
 <Routes>
@@ -25,14 +23,9 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 <Route Url="/css/index.css" Method="GET" Call="GetCss"/>
 <Route Url="/css/themes/:theme" Method="GET" Call="GetTheme"/>
 <Route Url="/js/index.js" Method="GET" Call="GetJs"/>
-
-<Route Url="/db" Method="GET" Call="getDBsize"/>
-<Route Url="/dirsize/:path" Method="GET" Call="getDirSize"/>
-
-<Route Url="/products/:mode" Method="GET" Call="getProductions"/>
-<Route Url="/productslist/:ns" Method="GET" Call="getListErrProducts"/>
-
 <Route Url="/proj/:proj/:metrics/:mode" Method="GET" Call="apptools.MVK.Metrics:getProj"/>
+<Route Url="/products/:mode" Method="GET" Call="apptools.MVK.Metrics:getProductions"/>
+<Route Url="/productslist/:ns" Method="GET" Call="apptools.MVK.Metrics:getListErrProducts"/>
 </Routes>
 }
 
@@ -309,99 +302,6 @@ ClassMethod getStatic(name As %String, ByRef Description) As %String
 		
 	}
 	return str
-}
-
-/// To sorted sizes subdirs for Linux
-/// w ##class(apptools.core.rest).getDirSize("/opt/isc/ensemble/mgr/")
-ClassMethod getDirSize(path = "", ByRef res, minsize = 10) As %Status
-{
-	set gn = "^||tmpfile"
-	do ##class(apptools.core.files).getPathcconsole(.dir,.logname)
-	if $g(path)="" set path=dir ;location of default database
-	if $zv'["Linux" quit $$$OK  ;for other OS not implemented
-	set st=$$$OK
-	set curNs=$zu(5)
-	zn "%sys"
-	set prefix = ..#ISCPREFIX_"_dirsize"
-	set tempfile=$SYSTEM.Util.InstallDirectory()_"mgr/Temp/dirsize.log"
-	kill @gn set nl = $c(10)
-	try {
-		set cmd="du -sm "_path_"*| sort -nr >"_tempfile
-		set result = $zf(-1, cmd)
-		if (result '= 0) { 
-			w !,$System.Status.GetErrorText(result)
-			$$$ThrowStatus($$$ERROR($$$GeneralError, "Error:" _ result_", "_cmd)) 
-		}
-		else {
-			set size=##class(apptools.core.files).File2Arr(tempfile,gn,"RSK\UTF8\")
-			for i=1:1 { q:'$d(@gn@(i))   ;pass the loop through the entire report
-				continue:$p(@gn@(i),$c(9))'>minsize ;eliminate small and empty directories
-				set str=$g(@gn@(i))
-				if $d(res) s res(i)=$P(str,$c(9),2)_" "_$P(str,$c(9),1)
-				else  w prefix_"_"_$P(str,$c(9),2)_" "_$P(str,$c(9),1)_nl
-			}
-		}
-	} catch ex {
-		set st = ex.AsStatus()
-		;$$$TRACE($system.Status.GetErrorText(st))
-	}
-	zn curNs
-	quit st
-}
-
-/// The size of the database in Gigabytes
-/// d ##class(apptools.core.rest).getDBsize("dbsize",.list)
-ClassMethod getDBsize(prefix = {..#ISCPREFIX_"_dbsize"}, dbname, int = 1, all = 0) As %Status
-{
-	set nl = $c(10)
-	new $namespace
-	set $namespace="%sys"
-	set gn="^||db"
-	set st=##class(apptools.core.sys).SaveQuery("SYS.Database:FreeSpace",gn)
-	set r=$q(@gn@("")) ;to the first link
-	set r=$na(@gn@($qs(r,1),$qs(r,2))) ;take the first 2 of the index in the link
-	s listDb=##class(apptools.core.sys).ListDB(.info,"NotPre,NotTemp")
-	for i=1:1 { q:'$d(@r@(i))   ;pass the loop through the entire report
-		continue:$g(@r@(i,1))=""
-		;by default, we give all sizes to Gigabytes
-		set free=$g(@r@(i,8))
-		set dir=$g(@r@(i,2))
-		set name=$g(@r@(i,1))
-		if 'all,(","_listDb_",")'[(","_name_",") continue
-		if 'all,(dir)[("secondary/")||((dir)[("temp/")) continue
-		set size=$g(@r@(i,4))
-		if size["MB" {s size=$j(size/(1024),"",3) ;if in MB, then divide
-		}
-		elseif size["TB" {s size=size*1024  ;if TB then multiply
-		}
-		else {
-			set size=+size  ;if GB then translate into the number
-		}
-		set dbname(dir)=size
-		set dbname(dir,"name")=name
-		set dbname(dir,"free")=+free
-		write:'int prefix_"_"_name_" "_size_nl
-		write:'int prefix_"_"_name_"_DiskFreeSpace "_(+free)_nl
-	}
-	write nl
-	quit $$$OK
-}
-
-ClassMethod getListErrProducts(nspace) As %Status
-{
-	d ##class(apptools.core.Production).GetListErrProducts(1,nspace)
-	q $$$OK
-}
-
-ClassMethod getProductions(day = "1") As %Status
-{
-	d ##class(apptools.core.Production).GetStatusProducts(day,.errors)
-	s ns=""
-	for { s ns=$o(errors(ns)) q:ns=""
-		s co=+$g(errors(ns,"CountErrors"))
-		w $s(co:"/",1:"\")_"server_"_$zu(110)_"_"_ns_" Errors: "_co_$$$NL
-	}
-	q $$$OK
 }
 
 XData Themecache

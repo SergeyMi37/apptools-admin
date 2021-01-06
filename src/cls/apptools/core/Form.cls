@@ -507,17 +507,17 @@ ClassMethod ButtonMake(value = "", onclick = "", id, title = "")
 	quit $$$OK
 }
 
-/// get parameter value by name
+/// To obtain the value of the parameter named 
 /// ExtProp=1 to extended properties, for example for the type of file
 /// if ##class(apptools.core.Form).GetValueByName("apptools.core.Parameter","TestFiles","Value",.Val,1) zwrite Val
-ClassMethod GetValueByName(class, name, NameField = "Value", ByRef Val, ExtProp = 0, field = "Name") As %Status
+ClassMethod GetValueByName(class, name, NameField = "Value", ByRef Val, ExtProp = 0) As %Status
 {
 	KILL Val
 	set Val=""
 	set st=$$$OK
 	s gn="^||tmpGetValueName"
 	set tab=##class(apptools.core.type).GetTableName(class)
-	s st=##class(apptools.core.sys).SaveSQL("select top 1 * from "_tab_" where "_field_"='"_name_"'",gn)
+	s st=##class(apptools.core.sys).SaveSQL("select top 1 * from "_tab_" where Name='"_name_"'",gn)
 	if 'st quit st
 	i $g(@gn@(-1,NameField))="" q $$$ERROR($$$GeneralError,"undefined field: "_NameField)
  	i '$d(@gn@(1)) q $$$ERROR($$$GeneralError,"undefined "_name)
@@ -557,12 +557,38 @@ ClassMethod GetValueProperty(obj, NameField, ByRef Val) As %Status
 	q $$$OK
 }
 
-/// get parameter value by identifier
+/// To obtain the value of parameter ID 
 /// ExtProp=1 to extended properties, for example for the type of file
 /// if ##class(apptools.core.Form).GetValueByIdField("apptools.core.Parameter","15","ImageFile",.Val,1) zwrite Val
 ClassMethod GetValueByIdField(class, id, NameField, ByRef Val, ExtProp = 0) As %Status
 {
- return ..GetValueByName(class,id,NameField,.Val,1,"ID")
+	KILL Val
+	set Val=""
+	set st=$$$OK
+	s gn="^||tmpGetValueName"
+	set tab=##class(apptools.core.type).GetTableName(class)
+	s st=##class(apptools.core.sys).SaveSQL("select top 1 * from "_tab_" where id='"_id_"'",gn)
+	if 'st quit st
+	i $g(@gn@(-1,NameField))="" q $$$ERROR($$$GeneralError,"undefined field: "_NameField)
+ 	i '$d(@gn@(1)) q $$$ERROR($$$GeneralError,"undefined "_name)
+ 	s Val=$lg(@gn@(1),@gn@(-1,NameField))
+ 	if ExtProp {
+	 	;set id=##class(apptools.core.sys).GetValue(gn,1,"ID")
+	 	set obj=##class(apptools.core.Form).GetObj(id_","_class)
+	 	if $isobject(obj) {
+			set st=..GetPropertyDefinition(obj,.prop)
+			if 'st quit st
+			m Val("Properties")=prop("Properties",NameField)
+			d ..GetJsonProp(obj, NameField, .prop, .pr)
+			m Val("PropJson")=pr
+		    m Val("obj")=obj
+			if $g(pr("inputpattern"))="files" {
+				set comp=..WebCompShowFiles(obj,.pr,0,NameField,Val,.Ext)
+				m Val=Ext
+			}
+	 	}
+ 	}
+	q st
 }
 
 /// Display a table from a matrix

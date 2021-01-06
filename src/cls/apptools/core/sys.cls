@@ -117,7 +117,7 @@ ClassMethod ListDB(info, Flag = "")
 }
 
 /// Get a list of domain namespaces separated by commas
-/// w ##class(apptools.core.sys).ListNS(.info,"NotPre,Ens")
+/// w ##class(apptools.core.sys).ListNS(.info,"NotPre")
 /// Flag = "Ens" - only where the ensemble is installed
 /// Flag = "NotPre" - exclude prepared
 ClassMethod ListNS(info, Flag = "")
