@@ -3,7 +3,7 @@
   <Document name="apptools-admin.ZPM">
     <Module>
       <Name>apptools-admin</Name>
-      <Version>1.1.1</Version>
+      <Version>1.1.2</Version>
       <Description>Application tools for technical support and DBMS administrator.View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files</Description>
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
@@ -33,7 +33,11 @@
             PasswordAuthEnabled="1"
             AuthenticationMethods="32" 
             MatchRoles=":%ALL"
-            DispatchClass="apptools.core.rest"/>
+            DispatchClass="apptools.core.rest"
+			Path="${cspdir}/apptools"
+			Recurse="1"
+			UnauthenticatedEnabled="0"
+			Generated="true"/>  
             
     </Module>
   </Document>
