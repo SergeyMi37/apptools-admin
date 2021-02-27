@@ -43,7 +43,7 @@ USER>
 USER>zpm
 zpm:USER>install apptools-admin
 ```
-
+![SQL](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_7-perm.png)
 ## Panel for admins & developers
 
  Load http://your-host:your-port/apptools/apptools.core.LogInfo.cls?WHAT=%3F
