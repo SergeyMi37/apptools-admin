@@ -141,29 +141,26 @@ ClassMethod DrawMenu(Par) As %String
 	set m="",ret=""
 	for { set m=$o(menu(m)) quit:m=""
 		set i=""
+		set icon=$select($lg(menu(m),4)'="":$lg(menu(m),4),1:"fa-copy")
 		set active=$s($lg(menu(m),3):"menu-open",1:"")
 		set ret=ret_
 		"<li class=""nav-item "_active_""">"_
             "<a href=""#"" class=""nav-link"" >"_
               //"<i class=""nav-icon fas fa-chart-pie""></i>"_
-              "<i class=""nav-icon fas fa-copy""></i>"_
+              "<i class=""nav-icon fas "_icon_"""></i>"_
               "<p>"_$lg(menu(m),2)_
                 "<i class=""right fas fa-angle-left""></i>"_
               "</p>"_
             "</a>"
-		
-		;s ret=ret_
-		;	"<li class='has-children overview "_active_"'><a href='#'>"_
-		;	$lg(menu(m),2)_
-		;	"</a><ul>"
+
 		for { set i=$o(menu(m,i)) quit:i=""
 	   		set onclick=##class(apptools.core.Action).WriteActJs(%request,"","MainHidden",..%ClassName(1),"ShowTab","&appPar="_i)
+			set iconInem=$select($g(opt(i,"aw-icon"))'="":$g(opt(i,"aw-icon")),1:"fa-ellipsis-h")
 		 	set ret=ret_	
 			"<ul class=""nav nav-treeview"">"_
               "<li class=""nav-item"">"_
                 "<a id='Menu"_$g(opt(i,"id"))_"' href=""#"" onclick="""_onclick_""" class=""nav-link"">"_
-                //"<i class=""far fa-circle nav-icon""></i>"_
-                "<i class=""nav-icon fas fa-ellipsis-h""></i>"_
+                "<i class=""nav-icon fas "_iconInem_"""></i>"_
                 			
                   "<p>"_$g(opt(i))_"</p>"_
                 "</a>"_

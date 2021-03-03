@@ -14,13 +14,11 @@ Parameter AppRoles = "ui_Permissions";
 /// Replace parameters
 ClassMethod MainParameter(ByRef h, path, url = "") As %Status
 {
- ;set path=$$$PATHCSP
  set par("=Brand-Text=")="AppTools-admin"
  set par("=Logo-png=")="ApptoolsLogo.png"
  set par("=titleAppToolsadmin=")=..#HeaderText
  set par("<!--=LinkIcon=-->")=..GetAppIcon(path_"dist/img/ApptoolsLogo","png")
  quit ..RepaceParameter(.h, path, url,.par)
- quit $$$OK
  quit $$$OK
 }
 
@@ -28,42 +26,43 @@ ClassMethod MainParameter(ByRef h, path, url = "") As %Status
 ClassMethod GetAllApps(opt) As %Status
 {
 	if ..IsPermiss("%All") {	
-	s LeftMenuName="Permission",LeftMenuNumer=1
-	s key="MenuMatrix"
-	s opt(key)=$$$aText("The matrix","") ;The name of the menu
-	s opt(key,"id")="Matrix"
-	s opt(key,"TabName")=$$$aText("The matrix","") ;the name of the tab
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"Method")="ShowTabSample"
-	s opt(key,"Disable")=0 ;developed
-	s opt(key,"TabMenu","Close")=1
-	s opt(key,"Menu")=$lb(LeftMenuNumer,LeftMenuName,1) ;$lg(,3)=1 - level 1 open menu
-	s opt(key,"Active")=1 ;active menu item
+	set LeftMenuName="Permission",
+		LeftMenuNumer=1,
+		open=1,        //3 =1 open menu
+		icon="fa-cog"  //4  icon
+	set menu=$lb(LeftMenuNumer,LeftMenuName,open,icon) 
+	set key="MenuMatrix"
+	set opt(key)=$$$aText("The matrix","") ;The name of the menu
+	set opt(key,"id")="Matrix"
+	set opt(key,"TabName")=$$$aText("The matrix","") ;the name of the tab
+	set opt(key,"ClassName")=..%ClassName(1)
+	set opt(key,"Method")="ShowTabSample"
+	set opt(key,"Disable")=0 ;developed
+	set opt(key,"TabMenu","Close")=1
+	set opt(key,"Menu")=menu
+	set opt(key,"Active")=1 ;active menu item
+	set opt(key,"aw-icon")="fa-list-alt" ;fa-table"
 
-	s LeftMenuName="Account",LeftMenuNumer=99
-	s key="menu-top-account3"
-	s opt(key)="Exit"
-	s opt(key,"id")="AccountExit"
-	s opt(key,"TabName")="Logoit" 
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"Method")="Logout"
-	s opt(key,"MenuTop")=$lb(LeftMenuNumer,LeftMenuName) ; 99-account has nested items
-
+	set LeftMenuName="Account",LeftMenuNumer=99
+	set key="menu-top-account3"
+	set opt(key)="Exit"
+	set opt(key,"id")="AccountExit"
+	set opt(key,"TabName")="Logoit" 
+	set opt(key,"ClassName")=..%ClassName(1)
+	set opt(key,"Method")="Logout"
+	set opt(key,"MenuTop")=$lb(LeftMenuNumer,LeftMenuName) ; 99-account has nested items
 	}
-	q $$$OK
+	quit $$$OK
 }
 
 /// download form template search users and roles
 ClassMethod MatrixFirstHead(Par = "") As %Status
 {
 	do ##class(apptools.core.Form).BlockUI(0)
-	s key=Par("key")
-	s divId=Par("divId")
-	s %ui=1
-	;set onclick=$$$blockui($$$aText("Loading...",""))_";AppAct('"_divId_"MainForm','"_divId_"MainContent','AppAct="_$zu(5)_":"_..%ClassName(1)_":"_divId_"Result:&key="_key_"&divId="_divId_"&mode=*');"
+	set key=Par("key")
+	set divId=Par("divId")
+	set %ui=1
 	set onclick=$$$blockui("Load...")_";"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainContent",..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
-	;ActionJs('"_divId_"MainForm','"_divId_"MainContent','','"_divId_"Result','key="_key_"~divId="_divId_"~mode=*');"
-
 	&html<
 		<table>
 		<tr>
@@ -90,15 +89,12 @@ ClassMethod MatrixResult(Par = "") As %Status
 	set key=Par("key")
 	set divId=Par("divId")
 	set mode=Par("mode")
-
 	;Geting elements from form and prepare array Par
-	s name=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"name")	
+	set name=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"name")	
 	set roles=$g(Par("%request.Data",divId_"roles"))
-
-
 	write ..ButtonAgain(divId,key)
-	d ##class(apptools.Tabs.security).UiMatrixPermission(name,roles,divId,key,"apptools.Tabs.security","UiSavePermiss")
-	q $$$OK
+	do ##class(apptools.Tabs.security).UiMatrixPermission(name,roles,divId,key,"apptools.Tabs.security","UiSavePermiss")
+	quit $$$OK
 }
 
 }

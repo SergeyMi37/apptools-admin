@@ -7,7 +7,7 @@ This solution can be installed in earlier versions of Caché and Ensemble (teste
 
 ## What's new
 This project is not only a set of [tools for the administrator](#PanelAdmin), but a platform for the rapid creation of a prototype of any solution.
-For example, Photo Album, Music Player, and Personal Library all come together in a user-friendly treasure chest design.
+For example, Photo Album, Music Player, and Personal Books Library all come together in a user-friendly treasure chest design.
 
 Load http:// your-host:your-port/apptoolsrest/a/infochest
 

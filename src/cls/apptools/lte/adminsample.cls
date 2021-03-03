@@ -26,99 +26,100 @@ ClassMethod GetAllApps(opt) As %Status
 {
 	;make them zavisimye from the area
 	;------------ sidebar
-	s key="menu-first"
-	s opt(key)="Find users" ;The name of the menu
-	s opt(key,"id")="Find" ;use methods: FindFirstHead FindResult
-	s opt(key,"TabName")="finding users" ;the name of the tab
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"Method")="ShowTabSample"
-	s opt(key,"Disable")=0 ;developed
-	s opt(key,"TabMenu","Close")=1
-	s opt(key,"Menu")=$lb(1,"Mode",1) ;$lg(,3)=1 - open menu level 1
-	s opt(key,"Active")=1 ;active menu item
+	set key="menu-first"
+	set opt(key)="Find users" ;The name of the menu
+	set opt(key,"id")="Find" ;use methods: FindFirstHead FindResult
+	set opt(key,"TabName")="finding users" ;the name of the tab
+	set opt(key,"ClassName")=..%ClassName(1)
+	set opt(key,"Method")="ShowTabSample"
+	set opt(key,"Disable")=0 ;developed
+	set opt(key,"TabMenu","Close")=1
+	set opt(key,"Menu")=$lb(1,"Mode",1,"fa-cog") ;$lg(,3)=1 - open menu level 1
+	set opt(key,"Active")=1 ;active menu item
+	set opt(key,"aw-icon")="fa-list-alt" ;fa-table"
 
-	s key="menu-first2"
-	s opt(key)="Sample gallery" ;The name of the menu
-	s opt(key,"id")="Lighbox" ;use methods: LighboxFirstHead LighboxResult
-	s opt(key,"TabName")="Gallery" ;the name of the tab
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"Method")="ShowTabSample"
-	s opt(key,"Disable")=0 ;developed
-	s opt(key,"TabMenu","Close")=1
-	s opt(key,"Menu")=$lb(1,"Mode",1) ;$lg(,3)=1 - open menu level 1
+	set key="menu-first2"
+	set opt(key)="Sample gallery" ;The name of the menu
+	set opt(key,"id")="Lighbox" ;use methods: LighboxFirstHead LighboxResult
+	set opt(key,"TabName")="Gallery" ;the name of the tab
+	set opt(key,"ClassName")=..%ClassName(1)
+	set opt(key,"Method")="ShowTabSample"
+	set opt(key,"Disable")=0 ;developed
+	set opt(key,"TabMenu","Close")=1
+	set opt(key,"Menu")=$lb(1,"Mode",1) ;$lg(,3)=1 - open menu level 1
 	
-	s key="menu-second"
-	s opt(key)="Help"
-	s opt(key,"id")="Help"
-	s opt(key,"TabName")="Help"
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"MethodUrl")="http://ShowTabAbout.cls"
-	s opt(key,"Disable")=1 ;developed
-	s opt(key,"Menu")=$lb(2,"About the program",0)
+	set key="menu-second"
+	set opt(key)="Help"
+	set opt(key,"id")="Help"
+	set opt(key,"TabName")="Help"
+	set opt(key,"ClassName")=..%ClassName(1)
+	set opt(key,"MethodUrl")="http://ShowTabAbout.cls"
+	set opt(key,"Disable")=1 ;developed
+	set opt(key,"Menu")=$lb(2,"About the program",0)
 
-	s key="menu-second2"
-	s opt(key)="Menu 3"
-	s opt(key,"id")="About"
-	s opt(key,"TabName")="Menu 3"
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"Method")="ShowTabAbout"
-	s opt(key,"Disable")=1 ;developed
-	s opt(key,"Menu")=$lb(2,"About the program")
+	set key="menu-second2"
+	set opt(key)="Menu 3"
+	set opt(key,"id")="About"
+	set opt(key,"TabName")="Menu 3"
+	set opt(key,"ClassName")=..%ClassName(1)
+	set opt(key,"Method")="ShowTabAbout"
+	set opt(key,"Disable")=1 ;developed
+	set opt(key,"Menu")=$lb(2,"About the program")
 
-	s key="menu-second3"
-	s opt(key)="Support"
-	s opt(key,"id")="Support"
-	s opt(key,"TabName")="Support"
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"MethodUrlNewWin")="http://ShowTabAbout.cls"
-	s opt(key,"Disable")=1 ;developed
-	s opt(key,"Menu")=$lb(2,"About the program")
+	set key="menu-second3"
+	set opt(key)="Support"
+	set opt(key,"id")="Support"
+	set opt(key,"TabName")="Support"
+	set opt(key,"ClassName")=..%ClassName(1)
+	set opt(key,"MethodUrlNewWin")="http://ShowTabAbout.cls"
+	set opt(key,"Disable")=1 ;developed
+	set opt(key,"Menu")=$lb(2,"About the program")
 	
 	;------------ one-level upper menu 
-	s key="menu-topLern"
-	s opt(key)="Menu 2"
-	s opt(key,"id")="Menu2"
-	s opt(key,"TabName")="Menu 2"
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"Method")="ShowTabAbout"
-	s opt(key,"MenuTop")=$lb(1,"Menu 2") ;has no sub-items
+	set key="menu-topLern"
+	set opt(key)="Menu 2"
+	set opt(key,"id")="Menu2"
+	set opt(key,"TabName")="Menu 2"
+	set opt(key,"ClassName")=..%ClassName(1)
+	set opt(key,"Method")="ShowTabAbout"
+	set opt(key,"MenuTop")=$lb(1,"Menu 2") ;has no sub-items
 
-	s key="menu-topOpt"
-	s opt(key)="Option"
-	s opt(key,"id")="Option"
-	s opt(key,"TabName")="Option"
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"Method")="ShowTabAbout"
-	s opt(key,"MenuTop")=$lb(2,"Option") ;has no sub-items
+	set key="menu-topOpt"
+	set opt(key)="Option"
+	set opt(key,"id")="Option"
+	set opt(key,"TabName")="Option"
+	set opt(key,"ClassName")=..%ClassName(1)
+	set opt(key,"Method")="ShowTabAbout"
+	set opt(key,"MenuTop")=$lb(2,"Option") ;has no sub-items
 
 	;------------ top menu the top-accoun
-	s key="menu-top-accoun"
-	s opt(key)=$$$aText("Profile","")
-	s opt(key,"id")="AccountProf"
-	s opt(key,"TabName")=$$$aText("Profile","")
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"Method")="ShowTabAbout"
-	s opt(key,"MenuTop")=$lb(99,"Account") ;only 99-account has sub-items
+	set key="menu-top-accoun"
+	set opt(key)=$$$aText("Profile","")
+	set opt(key,"id")="AccountProf"
+	set opt(key,"TabName")=$$$aText("Profile","")
+	set opt(key,"ClassName")=..%ClassName(1)
+	set opt(key,"Method")="ShowTabAbout"
+	set opt(key,"MenuTop")=$lb(99,"Account") ;only 99-account has sub-items
 
-	s key="menu-top-account3"
-	s opt(key)=$$$aText("Exit","")
-	s opt(key,"id")="AccountExit"
-	s opt(key,"TabName")=$$$aText("Exit","")
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"Method")="Logout"
-	s opt(key,"MenuTop")=$lb(99,"Account") ;only 99-account has sub-items
+	set key="menu-top-account3"
+	set opt(key)=$$$aText("Exit","")
+	set opt(key,"id")="AccountExit"
+	set opt(key,"TabName")=$$$aText("Exit","")
+	set opt(key,"ClassName")=..%ClassName(1)
+	set opt(key,"Method")="Logout"
+	set opt(key,"MenuTop")=$lb(99,"Account") ;only 99-account has sub-items
 	
 	;----- Setup the search in the top menu
-	s key="Search"
-	s opt(key)=$$$aText("Search","")
-	s opt(key,"id")="Search-"
-	s opt(key,"TabName")=$$$aText("Search","")_"-"
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"Method")="ShowTabSearch"
-	s opt(key,"TabMenu","Close")=1
-	s opt(key,"TabMenu","Mode")=0 ;1 - for each new search bar to make new tab, 0-tab is always the same
+	set key="Search"
+	set opt(key)=$$$aText("Search","")
+	set opt(key,"id")="Search-"
+	set opt(key,"TabName")=$$$aText("Search","")_"-"
+	set opt(key,"ClassName")=..%ClassName(1)
+	set opt(key,"Method")="ShowTabSearch"
+	set opt(key,"TabMenu","Close")=1
+	set opt(key,"TabMenu","Mode")=0 ;1 - for each new search bar to make new tab, 0-tab is always the same
 	
-	q $$$OK
+	quit $$$OK
 }
 
 /// download template forms search
