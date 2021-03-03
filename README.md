@@ -7,14 +7,15 @@ Application tools for technical support and DBMS administrator. View and edit ar
 This solution can be installed in earlier versions of Caché and Ensemble (tested 2016.1+). This can be done by importing xml.
 
 ## What's new
-This project is not only a set of [tools for the administrator](https://community.intersystems.com/post/intersystems-full-stack-contest-winners), but a platform for the rapid creation of a prototype of any solution.
+This project is not only a set of [tools for the administrator](#PanelAdmin), but a platform for the rapid creation of a prototype of any solution.
 For example, Photo Album, Music Player, and Personal Library all come together in a user-friendly treasure chest design.
 
-Load http://your-host:your-port/apptoolsrest/a/infochest
+Load http:// your-host:your-port/apptoolsrest/a/infochest
 
 Change the path to your treasure files and start viewing, listening or reading from any convenient device: desktop, tablet or smartphone.
 
 ![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/chest/Screenshot_1.png)
+
 The example will be located at ${CSPdir}/apptools/files
 ![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/chest/Screenshot_2.png)
 ![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/chest/Screenshot_3.png)
@@ -66,7 +67,7 @@ USER>zpm
 zpm:USER>install apptools-admin
 ```
 
-## Panel for admins & developers
+## <a name="PanelAdmin">Panel for admins & developers</a>
 
  Load http://your-host:your-port/apptools/apptools.core.LogInfo.cls?WHAT=%3F
   
