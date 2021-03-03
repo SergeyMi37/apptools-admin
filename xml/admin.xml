@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25" zv="IRIS for UNIX (Red Hat Enterprise Linux for x86-64) 2019.1.1 (Build 612U)" ts="2020-10-08 16:48:30">
+<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2020.1 (Build 215U)" ts="2021-03-03 10:08:03">
 <Class name="apptools.Chart.Chart">
 <Super>apptools.core.AutoPage</Super>
 <TimeChanged>65428,53141.445298</TimeChanged>
@@ -32,7 +32,7 @@ Get the detail pane info object</Description>
 <Class name="apptools.Chart.ChartPanel">
 <IncludeCode>apptools.core</IncludeCode>
 <Super>apptools.core.LogInfoPane</Super>
-<TimeChanged>65659,64991.475677</TimeChanged>
+<TimeChanged>65671,35471.418897</TimeChanged>
 <TimeCreated>64985,34799.861897</TimeCreated>
 
 <Parameter name="XMLTYPE">
@@ -52,27 +52,27 @@ Drawing graphs</Description>
 	if nsp'="" try {zn nsp set NSpace=nsp } catch e {}
 	set NSpace=$zu(5)
 
-	s arg("header")="Error"
-	s arg("labels")="[""Error""]"
-	s arg("type")="bar" ;line
-	s arg("datasets")="{   label: """_$$$aText("Error display on the graph","")_""", borderColor: 'rgb(255, 199, 132)',  data: [30],  }"
+	set arg("header")="Error"
+	set arg("labels")="[""Error""]"
+	set arg("type")="bar" ;line
+	set arg("datasets")="{   label: """_$$$aText("Error display on the graph","")_""", borderColor: 'rgb(255, 199, 132)',  data: [30],  }"
 
-	s days=1000
-	i %request.Get("days") S days=%request.Get("days")
+	set days=1000
+	if %request.Get("days") S days=%request.Get("days")
 	
 	if %request.Get("panel")'="" {
-		s class=$p($p(%request.Get("panel"),"(",2),")"),method=$p($p(%request.Get("panel"),")",2),".",2)
-		s st=$classmethod(class,method,.arg,days)
+		set class=$p($p(%request.Get("panel"),"(",2),")"),method=$p($p(%request.Get("panel"),")",2),".",2)
+		set st=$classmethod(class,method,.arg,days)
 	}
 	&html< <canvas id="Chart"></canvas>
 	>
 	$$$jsstart
- 	w "var ctx = document.getElementById('Chart').getContext('2d');"
- 	w "var chart = new Chart(ctx, {   type: '"_$g(arg("type"),"bar")_"',"
+ 	write "var ctx = document.getElementById('Chart').getContext('2d');"
+ 	write "var chart = new Chart(ctx, {   type: '"_$g(arg("type"),"bar")_"',"
     // The data for our dataset
-    w "data: {  labels: "_$g(arg("labels"))_","   // ["January", "February", "March", "April", "May", "June", "July"],
-    w "   datasets: ["_$g(arg("datasets"))
-    w " ] },  options: {    hover: { mode: 'index' }, tooltips: { mode: 'index' }	, title: { display: true, text: '"_$tr($g(arg("header")),"'""")_"'  }    } });"
+    write "data: {  labels: "_$g(arg("labels"))_","   // ["January", "February", "March", "April", "May", "June", "July"],
+    write "   datasets: ["_$g(arg("datasets"))
+    write " ] },  options: {    hover: { mode: 'index' }, tooltips: { mode: 'index' }	, title: { display: true, text: '"_$tr($g(arg("header")),"'""")_"'  }    } });"
 	$$$jsstop
 	quit $$$OK
 errors
@@ -88,19 +88,19 @@ d ##class(apptools.Chart.ChartPanel).ColorRGBa(32,0.2)</Description>
 <FormalSpec>num,alfa=1</FormalSpec>
 <Implementation><![CDATA[
  
-	s c=$e(+num,*)
+	set c=$e(+num,*)
 	;i +num>9 
 	;the same light alfa=1 because the opacity: 100% *
-	i c=0 q "rgba(255, 0, 0, "_alfa_")" ;pure red
-	i c=1 q "rgba(255, 99, 132, "_alfa_")" ;red
-    i c=2 q "rgba(255, 159, 64, "_alfa_")" ;orange
-    i c=3 q "rgba(255, 206, 86, "_alfa_")" ;yellow
-    i c=4 q "rgba(0, 255, 0, "_alfa_")" ;pure green
-    i c=5 q "rgba(75, 192, 192, "_alfa_")" ;green
-    i c=6 q "rgba(12, 164, 240, "_alfa_");" ;blue
-    i c=7 q "rgba(0, 0, 255, "_alfa_")" ;clear blue
-    i c=8 q "rgba(54, 162, 235, "_alfa_")" ;blue
-    i c=9 q "rgba(153, 102, 255, "_alfa_")" ;purple
+	if c=0 quit "rgba(255, 0, 0, "_alfa_")" ;pure red
+	if c=1 quit "rgba(255, 99, 132, "_alfa_")" ;red
+    if c=2 quit "rgba(255, 159, 64, "_alfa_")" ;orange
+    if c=3 quit "rgba(255, 206, 86, "_alfa_")" ;yellow
+    if c=4 quit "rgba(0, 255, 0, "_alfa_")" ;pure green
+    if c=5 quit "rgba(75, 192, 192, "_alfa_")" ;green
+    if c=6 quit "rgba(12, 164, 240, "_alfa_");" ;blue
+    if c=7 quit "rgba(0, 0, 255, "_alfa_")" ;clear blue
+    if c=8 quit "rgba(54, 162, 235, "_alfa_")" ;blue
+    if c=9 quit "rgba(153, 102, 255, "_alfa_")" ;purple
 ]]></Implementation>
 </Method>
 
@@ -110,16 +110,16 @@ Complete the chart objects</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>res,data,labels,arg</FormalSpec>
 <Implementation><![CDATA[
-	s datasets=""
-	s a="" f num=1:1 { s a=$o(res(a)) q:a=""
-		s data(a)=$e(data(a),1,*-1)_"], }"
-		s datasets=datasets_data(a)_","
+	set datasets=""
+	set a="" for num=1:1 { set a=$o(res(a)) quit:a=""
+		set data(a)=$e(data(a),1,*-1)_"], }"
+		set datasets=datasets_data(a)_","
 	}
-	s datasets=$e(datasets,1,*-1)
-	s labels=$e(labels,1,*-1)_"]"
-	s arg("datasets")=datasets
-	s arg("labels")=labels
-	q 1
+	set datasets=$e(datasets,1,*-1)
+	set labels=$e(labels,1,*-1)_"]"
+	set arg("datasets")=datasets
+	set arg("labels")=labels
+	quit 1
 ]]></Implementation>
 </Method>
 
@@ -131,15 +131,15 @@ d ##class(apptools.Chart.ChartPanel).ChartLicUsed(.arg,1200,.res)</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>arg,days,res,gn="^%apptools.Task"</FormalSpec>
 <Implementation><![CDATA[
- s par=$p(days,",",2,999)
- s days=+days
- s ToDay=$zd($h,3),FromDay=$zd($h-days,3)
- s arg("header")=$$$aText("The dynamics of license spending based on a regular job in a date range ","")_FromDay_" - "_ToDay
- s arg("type")="line"
- s GN=$na(@gn@("%SYSTEM.License:Counts"))
- s dt=""
- f i=1:1:10 { s dt=$o(@GN@(dt),1) q:dt=""
- 	w !,dt," ",$g(@GN@(dt,4,2))
+ set par=$p(days,",",2,999)
+ set days=+days
+ set ToDay=$zd($h,3),FromDay=$zd($h-days,3)
+ set arg("header")=$$$aText("The dynamics of license spending based on a regular job in a date range ","")_FromDay_" - "_ToDay
+ set arg("type")="line"
+ set GN=$na(@gn@("%SYSTEM.License:Counts"))
+ set dt=""
+ for i=1:1:10 { set dt=$o(@GN@(dt),1) quit:dt=""
+ 	write !,dt," ",$g(@GN@(dt,4,2))
  }
 ]]></Implementation>
 </Method>
@@ -151,30 +151,30 @@ d ##class(apptools.Chart.ChartPanel).ChartAlert(.arg,1200,.res)</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>arg,days,res,list,mm</FormalSpec>
 <Implementation><![CDATA[
- 	s method="class(apptools.core.files).Alert" 
-	d ##class(apptools.core.files).FindContextInLog(days,method,.res) // to parse a Protocol to calculate important events
-	s df=$p(res," ",1)
-	s dt=$p(res," ",2)
-	s arg("header")=$$$aText("Important system events in the date range ","")_df_" - "_dt
-	s arg("type")="line"
-	s labels="["
-	f yyyy=$p(df,".",3):1:$p(dt,".",3) {
+ 	set method="class(apptools.core.files).Alert" 
+	do ##class(apptools.core.files).FindContextInLog(days,method,.res) // to parse a Protocol to calculate important events
+	set df=$p(res," ",1)
+	set dt=$p(res," ",2)
+	set arg("header")=$$$aText("Important system events in the date range ","")_df_" - "_dt
+	set arg("type")="line"
+	set labels="["
+	for yyyy=$p(df,".",3):1:$p(dt,".",3) {
 		for m=1:1:12 {
-			i yyyy=$p(df,".",3),m<$p(df,".",2)  continue
-			i yyyy=$p(dt,".",3),m>$p(dt,".",2)  continue
-			i m?1n s mm="0"_m
-			e  s mm=m
-			s labels=labels_""""_##class(apptools.core.type).GetTextMonth(mm)_"."_yyyy_""","
-			s a="" f num=1:1 { s a=$o(res(a)) q:a=""
-				i '$d(color(a)) s color(a)=num
-				i '$d(data(a)) s data(a)="{  label: """_a_""", borderColor: '"_..ColorRGBa(color(a),1)_"',  data: ["
-				s data(a)=data(a)_+$g(res(a,yyyy,mm))_","
+			if yyyy=$p(df,".",3),m<$p(df,".",2)  continue
+			if yyyy=$p(dt,".",3),m>$p(dt,".",2)  continue
+			if m?1n s mm="0"_m
+			else  s mm=m
+			set labels=labels_""""_##class(apptools.core.type).GetTextMonth(mm)_"."_yyyy_""","
+			set a="" f num=1:1 { s a=$o(res(a)) q:a=""
+				if '$d(color(a)) s color(a)=num
+				if '$d(data(a)) s data(a)="{  label: """_a_""", borderColor: '"_..ColorRGBa(color(a),1)_"',  data: ["
+				set data(a)=data(a)_+$g(res(a,yyyy,mm))_","
 			}
 
 		}
 	}
- d ..FinishArg(.res, .data, .labels, .arg)
- q $$$OK
+ do ..FinishArg(.res, .data, .labels, .arg)
+ quit $$$OK
 ]]></Implementation>
 </Method>
 
@@ -185,9 +185,9 @@ d ##class(apptools.Chart.ChartPanel).ChartDbSize(.arg,1200,.res,.list,.mm)</Desc
 <ClassMethod>1</ClassMethod>
 <FormalSpec>arg,days,res,list,mm</FormalSpec>
 <Implementation><![CDATA[
-	s method="class(apptools.core.files).ExpansionDB" 
-	d ##class(apptools.core.files).FindContextInLog(days,method,.res) //to disassemble the Protocol to calculate the monthly growth of the database in megabytes
-	d ##class(apptools.core.rest).getDBsize("dbsize",.list) //to calculate the current database size in gigabytes
+	set method="class(apptools.core.files).ExpansionDB" 
+	do ##class(apptools.core.files).FindContextInLog(days,method,.res) //to disassemble the Protocol to calculate the monthly growth of the database in megabytes
+	do ##class(apptools.core.rest).getDBsize("dbsize",.list) //to calculate the current database size in gigabytes
 	//let's go back in time taking masany growth
 	s df=$p(res," ",1)
 	s dt=$p(res," ",2)
@@ -2331,7 +2331,7 @@ The template GUI of the application selector and tabs on the basis jQueryUi, Uik
 <IncludeCode>apptools.core</IncludeCode>
 <ProcedureBlock>1</ProcedureBlock>
 <Super>%CSP.Page</Super>
-<TimeChanged>65610,77273.857</TimeChanged>
+<TimeChanged>65779,53110.832732</TimeChanged>
 <TimeCreated>65065,36454.902831</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -2430,7 +2430,7 @@ TODO #2c3136 - 6699CC , 33383e - #6FA6DE , ffffff - #0048BA
 
  &html<
 	
-<link rel="stylesheet" href="#(path)#/uikit-dark-admin/css/nav.css"> <!-- CSS reset -->
+<link rel="stylesheet" href="#(path)#apptools-uikit-dark-admin/css/nav.css"> <!-- CSS reset -->
 	
 </head>
 <body>
@@ -2484,7 +2484,7 @@ TODO #2c3136 - 6699CC , 33383e - #6FA6DE , ffffff - #0048BA
 		</div> <!-- .content-wrapper -->
 	</main> <!-- .cd-main-content -->
 
-<script src="#(path)#/uikit-dark-admin/js/main.js"></script> <!-- Resource jQuery -->
+<script src="#(path)#apptools-uikit-dark-admin/js/main.js"></script> <!-- Resource jQuery -->
 
  <script language="javascript">
 
@@ -3779,7 +3779,7 @@ Search result </Description>
 Security utilities</Description>
 <Abstract>1</Abstract>
 <IncludeCode>apptools.core</IncludeCode>
-<TimeChanged>65610,77273.857</TimeChanged>
+<TimeChanged>65803,41967.05491</TimeChanged>
 <TimeCreated>64734,80043.870644</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -3863,7 +3863,7 @@ d ##class(apptools.Tabs.security).UiMatrixPermission("sm","sp","Ui","AnyKey","ap
 		
 		set onclick=$$$blockui("Load...")_";"_##class(apptools.core.Action).WriteActJs(%request,divId_"FormContentSave",divId_"ContentSave",class,Method,"&key="_key_"&divId="_divId_"&mode=Save")
 		;ActionJs('"_divId_"MainForm','"_divId_"MainContent','','"_divId_"Result','key="_key_"~divId="_divId_"~mode=*');"
-
+        ;set %ui=1
 		set butt=$$$appButton(divId_"appButtonSavePermiss","onclick="""_onclick_"""",$$$aText("Save access rights",""))
 		write butt_"<br><br>"
 		write "<form id='"_divId_"FormContentSave' >"
@@ -5225,7 +5225,7 @@ Withdraw the necessary actions</Description>
 <IncludeCode>apptools.core</IncludeCode>
 <ProcedureBlock>1</ProcedureBlock>
 <Super>%CSP.Page</Super>
-<TimeChanged>65610,77273.857</TimeChanged>
+<TimeChanged>65803,39271.006905</TimeChanged>
 <TimeCreated>65607,76497.951768</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -5236,9 +5236,11 @@ s par=##class(apptools.core.Action).GetParam(.%request,"ns",param)</Description>
 <FormalSpec>req,paramName,param</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
- if $d(req) { q $tr(req.Get(paramName),"#")
+ if $d(req) { 
+ 	q $tr(req.Get(paramName),"#")
  }
  else { set val=$p($p(param,("&"_paramName_"="),2),"&",1)
+ 	quit val
  }
 ]]></Implementation>
 </Method>
@@ -5311,6 +5313,10 @@ Main method generate the content of page</Description>
 		$$$jsstart
  		write "alert('"_$$$aText("The appMethod parameter is empty","")_"');"
  		$$$jsstop
+ 		zw jsobj
+ 		m a=%request.Data
+ 		zw a
+ 		w
 		quit $$$OK
 	}
 	elseif appMethod="ShowJson" {
@@ -5468,7 +5474,9 @@ w ##class(apptools.core.Action).WriteActJs(%request,pref_"MainForm",mhead,..%Cla
 <Implementation><![CDATA[
   	s $$$AppL("MML","%request-WriteActJs-")=$$$AppObJs(req)
   	set:CGIVar'["'" CGIVar=CGIVar_"'"
-  	if req.URL[(req.Application_"get-html")||(req.URL[(req.Application_"post-json")) { //is static content
+  	if req.URL[(req.Application_"get-html")||
+  		(req.URL[(req.Application_"post-json"))||
+  		(req.URL[(req.Application_"a")) { //is static content
   		q "AppRpc('"_fornId_"','"_resultDivId_"','"_$zu(5)_":"_classname_":"_method_":"_CGIVar_",'"_req.Application_"post-json');"
   	} else {
   		q "ActionJs('"_fornId_"','"_resultDivId_"','"_classname_"','"_method_"','"_CGIVar_");"
@@ -6528,565 +6536,7 @@ do ##class(apptools.core.Form).DrawTable(.matrix) </Description>
 </Class>
 
 
-<Class name="apptools.core.GenerateDB">
-<Description>
-/// Generate DB and Namespace with CSP, REST application 
-Forked from iashenrique.Utils.GenerateDB</Description>
-<IncludeCode>apptools.core</IncludeCode>
-<TimeChanged>65610,77273.857</TimeChanged>
-<TimeCreated>65607,76507.625263</TimeCreated>
-
-<Parameter name="LIBRARY">
-<Expression>$Select($Select($ZVersion["IRIS":1,1:0):"IRISLIB",1:"CACHELIB")</Expression>
-</Parameter>
-
-<Parameter name="SYSGLOBALS">
-<Expression>$Select($Select($ZVersion["IRIS":1,1:0):"IRISSYS",1:"CACHESYS")</Expression>
-</Parameter>
-
-<Parameter name="TEMPGLOBALS">
-<Expression>$Select($Select($ZVersion["IRIS":1,1:0):"IRISTEMP",1:"CACHETEMP")</Expression>
-</Parameter>
-
-<Parameter name="DATABASENAME">
-<Expression>$Select($Select($ZVersion["IRIS":1,1:0):"IRIS.DAT",1:"CACHE.DAT")</Expression>
-</Parameter>
-
-<Method name="CreateNew">
-<Description>
-write ##class(apptools.core.GenerateDB).Install("NEWNS", 1, "NEWBD", 1, "REST.Dispatch")
-do ##class(apptools.core.GenerateDB).CreateNew()</Description>
-<ClassMethod>1</ClassMethod>
-<Implementation><![CDATA[
-    Write !!
-
-    Read "Do you want to create a new Database/Namespace? (Y/N) : ",tStart,!!
-
-    If $Extract($ZConvert(tStart,"U"),1,1) = "Y" {
-        Read "Choose your Namespace name : ",tNamespaceName,!
-        Read "Choose the Dataset location <Path Default is mgr directory> : ",tPathDataset, !
-        Read "Make this an Interoperability namespace? (Y/N) : ",tInteroperability,!
-        Read "Do you want to split the database into CODE/DATA? (Y/N) : ",tCodeData,! 
-        Read "Create a REST Application? (Y/N) : ",tREST,!
-		if $ZConvert(tREST,"U")="Y" {
-			read "Choose your Dispatcher classname <REST.Dispatch> : ",tREST,!
-			if tREST="" {
-				set tREST="REST.Dispatch"
-			}
-			elseif tREST'["." {
-				set tREST="N"
-			}
-		}
-        
-        Write !!
-
-        Write "=======================================",!
-        Write "=               SUMMARY               =",!
-        Write "======================================="
-        Write !!
-
-        Write "Namespace => "_$ZConvert(tNamespaceName,"U"),!
-        If $Extract($ZConvert(tCodeData,"U"),1,1) = "Y" {
-            Set tCodeData = $$$YES
-            Write "Database => "_$ZConvert(tNamespaceName,"U")_"-CODE / "_$ZConvert(tNamespaceName,"U")_"-DATA",!
-        }
-        Else {
-            Set tCodeData = $$$NO
-            Write "Database => "_$ZConvert(tNamespaceName,"U"),!
-        }
-
-        If (tPathDataset '= "") {
-            Write "Dataset Location => "_$ZConvert(tPathDataset,"L"),!
-        }
-        Else {
-            Write "Dataset Default Location => "_$System.Util.ManagerDirectory(),!
-        }
-
-        If $Extract($ZConvert(tInteroperability,"U"),1,1) = "Y" {
-            Set tInteroperability = $$$YES
-            Write "Interoperability => Yes",!
-        }
-        Else {
-            Set tInteroperability = $$$NO
-            Write "Interoperability => No",!
-        }
-
-        Write "CSP Application => /csp/"_$ZConvert(tNamespaceName,"L"),!
-        If tREST["." {
-            Write "REST Application => /rest/"_$ZConvert(tNamespaceName,"L"),!	
-            Write "Dispatch Class: "_tREST,!	
-        }
-        Else {
-            Set tREST = ""
-            Write "REST Application => No",!
-        }
-
-        Write !!
-        Read "Do you want to proceed? (Y/N) : ",tProceed,!
-
-        If $Extract($ZConvert(tProceed,"U"),1,1) = "Y" {
-            Do ..Install(tNamespaceName, tCodeData, tPathDataset, tInteroperability, tREST)
-        }
-        Else {
-            Write #,!
-            Do ..CreateNew()
-        }
-
-    }
-
-    Quit
-]]></Implementation>
-</Method>
-
-<Method name="Install">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pNamespace:%String,pCodeData:%Boolean=1,pPathDataset:%String,pInterOperability:%Boolean=0,pREST:%String=""</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-    Set sc = $$$OK
-    Try {
-        Set sc = $$$ADDSC(sc,..CreateDatabase(pNamespace, pCodeData, pPathDataset)) quit:$$$ISERR(sc)
-        Set sc = $$$ADDSC(sc,..CreateNamespace(pNamespace, pCodeData, pInterOperability, pREST)) quit:$$$ISERR(sc)
-    }
-    Catch (err) {
-        Set sc = $$$ADDSC(sc,err.AsStatus())
-    }
-    Return sc
-]]></Implementation>
-</Method>
-
-<Method name="CreateDatabase">
-<Description>
-Create new database directory</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pNamespace:%String,pCodeData:%Boolean,pPathDataset:%String</FormalSpec>
-<Private>1</Private>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-    New $Namespace
-    Set $Namespace = "%SYS"
-    Set sc = $$$OK
-    Try {
-        Set dbList = $Listbuild("")
-        Set:(pCodeData = $$$YES) dbList= $Listbuild("-CODE","-DATA") 
-        Set i = 0
-        For i = 1:1:$Listlength(dbList) {
-            Set dbSuffix = $Listget(dbList,i)
-            If (pPathDataset '= "") {
-                Set directory = pPathDataset_$Case($$$isWINDOWS,1:"\",:"/")_pNamespace_dbSuffix
-            }
-            Else {
-                Set directory = ..GetDatabaseDirectory(pNamespace_dbSuffix)
-            }
-
-            #; create a new directory if does not exist
-            If '..CheckDatabaseDirExists(directory) {
-                Set directory = $ZStrip(directory,"<>W")
-                Set sc = $$$ADDSC(sc,##class(%File).CreateDirectoryChain(directory))
-                If $$$ISERR(sc) {
-                    Set msg = directory_": Could not create this directory. Please check the directory and try again."
-                    Set sc = $$$ADDSC(sc,$$$ERROR($$$GeneralError,msg))				
-                }
-            }
-            Else {
-                #; abort if database is already created
-                If ..CheckDatabaseExists(directory) {
-                    Set msg = directory_": Database already existent in this directory. Please check the directory and try again."
-                    Set sc = $$$ADDSC(sc,$$$ERROR($$$GeneralError,msg))
-                }
-            }
-            Quit:$$$ISERR(sc)
-
-            #; create new database
-            Set dbName = pNamespace_dbSuffix
-            Set sc = $$$ADDSC(sc,##class(apptools.core.GenerateDB).CreateResource(dbName))
-            Quit:$$$ISERR(sc)
-            
-            Write "Creating Database "_dbName_"... "
-            Set size = 1
-            Set blockSize = 8192
-            Set properties("Directory") = directory
-            Set journalState = 1
-            Set sc = $$$ADDSC(sc,##class(SYS.Database).CreateDatabase(directory,size,blockSize,0,"%DB_"_dbName,journalState,"",""))
-            Quit:$$$ISERR(sc)
-
-            #; Handle if we have dismounted then deleted the database at the O/S level,
-            #; but the CPF entry still exists with the same directory, then recreate the DB only
-            If ##class(Config.Databases).Exists(dbName,.obj) {
-                If obj.Directory '= ##class(%File).ComputeFullDBDir(directory) {
-                    Set sc = $$$ADDSC(sc,##Class(Config.Databases).Create(dbName,.properties))
-                    Quit:$$$ISERR(sc)
-                }
-            }
-            Else {
-                Set sc = $$$ADDSC(sc,##Class(Config.Databases).Create(dbName,.properties))
-                Quit:$$$ISERR(sc)
-            }
-            Write "done!",!
-        }
-    }
-    Catch (err) {
-        Set sc = $$$ADDSC(sc,err.AsStatus())
-    }
-    Return sc
-]]></Implementation>
-</Method>
-
-<Method name="CreateRole">
-<Description>
-Create new Role
-w $system.Status.GetErrorText(##class(apptools.core.GenerateDB).CreateRole("SWAGGERUI-CODE"))</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>dbName:%String</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-   ;create new role
-   New $Namespace
-   Set $Namespace = "%SYS"
-   Set sc = $$$OK
-   s nameR="%DB_"_dbName,desc="Role for "_nameR 
-	s pResources=nameR_":RW" 
-	if '##class(Security.Resources).Exists(nameR) {
-		Set sc = $$$ADDSC(sc,##class(Security.Resources).Create(nameR,"Resources for "_nameR,"RW"))
-		Quit:$$$ISERR(sc) sc
-	}
-	s pRolesGranted=""
-	if '##class(Security.Roles).Exists(nameR) {
-		Set sc = $$$ADDSC(sc,##class(Security.Roles).Create(nameR,desc,pResources,pRolesGranted))
-		Quit:$$$ISERR(sc) sc
-		w !,"Create new role "_nameR
-	}
-	Return sc
-]]></Implementation>
-</Method>
-
-<Method name="CreateResource">
-<Description>
-Create new Resource
-w $system.Status.GetErrorText(##class(apptools.core.GenerateDB).CreateResource("DSW-DATA"))</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>dbName:%String,Permiss:%String="RW"</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-   ;create new resource
-   New $Namespace
-   Set $Namespace = "%SYS"
-    Set sc = $$$OK
-   s nameR="%DB_"_dbName,desc="Resource for "_nameR 
-	if '##class(Security.Resources).Exists(nameR) {
-		Set sc = $$$ADDSC(sc,##class(Security.Resources).Create(nameR,desc,Permiss))
-		Quit:$$$ISERR(sc) sc
-		w !,"Create new Resource "_nameR
-	}
-	Return sc
-]]></Implementation>
-</Method>
-
-<Method name="DeleteResource">
-<Description>
-Delete Resource
-w $system.Status.GetErrorText(##class(apptools.core.GenerateDB).DeleteResource("DSW-DATA"))</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>dbName:%String</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
- New $Namespace
- Set $Namespace = "%SYS"
- Set sc = $$$OK
-   s nameR="%DB_"_dbName
-	if ##class(Security.Resources).Exists(nameR) {
-		Set sc = $$$ADDSC(sc,##class(Security.Resources).Delete(nameR))
-		Quit:$$$ISERR(sc) sc
-		w !,"Delete Resource "_nameR
-	}
-	Return sc
-]]></Implementation>
-</Method>
-
-<Method name="DeleteRole">
-<Description>
-Delete Role
-w $system.Status.GetErrorText(##class(apptools.core.GenerateDB).DeleteRole("DSW-DATA"))</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>dbName:%String</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
- New $Namespace
- Set $Namespace = "%SYS"
- Set sc = $$$OK
-   s nameR="%DB_"_dbName
-	if ##class(Security.Roles).Exists(nameR) {
-		Set sc = $$$ADDSC(sc,##class(Security.Roles).Delete(nameR))
-		Quit:$$$ISERR(sc) sc
-		w !,"Delete role "_nameR
-	}
-	Return sc
-]]></Implementation>
-</Method>
-
-<Method name="CreateNamespace">
-<Description>
-Create new namespace</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pNamespace:%String,pCodeData:%Boolean,pInterOperability:%Boolean,pREST:%String</FormalSpec>
-<Private>1</Private>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-
-    New $Namespace
-    Set $Namespace = "%SYS"
-
-    If (pCodeData = $$$YES) {
-        Set strGlobals = pNamespace_"-DATA"
-        Set strRoutine = pNamespace_"-CODE"
-    }
-    Else {
-        Set (strGlobals, strRoutine) = pNamespace
-    }
-
-    Set sc = $$$OK
-    Try {
-
-        Write "Creating Namespace "_pNamespace_"... "
-
-        Set nsProperties("Globals") = strGlobals
-        Set nsProperties("Library") = ..#LIBRARY
-        Set nsProperties("Routines") = strRoutine
-        Set nsProperties("SysGlobals") = ..#SYSGLOBALS
-        Set nsProperties("SysRoutines") = ..#SYSGLOBALS
-        Set nsProperties("TempGlobals") = ..#TEMPGLOBALS
-        Set sc = $$$ADDSC(sc,##Class(Config.Namespaces).Create(pNamespace,.nsProperties))
-
-        Write "done!",!
-
-        #; enable Interoperability
-        If (pInterOperability = $$$YES) {
-            Write "Creating Interoperability mappings ... "
-            #; create InterOperability mappings
-            Set:'$Data(^%SYS("Ensemble","InstalledNamespace",pNamespace)) ^%SYS("Ensemble","InstalledNamespace",pNamespace)=""
-            Set sc = $$$ADDSC(sc,##class(%EnsembleMgr).createMappings(pNamespace))
-            Write "done!",!
-
-            Write "Adding Interoperability SQL privileges ... "
-            #; add InterOperability SQL privileges
-            Set sc = $$$ADDSC(sc,##class(%EnsembleMgr).addEnsembleSQLPrivileges(pNamespace))	
-            Write "done!",!
-        }
-        Set sc = $$$ADDSC(sc,..CreateCSPApplication(pNamespace))
-        If (pREST '= "") {
-            Set sc = $$$ADDSC(sc,..createRESTApp(pNamespace,pREST))
-        }
-    }
-    Catch (err) {
-        Set sc = $$$ADDSC(sc,err.AsStatus())
-    }
-    Return sc
-]]></Implementation>
-</Method>
-
-<Method name="CreateCSPApplication">
-<Description>
-Create CSP application</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pNamespace:%String</FormalSpec>
-<Private>1</Private>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-    Set sc = $$$OK
-    New $Namespace
-    Set $Namespace="%SYS"
-    Try {
-        Write "Creating CSP Application ... "
-        Set lower = $ZConvert(pNamespace,"L")
-        Set del = $Case($$$isWINDOWS,1:"\",:"/")
-        Set cspName = "/csp/"_lower
-
-        Set properties("Name") = cspName
-        Set properties("CookiePath") = "/csp/"_lower
-        Set properties("AutheEnabled") = $$$AutheUnauthenticated
-        Set properties("NameSpace") = pNamespace
-        Set properties("Path") = $System.Util.InstallDirectory()_"csp"_del_lower
-        Set properties("GroupById") = $$$IscMgtPortalId
-        Set properties("AutoCompile") = 1
-
-        // If the application exists, quit
-        If '##class(Security.Applications).Exists(cspName,.existingApp,.sc2) {
-            // Create the csp application properties	
-            Set sc = $$$ADDSC(sc,##class(Security.Applications).Create(cspName,.properties))
-        }
-        Else {
-            Set sc = $$$ADDSC(sc,sc2)
-        }
-        Write "done!",!
-    }
-    Catch (err) {
-        Set sc = $$$ADDSC(sc,err.AsStatus())
-    }
-    Return sc
-]]></Implementation>
-</Method>
-
-<Method name="createRESTApp">
-<Description>
-Create REST Application</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pNamespace:%String,DispatchClass="REST.Dispatch"</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-    #dim sc As %Status = $$$OK
-
-    New $Namespace
-    Set $Namespace = "%SYS"
-
-    Write "Creating CSP Application ... "
-
-    Set lower = $ZConvert(pNamespace,"L")
-    Set restName = "/rest/"_lower
-
-    If '##class(Security.Applications).Exists(restName) {
-        Set props("AutheEnabled") = $$$AutheUnauthenticated
-        Set props("NameSpace") = pNamespace
-        Set props("IsNameSpaceDefault") = $$$NO
-        Set props("DispatchClass") = DispatchClass
-        Set props("MatchRoles")=":%All"
-        Set sc = ##class(Security.Applications).Create(restName, .props)
-        Write "done!",!
-
-
-        Write "Creating "_DispatchClass_".cls ... "
-        Do ..CreateDispatchClass(pNamespace,DispatchClass)
-        Write "done!",!
-    }
-
-    Quit sc
-]]></Implementation>
-</Method>
-
-<Method name="CreateDispatchClass">
-<Description>
-Create a dummy REST service to populate messages</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pNamespace:%String,classname="REST.Dispatch"</FormalSpec>
-<Private>1</Private>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-    New $Namespace
-    Set $Namespace = pNamespace
-    Set sc = $$$OK
-    Try {
-        ;Set classname = "REST.Dispatch"
-        Set class = ##class(%Dictionary.ClassDefinition).%New(classname)
-        Set class.GeneratedBy = $ClassName()
-        Set class.Super = "%CSP.REST"
-
-        Set xdata = ##class(%Dictionary.XDataDefinition).%New()
-        Set xdata.Name = "UrlMap"
-        Set xdata.XMLNamespace = "http://www.intersystems.com/urlmap"
-        Do xdata.Data.WriteLine("<Routes>")
-        Do xdata.Data.WriteLine("<Route Url=""/"" Method=""GET"" Call=""Test"" Cors=""true""/>")
-        Do xdata.Data.WriteLine("</Routes>")
-        Do class.XDatas.Insert(xdata)
-        Set sc = $$$ADDSC(sc,class.%Save())
-
-        Set method = ##class(%Dictionary.MethodDefinition).%New(classname)
-        Set method.Name = "Test"
-        Set method.ClassMethod = 1
-        Set method.ReturnType = "%Status"
-        Set stream = ##class(%Stream.TmpCharacter).%New()
-        Do stream.WriteLine("	Set %response.ContentType = ""application/json"" ")
-        Do stream.WriteLine("	Set retObj = {}")
-        Do stream.WriteLine("	Set retMessage = ""Hello World!"" ")
-        Do stream.WriteLine("	Set retObj.Message = retMessage")
-        Do stream.WriteLine("	Write retObj.%ToJSON()")
-        Do stream.WriteLine("	Quit $$$OK")
-        Set method.Implementation = stream
-        Set sc = $$$ADDSC(sc,method.%Save())
-
-        Set sc = $$$ADDSC(sc,$System.OBJ.Compile(classname,"fck-dv"))
-    }
-    Catch (err) {
-        Set sc = $$$ADDSC(sc,err.AsStatus())
-    }
-    Return sc
-]]></Implementation>
-</Method>
-
-<Method name="GetDatabaseDirectory">
-<Description>
-Get database directory</Description>
-<ClassMethod>1</ClassMethod>
-<CodeMode>expression</CodeMode>
-<FormalSpec>pNamespace:%String</FormalSpec>
-<ReturnType>%String</ReturnType>
-<Implementation><![CDATA[##class(%File).SubDirectoryName($System.Util.ManagerDirectory(),$ZConvert(pNamespace,"L"))
-]]></Implementation>
-</Method>
-
-<Method name="CheckDatabaseDirExists">
-<Description>
-Checks if database directory exist</Description>
-<ClassMethod>1</ClassMethod>
-<CodeMode>expression</CodeMode>
-<FormalSpec>directory:%String</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[##class(%File).DirectoryExists(directory)
-]]></Implementation>
-</Method>
-
-<Method name="CheckDatabaseExists">
-<Description>
-Checks if database directory exist</Description>
-<ClassMethod>1</ClassMethod>
-<CodeMode>expression</CodeMode>
-<FormalSpec>directory:%String</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[##class(%File).Exists(directory_$Case($$$isWINDOWS,1:"\",:"/")_..#DATABASENAME)
-]]></Implementation>
-</Method>
-
-<Method name="DeleteDBNS">
-<Description>
-w $system.Status.GetErrorText(##class(apptools.core.GenerateDB).DeleteDBNS("SWAGGERUI", 1))</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pNamespace:%String="",pCodeData:%Boolean=1</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-   New $Namespace
-    Set $Namespace = "%SYS"
-	s sc=$$$OK
-	s slash=$$$slash
-	Set sc = $$$ADDSC(sc,##class(apptools.core.sys).DismountListDB(pNamespace))
-	if pCodeData {
-		for suff="-CODE","-DATA" {
-			set path=$zu(12)_pNamespace_slash_pNamespace_suff_slash
-			Set sc = $$$ADDSC(sc,##class(SYS.Database).DeleteDatabase(path))
-			Quit:$$$ISERR(sc)
-			Set sc = $$$ADDSC(sc,##class(%File).RemoveDirectoryTree(path))
-			Quit:$$$ISERR(sc)
-			d ..DeleteResource(pNamespace_suff)
-			d ..DeleteRole(pNamespace_suff)
-		}
-	} else {
-			set path=$zu(12)_pNamespace_slash
-			Set sc = $$$ADDSC(sc,##class(SYS.Database).DeleteDatabase(path))
-			Quit:$$$ISERR(sc)
-			Set sc = $$$ADDSC(sc,##class(%File).RemoveDirectoryTree(path))
-			Quit:$$$ISERR(sc) sc
-			d ..DeleteResource(pNamespace)
-			d ..DeleteRole(pNamespace)
-	}
-	Quit:$$$ISERR(sc) sc
-	if pNamespace'="" {
-		Set sc = $$$ADDSC(sc,##Class(Config.Namespaces).Delete(pNamespace))
-		Quit:$$$ISERR(sc) sc
-	}
-	q sc
-]]></Implementation>
-</Method>
-</Class>
-
-
-<Routine name="apptools.core" type="INC" timestamp="65653,35392.885313"><![CDATA[
+<Routine name="apptools.core" type="INC" timestamp="65803,41545.091914"><![CDATA[
 #Include %occMessages
 #include %occReference
 
@@ -7274,7 +6724,7 @@ w $system.Status.GetErrorText(##class(apptools.core.GenerateDB).DeleteDBNS("SWAG
 #define appAutocomplete(%id,%attr,%val) "<span class='ui-spinner ui-corner-all ui-widget ui-widget-content'><input id='"_%id_"' name='"_%id_"' "_%attr_" "_$$$appStyleInput_" autocomplete='off' value='"_%val_"'>"
 #define appAutocomplete2(%id,%attr,%val) "<input id='"_%id_"' name='"_%id_"' "_%attr_" class='ui-autocomplete-input' autocomplete='off' value='"_%val_"'>"
 #define appInput(%id,%attr,%val) "<span class='ui-spinner ui-corner-all ui-widget ui-widget-content'><input autocomplete='off' "_$$$appStyleInput_" "_%attr_" id='"_%id_"' name='"_%id_"' value='"_%val_"'></span>"
-#define appButton(%id,%attr,%val) $s($g(%ui):"<button class='uk-button uk-button-default uk-margin-small-right' type='button' "_%attr_" id='"_%id_"' name='"_%id_"' >"_%val_"</button>",1:"<input class='ui-button ui-corner-all ui-widget' type=button id='"_%id_"' name='"_%id_"' "_%attr_" value='"_%val_"'>")
+#define appButton(%id,%attr,%val) $s($g(%ui):"<button class='uk-button uk-button-primary uk-margin-small-right' type='button' "_%attr_" id='"_%id_"' name='"_%id_"' >"_%val_"</button>",1:"<input class='ui-button ui-corner-all ui-widget' type=button id='"_%id_"' name='"_%id_"' "_%attr_" value='"_%val_"'>")
 #define appTextarea(%id,%attr,%val) "<span class='ui-spinner ui-corner-all ui-widget ui-widget-content'><textarea autocomplete='off' "_$$$appStyleInput_" "_%attr_" id='"_%id_"' name='"_%id_"' >"_%val_"</textarea></span>"
 #define appDate(%id,%attr,%val) "<span class='ui-spinner ui-corner-all ui-widget ui-widget-content'><input autocomplete='off' "_$$$appStyleInput_" type=date "_%attr_" id='"_%id_"' name='"_%id_"' value='"_%val_"'></span>"
 #define appDateTime(%id,%attr,%val) "<span class='ui-spinner ui-corner-all ui-widget ui-widget-content'><input autocomplete='off' "_$$$appStyleInput_" type=datetime-local "_%attr_" id='"_%id_"' name='"_%id_"' value='"_%val_"'></span>"
@@ -7338,8 +6788,6 @@ w $system.Status.GetErrorText(##class(apptools.core.GenerateDB).DeleteDBNS("SWAG
 #define  EMAILXLSPATH $G(@$$$GNEnsConf@("EMAILXLSPATH"))
 #; Path to storing project sources
 #define  EXPORTPROJPATH $G(@$$$GNEnsConf@("EXPORTPROJPATH")) 
-#; List of databases to monitor free space in apptools..Chart.cls?panel=class(apptools.Chart.ChartPanel).ChartDbSize
-#define DBCACHESizeMon $G(@$$$GNEnsConf@("DBCACHESizeMon"))
 
 #; --------------- Application section
 #define GNmessages "^%apptools.cconsolelog"
@@ -7379,7 +6827,7 @@ Importing this class will install App Tools properly.
 fork from WebTerminal </Description>
 <IncludeCode>apptools.core</IncludeCode>
 <Super>%Projection.AbstractProjection</Super>
-<TimeChanged>65660,49872.082817</TimeChanged>
+<TimeChanged>65671,48963.126124</TimeChanged>
 <TimeCreated>65607,76509.816379</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -7430,7 +6878,6 @@ This method is invoked when a class is compiled.
 	}
 	if $g(@$$$GNEnsConf@("HomeNamespace"))="" {
 	;Filling the global default values
-	 set @$$$GNEnsConf@("DBCACHESizeMon")="CACHESYS,CACHEAUDIT"
 	 set @$$$GNEnsConf@("EMAILAUTH")="user_from_send_mail@server.com"
 	 set @$$$GNEnsConf@("EMAILAUTHPASS")=12345
 	 set @$$$GNEnsConf@("EMAILSERVERIP")="127.0.0.1"
@@ -7772,7 +7219,7 @@ This method is invoked when a class is 'uncompiled'.</Description>
 <Class name="apptools.core.Log">
 <IncludeCode>apptools.core</IncludeCode>
 <Super>%Persistent</Super>
-<TimeChanged>65611,76706.59486</TimeChanged>
+<TimeChanged>65741,58810.230955</TimeChanged>
 <TimeCreated>65607,76509.946449</TimeCreated>
 
 <Parameter name="Null">
@@ -7880,6 +7327,17 @@ User IP address</Description>
 <Index name="idxClientIPAddress">
 <Properties>ClientIPAddress</Properties>
 </Index>
+
+<Method name="ConvertOutHTML">
+<Description>
+apptools_core.Log_ConvertOutHTML(txt)</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>text:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<SqlProc>1</SqlProc>
+<Implementation><![CDATA[	q $zcvt(text, "O", "HTML")
+]]></Implementation>
+</Method>
 
 <Method name="GetClientAddress">
 <Description>
@@ -8200,7 +7658,7 @@ To load the context from the table Protocol</Description>
 <Class name="apptools.core.LogInfo">
 <IncludeCode>apptools.core</IncludeCode>
 <Super>apptools.core.AutoPage</Super>
-<TimeChanged>65610,77273.857</TimeChanged>
+<TimeChanged>65718,82553.654325</TimeChanged>
 <TimeCreated>65607,76510.179396</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -8382,11 +7840,47 @@ d ##class(apptools.core.LogInfo).ExportProjects("/backup/iris/source/",.file)</D
 <FormalSpec>Dir,files</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	$$$NspGoto(curNs,"APP")
-	d ..ExportAppProj(Dir,"app",.files)
+	$$$NspGoto(curNs,"apptools")
+	d ..ExportAppProj(Dir,"apptools",.files)
 	$$$NspReturn(curNs)
 	d ##class(apptools.core.net).SendFilesToEmail($zn,Dir,.files)
 	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="ExtSQL">
+<Description>
+xec do ##class(apptools.core.LogInfo).ExtSQL()</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>gn,DSN="",h="",v=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if '$d(@gn) w "It's node undefined" q $$$OK
+	if $d(@gn@(-3,"sql")) {
+		s sql=$replace( $lg(@gn@(-3,"sql"),1), $c(34)_$c(9)_$c(34) , "")
+		if h'="" s h="CHARACTERISTIC = '"_h_"'"
+		if v'="" s v="CHARACTERISTICSPGZENUM like '%"_v_"%'"
+		i h'="" s sql=$replace(sql,"where","where "_h_" and "_v_" and ")
+		w "<b>"_sql_"</b>"
+		set MaxNode=10000
+		if $g(sql)'="" {
+			if DSN'="" {
+				set gnTemp=$na(@$$$TEMPORYGN@($username))
+				KILL @gnTemp
+				set st=##class(apptools.core.sys).SqlToDSN(sql,DSN,gnTemp,MaxNode)
+				if $d(@gnTemp) {
+					set st=##class(apptools.core.LogInfoPane).DrawSQL("result "_gnTemp,MaxNode,$NameSpace,"DSN: "_DSN_", Query: <br>"_$g(sql)_"<br>"_gnTemp,$g(ExecuteDraw))
+				}
+			}
+			else {
+					set st=##class(apptools.core.LogInfoPane).DrawSQL(sql,MaxNode,$NameSpace,"Namespace: "_$NameSpace_" "_$g(msg),$g(ExecuteDraw))
+			}
+			if $$$ISERR(st) write "<br>Error :"_##class(%CSP.Page).EscapeHTML(sql_"; "_$SYSTEM.OBJ.DisplayError(st))_"<br>"
+		}
+	} else {
+		w "Not found nnode -3,""sql"")"
+	}
+	quit $$$OK
 ]]></Implementation>
 </Method>
 
@@ -8418,8 +7912,8 @@ If exporting multiple items, separate them with commas, pass the items("item")="
 	new $namespace
 	try {
 	s pFileName=Dir_$zu(110)_"-"_$zu(5)_"-"_proj_"-"_$tr(##class(apptools.core.type).GetDateTime($h),":T","-_")_".xml"
-	s list("App*.CLS")=""
-	s list("App*.INC")=""
+	s list("apptools*.CLS")=""
+	s list("apptools*.INC")=""
 	s list("apptools.core.ParameterD.GBL")=""
 	s st=$SYSTEM.OBJ.Export(.list, pFileName)
 	i st w !,pFileName s files(pFileName)=""
@@ -8453,9 +7947,13 @@ If exporting multiple items, separate them with commas, pass the items("item")="
 <Class name="apptools.core.LogInfoPane">
 <IncludeCode>apptools.core</IncludeCode>
 <Super>%CSP.Util.Pane</Super>
-<TimeChanged>65660,60379.273649</TimeChanged>
+<TimeChanged>65792,59612.939436</TimeChanged>
 <TimeCreated>65607,76510.552235</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
+
+<Parameter name="version">
+<Default>1.0.24</Default>
+</Parameter>
 
 <Parameter name="XMLTYPE">
 <Default>apptools.core</Default>
@@ -8509,10 +8007,32 @@ write ##class(apptools.core.LogInfoPane).AddJsScripts() </Description>
 ]]></Implementation>
 </Method>
 
+<Method name="AddJScopyToClipboard">
+<Description>
+add javascript
+/// /*! \example do ##class(apptools.core.LogInfoPane).AddJScopyToClipboard()*/</Description>
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+ 	$$$jsstart	
+ &js<	
+
+ function copyToClipboard(elementId) {
+	 var aux = document.createElement("input"); 
+	 aux.setAttribute("value", document.getElementById(elementId).innerHTML);
+	 document.body.appendChild(aux);
+	 aux.select();
+	 document.execCommand("copy");
+	 document.body.removeChild(aux); 
+  }
+>
+	$$$jsstop
+]]></Implementation>
+</Method>
+
 <Method name="AddJS">
 <Description>
 add javascript
-/// /*! \example d ##class(apptools.core.LogInfoPane).AddJS("MSW")*/</Description>
+/// /*! \example do ##class(apptools.core.LogInfoPane).AddJS("MSW")*/</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>ns="",class=""</FormalSpec>
 <Implementation><![CDATA[
@@ -8800,9 +8320,9 @@ Drawing the form to enter information</Description>
 	if $p(what,"-p",2)?1n.n set exp=$p(what,"-p",2),what=$p(what,"-p")
 	set (%DSN,DSN)=%request.Get("selectDSN")
 	set SDNum=%request.Get("SDNum")
-
+	
 	//code to use when displaying tables
-	set ExecuteDraw=%request.Get("ExecuteDraw") 
+	set ExecuteDraw=%request.Get("ExecuteDraw")
 	set:$e(ExecuteDraw,1)="(" ExecuteDraw="##class"_ExecuteDraw_"(.%AppLogInfoVal,%AppLogInfoCol,%AppLogInfoHead,.%AppLogInfoTemp,"""_NSpace_""","""_DSN_""")"
 
 	// Preparing variables for export to Excel
@@ -8819,7 +8339,7 @@ Drawing the form to enter information</Description>
 		set ExecuteDraw="##class(apptools.core.LogInfoPane).DrawHelp(.%AppLogInfoVal,%AppLogInfoCol,%AppLogInfoHead,.%AppLogInfoTemp,"""_NSpace_""","""_DSN_""")"
 	}
 	#; queries and query results
-	elseif ",query,result,select,insert,s,q,r,begin,"[(","_$zconvert($p(what," ",1),"L")_",") {
+	elseif ",query,result,select,delete,insert,s,q,r,begin,"[(","_$zconvert($p(what," ",1),"L")_",") {
 			set sql=what
 			if sql["p.party_id( )" s sql=$replace(sql,"p.party_id( )","p.party_id(+)")
 	}
@@ -8913,6 +8433,7 @@ Drawing the form to enter information</Description>
 			<td>
 				<span class='ui-icon ui-icon-play' name="show" id="show" onclick="document.forms['loginfo'].submit();" >#($$$aText("Execute",""))#</span>
 				<input type="submit" name="show2" id="show2" value='#($$$aText("Execute",""))#'>
+				<input type="button" name="exe2" id="exe2" value='#($$$aText("ExecutePost",""))#'>
 				#(##class(apptools.core.LogInfo).GetInfoImg("help"))# 
 	 			#(##class(apptools.core.LogInfo).ClearFields("NSP,MaxNode,Filtr,Next,WHAT,tWHAT,exportXLS,exportXLSfile,exportXLSfileEmail,selectDSN,SDNum"))# 
 		 		#($$$aText("Upload to file Excel",""))#  
@@ -8939,7 +8460,10 @@ Drawing the form to enter information</Description>
 	>
 	do ##class(apptools.core.LogInfoPane).AddJS(NSpace) 
 	if $g(execute)'="" {
-		write "<H3>"_$$$aText("Executing the command","")_" "_execute_"</H3>"
+		write "<H5>"_$$$aText("Executing the command","")_" "_execute_"</H5>"
+		if ..GetCodeExtensionNamespace(execute,.code) {
+			set execute=code
+		}
 		x execute
 		quit $$$OK
 	}
@@ -8976,10 +8500,19 @@ Drawing the form to enter information</Description>
 	#; arbitrary query
 	if $g(sql)'="" {
 		if DSN'="" {
-			set gnTemp=$na(@$$$TEMPORYGN@($username))
+			set gnTemp=$na(@"^tmpLogInfo"@($j))  ;$$$TEMPORYGN@($j))
 			KILL @gnTemp
-			if $G(listDSN(DSN))'="" set st=##class(apptools.core.sys).SaveGateway(sql,$G(listDSN(DSN)),%request.Get("User"),%request.Get("Password"),gnTemp,MaxNode) 
-			else  set st=##class(apptools.core.sys).SqlToDSN(sql,DSN,gnTemp,MaxNode)
+			if $G(listDSN(DSN))'="" {
+				set st=##class(apptools.core.sys).SaveGateway(sql,$G(listDSN(DSN)),%request.Get("User"),%request.Get("Password"),gnTemp,MaxNode) 
+			}
+			else {
+				//do ##class(%SYS.System).WriteToConsoleLog("job "_$j_" sql "_$tr(sql,$c(13,10)," "),,0)
+				KILL %objlasterror
+				set st=##class(apptools.core.sys).SqlToDSN(sql,DSN,gnTemp,MaxNode)
+				if 'st write "<font color=red>"_$System.Status.GetErrorText(st)_"</font>"
+				Set sc = $g(%objlasterror, $$$OK)
+				if 'sc write "<font color=red>"_$System.Status.GetErrorText(sc)_"</font>"
+			}
 			if $d(@gnTemp) {
 				set st=..DrawSQL("result "_gnTemp,MaxNode,NSpace,"DSN: "_DSN_", Query: <br>"_$g(sql)_"<br>"_gnTemp,$g(ExecuteDraw),$lb(exportXLS,exportXLSfile,exportXLSfileEmail))
 			}
@@ -9025,6 +8558,21 @@ AddExp(title,gn,Next="",Filtr="",MaxNode)
 errors
  	write !,$ze
  	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetCodeExtensionNamespace">
+<Description>
+do ##class(apptools.core.LogInfoPane).GetCodeExtensionNamespace("ShowGlobals^log**",.code)</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[Node,&code]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set code=""
+	set Node=$E(Node,1,200)
+	if $D(@$$$GNExtentions@("%All",Node)) set code=$e($G(@$$$GNExtentions@("%All",Node,"Xecute")),5,*) quit $$$OK
+	if $D(@$$$GNExtentions@($namespace,Node)) set code=$e($G(@$$$GNExtentions@($namespace,Node,"Xecute")),5,*) quit $$$OK
+	quit $$$ERROR($$$GeneralError,"No find")
 ]]></Implementation>
 </Method>
 
@@ -9696,7 +9244,7 @@ Close file XLS</Description>
 		s sc=##class(apptools.core.LogInfo).SendEmail(exportXLSfileEmail, $$$aText("Send file","")_" "_exportXLSfile, $g(msg)_"<br> "_$$$aText("Namespace","")_" :"_$Namespace_"<br> "_$$$aText("Query","")_": "_SQL, exportXLSfile)
 		;i 'sc ;s $$$AppL("APP","CloseXLSfile-SendEmail")=$System.Status.GetErrorText(sc) 
 		}
-	write !,"<br><h3>"_$$$aText("Query result","")_" ("_(+count)_" "_$$$aText("lines) uploaded to file","")_" "_exportXLSfile_"</h3>"
+	write !,"<br><h5>"_$$$aText("Query result","")_" ("_(+count)_" "_$$$aText("lines) uploaded to file","")_" "_exportXLSfile_"</h5>"
 	quit
 ]]></Implementation>
 </Method>
@@ -9709,7 +9257,7 @@ fileXLS - list of parameters for uploading to Excel and sending by mail
 	s exportXLSfileEmail=$lg(fileXLS,3) - parcel addresses separated by commas, to which to send the file
 	s exportXLSfile=$lg(fileXLS,2) - full path to the file where to write the table</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>SQL:%String="",MaxNode=$$$MAXSHOW,NSpace="",msg="",Execute="",fileXLS="",Mode=""</FormalSpec>
+<FormalSpec>SQL:%String="",MaxNode=$$$MAXSHOW,NSpace="",msg="",Execute="",fileXLS="",Mode="",FiltrRow=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	if ($zconvert($e(SQL,1),"L")="q") {
@@ -9799,8 +9347,9 @@ fileXLS - list of parameters for uploading to Excel and sending by mail
 	s %AppLogInfoHead=0 //We process lines
 	if $g(resGN)'="" { set i=0
 		for { set i=$order(@resGN@(i))   quit:i=""
+			if FiltrRow'="",'$D(@FiltrRow@(i)) continue 
 			for ii=1:1:ColCount set GetData(ii)=$s($lv($GET(@resGN@(i),"?")):$lg(@resGN@(i),ii),1:$GET(@resGN@(i,ii)))
-			d qNext(.GetData) q:$g(stopWrite)
+			d qNext(.GetData,i) q:$g(stopWrite)
 		}
 	}
 	else {
@@ -9831,10 +9380,10 @@ fileXLS - list of parameters for uploading to Excel and sending by mail
 	}
 	quit $$$OK
  // Handling one query string
-qNext(GetData)
+qNext(GetData,cou="")
 		set count=count+1
 		write "<tr class=trs >"
-		if 'Mode write "<th>"_(count)_"</th>"
+		if 'Mode write "<th>"_$s(cou="":count,1:cou)_"</th>"
 		if count>MaxNode w "<th style='color:red'>... "_$$$aText("More entries","")_" "_MaxNode_"</th></tr>" s stopWrite=1 QUIT
 		for ii=1:1:ColCount {	
 			set %AppLogInfoVal=$g(GetData(ii))
@@ -10103,6 +9652,12 @@ Get call stack</Description>
 	;$$$sH(" "_$$$addAppL("post http://User:pass@localhost:57772/apptoolsrest/jsonrpc"_$c(13,10)_"{""jsonrpc"":""2.0"",""method"":""server.shutdown"",""params"":{""server"":""42""},""id"":1}")_" --- Perform http request with POST method with a JSON body")
 	;$$$sH(" "_$$$addAppL("get https://openexchange.intersystems.com/index.html")_" --- to Perform http request with POST method with a JSON body")
 	$$$sH(" ")
+	
+	/*
+	##;3. Prevent page refresh at session end - #;YSD2224 
+	%SYS> -  %CSP.Util.AutoPage).DrawAutoLogout()  
+	;	If %request.URL '[ "UtilSqlQuery.csp" && ( %request.URL '[ "/apptools.") && ( %request.URL '[ "/App.") { ##; MSW
+	*/
 ]]></Implementation>
 </Method>
 </Class>
@@ -10339,7 +9894,7 @@ d ##class(apptools.core.Production).SaveAndStop()
 d ##class(apptools.core.Production).StartAll()</Description>
 <Abstract>1</Abstract>
 <IncludeCode>apptools.core</IncludeCode>
-<TimeChanged>65660,51895.855204</TimeChanged>
+<TimeChanged>65719,61872.79234</TimeChanged>
 <TimeCreated>65607,76510.942315</TimeCreated>
 
 <Parameter name="TIMEOUTSTOP">
@@ -10893,13 +10448,14 @@ do ##class(apptools.core.Production).ShowGlobals("^tmp**",##class(apptools.core.
 Get a list of product errors per day or more for one namespace
 d ##class(apptools.core.Production).GetListErrProducts(1,"USER".res)</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>day,NS,r</FormalSpec>
+<FormalSpec>day,NS,result</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
 
 	new $namespace
 	set sql="select ConfigName,Text,TimeLogged from Ens_Util.Log where Type='2' and TimeLogged>'"_##class(apptools.core.type).getYYYYMMDD($h-day)_" 21:00' order by id desc"
-	set GN=##class(apptools.core.Production).#SettingsGN
+	set listns= ##class(apptools.core.sys).ListNS(.info,"NotPre,Ens")
+	set GN="info" ;##class(apptools.core.Production).#SettingsGN
 	if $D(@GN@(NS)) {
 		zn NS
 		if $Namespace'=NS quit ""
@@ -10910,7 +10466,11 @@ d ##class(apptools.core.Production).GetListErrProducts(1,"USER".res)</Descriptio
 		if PN="" q ""
 		set gn="^||tmpErrEnsam" kill @gn
 		do ##class(apptools.core.sys).SaveSQL(sql,gn)
-		for i=1:1:10 {  if $d(@gn@(i)) k r m r(1)=@gn@(i)	zw r
+		for i=1:1:10 {  
+			if $d(@gn@(i)) {
+			;k r m r(1)=@gn@(i)	;zw r  
+			m result(i)=@gn@(i)
+			}
 		}
 	}
  q $$$OK
@@ -10925,10 +10485,17 @@ d ##class(apptools.core.Production).GetStatusProducts(0,.res)</Description>
 <FormalSpec>day,result</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-	if day=0 s result="OK" w "OK" quit 1 ;
+	set result("server")=$zu(110)
+		, result("version")=$zv
+		
+	if day=0 	quit $$$OK ;
 	set sql="select * from Ens_Util.Log where Type='2' and TimeLogged>'"_##class(apptools.core.type).getYYYYMMDD($h-day)_" 21:00' order by id desc"
-	set GN=##class(apptools.core.Production).#SettingsGN
-	set NS=""
+	set listns= ##class(apptools.core.sys).ListNS(.info,"NotPre,Ens")
+	set GN="info" ;##class(apptools.core.Production).#SettingsGN
+ 	set NS=""
+	set sql2=$replace(sql,"*","count(*)")
+	set result("sql")=sql2
+	set result("listns")=listns
 	for { s NS=$o(@GN@(NS)) q:NS=""
 		$$$NspGoto(curNs,NS)
 		if $Namespace'=NS  continue
@@ -10938,11 +10505,145 @@ d ##class(apptools.core.Production).GetStatusProducts(0,.res)</Description>
 			if $lg($g(@GN@(NS,"Ens",p)),1)[$$$EnsProductStatusRun s PN=p quit
 		}
 		if PN="" continue
-		set sql2=$replace(sql,"*","count(*)")
-		set gn="^||tmpErrEns"
+
+		set gn="^||tmpErrEns" kill @gn
 		do ##class(apptools.core.sys).SaveSQL(sql2,gn)
 		set result(NS,"CountErrors")=$lg(@gn@(1),1)
 	}
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetStatusProductsJson">
+<Description>
+Get the status of products for a day or more to Json
+d ##class(apptools.core.Production).GetStatusProductsJson(1,"system-stat",.res) zw res
+d ##class(apptools.core.Production).GetStatusProductsJson(1,"count-errors",.res) zw res
+d ##class(apptools.core.Production).GetStatusProductsJson(1,"list-errors-SPGZ",.res) zw res</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>day,mode=0,result</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set result={} 
+	set result.server=$zu(110)
+	set result.version=$zv		
+
+	if mode="system-stat" {
+		quit $$$OK
+	}
+	set result.ns=[]
+	set sql="select * from Ens_Util.Log where Type='2' and TimeLogged>'"_##class(apptools.core.type).getYYYYMMDD($h-day)_" 21:00' order by id desc"
+	set listns= ##class(apptools.core.sys).ListNS(.info,"NotPre,Ens")
+	set gn="^||tmpErrEns" kill @gn
+	if mode="count-errors" {
+		set sql2=$replace(sql,"*","count(*)")
+	}
+	elseif mode["list-errors" {
+		set sql2=$replace(sql,"*","ConfigName,Text,TimeLogged ")
+		set NSpace=$p(mode,"list-errors-",2)
+	}
+
+	set NS=""
+	for { s NS=$o(info(NS)) q:NS=""
+		$$$NspGoto(curNs,NS)
+		if $Namespace'=NS  continue
+		if $GET(NSpace)'="",NS'=NSpace continue 
+		if '$D(info(NS)) continue
+		set PN=""
+		set p="" for { s p=$o(info(NS,"Ens",p)) q:p=""
+			if $lg($g(info(NS,"Ens",p)),1)[$$$EnsProductStatusRun s PN=p quit
+		}
+		if PN="" continue
+
+		do ##class(apptools.core.sys).SaveSQL(sql2,gn)
+		set prod = {}
+		set prod.namespace = $namespace
+		set prod.nameproduction = PN
+		if mode="count-errors" {
+			set prod.counterrors = $lg(@gn@(1),1)
+		}
+		elseif mode["list-errors" {
+			set prod.errors = []
+			for i=1:1:10 {  if $d(@gn@(i)) {
+				set err = {}
+				set err.ConfigName=$lg(@gn@(i),1)
+				set err.Text=$lg(@gn@(i),2)
+				set err.TimeLogged=$lg(@gn@(i),3)
+				do prod.errors.%Push(err)
+				}
+			}
+		}
+		
+		do result.ns.%Push(prod)
+		
+	}
+]]></Implementation>
+</Method>
+
+<Method name="StopProdAndDismount">
+<Description>
+Stoped production and dismount. Later mounted 
+d ##class(apptools.core.Production).StopProdAndDismount("AAA")
+w $System.Status.GetErrorText(##class(apptools.core.sys).MountListDB("AAA"))</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>ns</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	new $namespace
+	try {
+		set $namespace=ns
+		s sc=##class(Ens.Director).StopProduction(..#TIMEOUTSTOP)
+		if 'sc {
+			s sc2=##class(Ens.Director).StopProduction(..#TIMEOUTSTOP,1) 
+			if 'sc2 write $System.Status.DisplayError(sc2) q
+			set sc=$$$OK
+		}
+		set $namespace="%SYS"
+		set sc=##class(apptools.core.sys).DismountListDB(ns)
+		if 'sc {
+			write $System.Status.DisplayError(sc) q
+		}
+		else {
+			write !,"Dismount "_ns
+		}
+	} catch ex {
+	   Set sc = $g(%objlasterror, $$$OK)
+	   Set sc = $$$ADDSC(sc, ex.AsStatus())
+	   write "Error type   "_ex.Name,!
+	   write "Error code   "_ex.Code,!
+	   write "Error location "_ex.Location,!
+ 	}
+]]></Implementation>
+</Method>
+
+<Method name="GetSettings">
+<Description>
+GetSettings
+write ##class(apptools.core.Production).GetSettings("ProductionName","ItemName","SettName",.val)</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[ProductName="",ItemName="",SettingName="",&Value]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+
+ #dim p As Ens.Config.Production
+ Set p = ##class(Ens.Config.Production).%OpenId(ProductName)
+ quit:p="" $$$ERROR($$$GeneralError,"Production not found: "_ProductName)
+ #dim item As Ens.Config.Item
+ #dim sett As Ens.Config.Setting
+ set st=0
+ for i=1:1:p.Items.Count() {
+	 s item=p.Items.GetAt(i)
+	 ;w !,item.Name
+	 if item.Name=ItemName 	{
+	 	for s=1:1:item.Settings.Count() {
+	 		set sett=item.Settings.GetAt(s)
+	 		;w !,sett.Name
+	 		if sett.Name=SettingName set Value=sett.Value, st=$$$OK quit
+	 	}
+	 }
+ }
+ if 'st q $$$ERROR($$$GeneralError,"Settings or ItemName not found")
+ quit st
 ]]></Implementation>
 </Method>
 </Class>
@@ -14341,7 +14042,7 @@ do ##class(apptools.core.msg).EscColor()</Description>
 Network Utility %Net.HttpRequest, %Net.SMTP, %Net.FTP</Description>
 <Abstract>1</Abstract>
 <IncludeCode>apptools.core</IncludeCode>
-<TimeChanged>65610,77273.857</TimeChanged>
+<TimeChanged>65795,55956.131654</TimeChanged>
 <TimeCreated>65607,76510.74453</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -14450,6 +14151,18 @@ Download the file and put on the server by adding the name of the mark date and 
 	s sc=1
 	i TempDir'="" s sc=##class(apptools.core.files).Stream2Log(aDATA("content"), TempDir, fileName,.path) s aDATA("pathfileName")=$g(path)
 	q sc
+]]></Implementation>
+</Method>
+
+<Method name="GetResult">
+<Description>
+if ##class(apptools.core.net).GetResult("http://localhost/apptoolsrest/productslist/-","user","pass",.json) do json.%ToJSON()</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[url:%String,user="",pass="",&result:%ZEN.proxyObject]]></FormalSpec>
+<Implementation><![CDATA[
+	$$$TOE(sc, ..GetHttp(url, .aData,,,user,pass))  
+	set stream =  aData("content")
+	quit ##class(Ens.Util.JSON).JSONStreamToObject(stream,.result)
 ]]></Implementation>
 </Method>
 
@@ -14562,16 +14275,21 @@ To response to Http Post request</Description>
 	}
 	s ht.ContentType="text/html;  charset=UTF-8"
 	;s ht.ContentType="application/json; charset=UTF-8"
-	i $p(ServerPort,":",2)'="" set ht.Port = $p(ServerPort,":",2)
+	set port=$p(ServerPort,":",2)
+	i $p(ServerPort,":",2)'="" set ht.Port = port
 	
-	;set ht.Https=1
-	;set ht.Port = 443
-	;set ht.SSLConfiguration=..CheckSSLCertificate("DefaultSSL")
+	if port=443 {
+		set ht.Https=1
+		;set ht.Port = 443
+		set ht.SSLConfiguration=..CheckSSLCertificate("DefaultSSL")
+	}
 	
 	Do ht.EntityBody.Write($g(body))
 	if $d(body)>1 s i="" f  s i=$o(body(i)) q:i=""  Do ht.EntityBody.Write(body(i))
 	
-	Do ht.Post(method)
+	s st=ht.Post(method)
+	if 'st w !,$System.Status.GetErrorText(st)  q ""
+
 	;Do ht.HttpResponse.OutputToDevice()
 	S out=ht.HttpResponse.StatusLine
 	;s ^z1=ht.HttpResponse.ContentLength
@@ -14793,6 +14511,35 @@ write ##class(apptools.core.net).GetURI(.prop)</Description>
 	quit $G(ServerPort)
 ]]></Implementation>
 </Method>
+
+<Method name="loadzpm">
+<Description>
+/* Install ZPM, ZAPM */ set $namespace="%SYS", name="DefaultSSL" do:'##class(Security.SSLConfigs).Exists(name) ##class(Security.SSLConfigs).Create(name) set url="https://pm.community.intersystems.com/packages/zpm/latest/installer" Do ##class(%Net.URLParser).Parse(url,.comp) set ht = ##class(%Net.HttpRequest).%New(), ht.Server = comp("host"), ht.Port = 443, ht.Https=1, ht.SSLConfiguration=name, st=ht.Get(comp("path")) quit:'st $System.Status.GetErrorText(st) set xml=##class(%File).TempFilename("xml"), tFile = ##class(%Stream.FileBinary).%New(), tFile.Filename = xml do tFile.CopyFromAndSave(ht.HttpResponse.Data) do ht.%Close(), $system.OBJ.Load(xml,"ck") do ##class(%File).Delete(xml) zpm "install zapm"
+w ##class(apptools.core.net).loadzpm()</Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+  SET $NAMESPACE="%SYS"
+  set name="DefaultSSL" DO:'##class(Security.SSLConfigs).Exists(name) ##class(Security.SSLConfigs).Create(name)
+  set url="https://pm.community.intersystems.com/packages/zpm/latest/installer" write !,url
+  Do ##class(%Net.URLParser).Parse(url,.comp)
+  set ht = ##class(%Net.HttpRequest).%New()
+  set ht.Server = comp("host")
+  set ht.Port = 443
+  set ht.Https=1
+  set ht.SSLConfiguration=name
+  set st=ht.Get(comp("path"))
+  quit:'st $System.Status.GetErrorText(st) 
+  set xml=##class(%File).TempFilename("xml")
+  Set tFileBinStream = ##class(%Stream.FileBinary).%New()
+  Set tFileBinStream.Filename = xml
+  do tFileBinStream.CopyFromAndSave(ht.HttpResponse.Data)      
+  do ht.%Close()
+  do $system.OBJ.Load(xml,"ck")
+  do ##class(%File).Delete(xml)
+  quit 1
+]]></Implementation>
+</Method>
 </Class>
 
 
@@ -14801,7 +14548,7 @@ write ##class(apptools.core.net).GetURI(.prop)</Description>
 // The REST interface: class that routes HTTP requests</Description>
 <IncludeCode>apptools.core</IncludeCode>
 <Super>%CSP.REST</Super>
-<TimeChanged>65660,48648.314792</TimeChanged>
+<TimeChanged>65802,72923.568129</TimeChanged>
 <TimeCreated>65607,76511.09225</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -14821,6 +14568,8 @@ write ##class(apptools.core.net).GetURI(.prop)</Description>
 <XMLNamespace>http://www.intersystems.com/urlmap</XMLNamespace>
 <Data><![CDATA[
 <Routes>
+<Route Url="/a/:text" Method="GET" Call="apptools.lte.adminStatic:GetMain"/>
+
 <Route Url="/get-html/:text" Method="GET" Call="Index"/>
 <Route Url="/post-json" Method="POST" Call="jsonrpc"/>
 <Route Url="/get-files/:text" Method="GET" Call="Files"/>
@@ -15055,10 +14804,10 @@ http://localhost:57772/apptoolsrest/finduser/super</Description>
 
 <Method name="WriteStatic">
 <Description>
-Calls StaticContent.Write method or sends not modified header. Type have to be "css" or "js"</Description>
+Calls StaticContent.Write method or sends not modified header. Type have to be "css" or "js"
+d ##class(apptools.core.rest).WriteStatic("html",,,,,text)</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>type:%String,ContentType:%String="",xDataClass="apptools.core.rest",ClassCSPPage="",IsCached=0</FormalSpec>
-<Private>1</Private>
+<FormalSpec>type:%String,ContentType:%String="",xDataClass="apptools.core.rest",ClassCSPPage="",IsCached=0,Content=""</FormalSpec>
 <Implementation><![CDATA[
     #define CompileTime ##Expression("""" _ $zd($h, 11) _ ", "_ $zdt($NOW(0), 2,1) _ " GMT""")
     set %response.CharSet = "utf-8"
@@ -15076,6 +14825,9 @@ Calls StaticContent.Write method or sends not modified header. Type have to be "
 	    if IsCached,(%request.GetCgiEnv("HTTP_IF_MODIFIED_SINCE")=$$$CompileTime) {
 	        set %response.Status = "304 Not Modified"
 	    } 
+	    elseif Content'="" {
+		    write Content
+	    }
 	    elseif ClassCSPPage'="" {
 		    s param=$p(ClassCSPPage,"?",2,*)
 		    s ClassCSPPage=$p(ClassCSPPage,"?")
@@ -15091,7 +14843,7 @@ Calls StaticContent.Write method or sends not modified header. Type have to be "
 	    }
     }
     catch e { 
-    	w $ze
+    	write $ze
     	set %response.Status = "501 Not Implemented" ;"405 Method Not Allowed" ;"400 Bad Request"
     }
 ]]></Implementation>
@@ -15236,13 +14988,13 @@ d ##class(apptools.core.rest).getDBsize("dbsize",.list)</Description>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set nl = $c(10)
-	set curNs=$zu(5)
-	zn "%sys"
-	set st=##class(apptools.core.sys).SaveQuery("SYS.Database:FreeSpace","^||db")
-	set r=$q(^||db("")) ;to the first link
-	set r=$na(^||db($qs(r,1),$qs(r,2))) ;take the first 2 of the index in the link
-	set listDb=$$$DBCACHESizeMon
-	if listDb="" s listDb=##class(apptools.core.sys).ListDB(.info,"NotPre,NotTemp")
+	new $namespace
+	set $namespace="%sys"
+	set gn="^||db"
+	set st=##class(apptools.core.sys).SaveQuery("SYS.Database:FreeSpace",gn)
+	set r=$q(@gn@("")) ;to the first link
+	set r=$na(@gn@($qs(r,1),$qs(r,2))) ;take the first 2 of the index in the link
+	s listDb=##class(apptools.core.sys).ListDB(.info,"NotPre,NotTemp")
 	for i=1:1 { q:'$d(@r@(i))   ;pass the loop through the entire report
 		continue:$g(@r@(i,1))=""
 		;by default, we give all sizes to Gigabytes
@@ -15265,33 +15017,46 @@ d ##class(apptools.core.rest).getDBsize("dbsize",.list)</Description>
 		write:'int prefix_"_"_name_" "_size_nl
 		write:'int prefix_"_"_name_"_DiskFreeSpace "_(+free)_nl
 	}
-	zn curNs
 	write nl
 	quit $$$OK
 ]]></Implementation>
 </Method>
 
 <Method name="getListErrProducts">
+<Description>
+http://localhost:57772/apptoolsrest/productslist/-SPGZ</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>nspace</FormalSpec>
+<FormalSpec>nspace=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	d ##class(apptools.core.Production).GetListErrProducts(1,nspace)
+	;d ##class(apptools.core.Production).GetListErrProducts(1,nspace)
+	do ##class(apptools.core.Production).GetStatusProductsJson(1,"list-errors"_nspace,.res)
+	do res.%ToJSON()
 	q $$$OK
 ]]></Implementation>
 </Method>
 
 <Method name="getProductions">
+<Description>
+http://localhost:57772/apptoolsrest/products/0</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>day="1"</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	d ##class(apptools.core.Production).GetStatusProducts(day,.errors)
-	s ns=""
-	for { s ns=$o(errors(ns)) q:ns=""
-		s co=+$g(errors(ns,"CountErrors"))
-		w $s(co:"/",1:"\")_"server_"_$zu(110)_"_"_ns_" Errors: "_co_$$$NL
+	if 'day {
+		do ##class(apptools.core.Production).GetStatusProductsJson(0,"system-stat",.res) 
+		do res.%ToJSON()
 	}
+	else {
+		do ##class(apptools.core.Production).GetStatusProductsJson(day,"count-errors",.res)
+		 do res.%ToJSON()
+	}
+	;d ##class(apptools.core.Production).GetStatusProducts(day,.errors)
+	;s ns=""
+	;for { s ns=$o(errors(ns)) q:ns=""
+	;	s co=+$g(errors(ns,"CountErrors"))
+	;	w $s(co:"/",1:"\")_"server_"_$zu(110)_"_"_ns_" Errors: "_co_$$$NL
+	;}
 	q $$$OK
 ]]></Implementation>
 </Method>
@@ -15336,7 +15101,7 @@ d ##class(apptools.core.rest).getDBsize("dbsize",.list)</Description>
 Query and SQL statements</Description>
 <Abstract>1</Abstract>
 <IncludeCode>apptools.core</IncludeCode>
-<TimeChanged>65610,77273.857</TimeChanged>
+<TimeChanged>65713,47388.040224</TimeChanged>
 <TimeCreated>65607,76511.179169</TimeCreated>
 
 <Method name="getSQL">
@@ -15344,7 +15109,7 @@ Query and SQL statements</Description>
 s sql=##class(apptools.core.sql).getSQL("apptools.core.sql:TestXData",0,.desc) w !,sql,!!,desc
 s sql=##class(apptools.core.sql).getSQL("TestQuery",0,.desc) w !,sql,!!,desc</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec><![CDATA[name:%String,removeNL=$$$NO,&Description]]></FormalSpec>
+<FormalSpec><![CDATA[name:%String,removeNL=$$$NO,&Description,today=1]]></FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
 	#dim sc As %Status = $$$OK
@@ -15371,7 +15136,7 @@ s sql=##class(apptools.core.sql).getSQL("TestQuery",0,.desc) w !,sql,!!,desc</De
 	}
 	
 	set:(removeNL = $$$YES) sql = $replace(sql, $$$NL, " ")
-	return sql_" -- Today "_$zd($h,3)_" "_$g(ssm)
+	return sql_$s(today:" -- Today "_$zd($h,3)_" "_$g(ssm),1:"")
 ]]></Implementation>
 </Method>
 
@@ -15438,7 +15203,7 @@ ORDER BY c.contractNumber
 <Class name="apptools.core.sys">
 <Abstract>1</Abstract>
 <IncludeCode>apptools.core</IncludeCode>
-<TimeChanged>65652,57028.527781</TimeChanged>
+<TimeChanged>65804,57910.272158</TimeChanged>
 <TimeCreated>65607,76511.284467</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -15865,9 +15630,11 @@ w $System.Status.GetErrorText(##class(apptools.core.sys).SqlToDSN("SELECT * FROM
 <Implementation><![CDATA[
 	#dim %JDBCGateway As %Net.Remote.Java.JDBCGateway
 	s hr=$h,ts=$$$AppDT(hr)
+	kill %objlasterror
 	set conn = $system.SQLGateway.GetJDBCConnection(DSN)
 	if (conn = "") {
-			set sc = $$$ERROR($$$GeneralError, "Cannot get connection for " _ DSN)
+		   	Set sc = $g(%objlasterror, $$$OK)
+   			Set sc = $$$ADDSC(sc, $$$ERROR($$$GeneralError, "Cannot get connection for " _ DSN))
 			quit sc
 	}
 	set st = %JDBCGateway.prepareStatement(conn, sql)
@@ -15999,21 +15766,21 @@ TODO save to gn</Description>
 
 <Method name="GetFullName">
 <Description>
-Sample  w ##class(apptools.core.sys).GetFullName("superuser")</Description>
+Sample  write ##class(apptools.core.sys).GetFullName("superuser")</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>login</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
- try {
-	$$$NspGoto(curNs,"%SYS")
+  new $namespace
+  set $namespace="%SYS"
+  try {
 	if ##class(Security.Users).Exists(login,.User,.Status) {
 			if $isobject(User) {
 				s fullName=User.FullName 
 			}
 		}
-  $$$NspReturn(curNs) 
- } catch e {}
-  q $g(fullName)
+  } catch e {}
+  quit $GET(fullName)
 ]]></Implementation>
 </Method>
 
@@ -16052,20 +15819,32 @@ Sample  w ##class(apptools.core.sys).GetRoles(mask,.roles)</Description>
 <Method name="GetUsers">
 <Description>
 Get system users
-w ##class(apptools.core.sys).GetUsers("super",.users)</Description>
+kill users w ##class(App.sys).GetUsers("super",.users,.sql) w !,sql,! zw users 
+kill users w ##class(App.sys).GetUsers("sup%,adm%",.users,.sql) w !,sql,! zw users 
+kill users w ##class(App.sys).GetUsers("sup%,admin",.users,.sql) w !,sql,! zw users </Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec><![CDATA[mask="",&list]]></FormalSpec>
+<FormalSpec><![CDATA[mask="",&list,&sql]]></FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
   NEW $NAMESPACE
   SET $NAMESPACE = "%SYS"
   set mask=$zconvert(mask,"L")
-  set sql="select NameLowerCase,FullName,Comment,Roles,EmailAddress FROM Security.Users"
-  if mask["," { set mask=$replace($ZStrip(mask,"<>W"),",","','")
-  	set sql=sql_" where NameLowerCase in ('"_mask_"')"
+  set sql="select NameLowerCase,FullName,Comment,Roles,EmailAddress FROM Security.Users where (1=1)"
+  if mask[",",mask'["%" { set mask=$replace($ZStrip(mask,"<>W"),",","','")
+  	set sql=sql_" and NameLowerCase in ('"_mask_"')"
   } 
+  elseif mask["%" {
+	  set sql=sql_" and ( "
+	  for i=1:1:$l(mask,",") {
+		if $p(mask,",",i)="" continue
+		if i>1 set sql=sql_" or "
+	  	if $p(mask,",",i)["%" set sql=sql_" NameLowerCase like '"_$p(mask,",",i)_"'"
+	  	else  set sql=sql_" NameLowerCase = '"_$p(mask,",",i)_"'"
+	  }
+	  set sql=sql_" ) "
+  }
   elseif mask'="" {
-	  set sql=sql_" where NameLowerCase like '%"_mask_"%'"
+	  set sql=sql_" and NameLowerCase like '%"_mask_"%'"
   }
 	set result=##CLASS(%ResultSet).%New("%DynamicQuery:SQL")
 	set tSC=result.Prepare(sql)
@@ -16255,6 +16034,66 @@ zn "app" w $System.Status.GetErrorText(##class(apptools.core.sys).MountListDB("D
 		if st2 q st2
 	} else { q st }
 	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetDirDB">
+<Description>
+write $System.Status.GetErrorText(##class(apptools.core.sys).GetDirDB("APPTOOLS",.d,.dir,0))</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[nspace,&db,&dirlist,IRIS=1]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	new $namespace
+	zn "%sys"
+	set Status=##Class(Config.Namespaces).Get(nspace,.p)
+	Q:'Status Status
+	set db="",dirlist=""
+	for { set db=$o(p(db)) q:db=""
+		if 'IRIS,p(db)["IRIS" continue
+		set db(p(db))=""
+	}
+	s st=$$$OK
+	for { set db=$o(db(db)) quit:db=""
+		If ##Class(Config.Databases).Get(db,.Properties) {
+  			Set Directory = $G(Properties("Directory"))
+  			set dirlist=dirlist_$lb(Directory)
+  			set db(db)=Directory
+		} Else {
+			set err="Database " _ db _ " does not exist" 
+			Set st = $$$ERROR($$$GeneralError,err)
+			q
+		}
+	}
+	quit st
+]]></Implementation>
+</Method>
+
+<Method name="Integrity">
+<Description>
+write $System.Status.GetErrorText(##class(apptools.core.sys).Integrity("APPTOOLS,APP,USER"))</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>nspace,dir="/backup/iris-backup/integrity/",adddir=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	new $namespace
+	zn "%sys"
+	$$$TOE(st, ##class(%File).CreateDirectoryChain(dir))
+	set result=""
+	for i=1:1:$L(nspace,",") {
+		s ns=$P(nspace,",",i)
+		continue:ns=""
+		s st=##class(apptools.core.sys).GetDirDB(ns,.d,,0)
+	}
+	set d=""
+	for { set d=$o(d(d)) q:d=""
+		set result=result_$lb($g(d(d)))
+	}
+	if adddir'="" set result=result_adddir
+	set filename=dir_$zd($h,3)_"-"_nspace_".log"
+	write !,filename zw result
+	
+	quit $$Silent^Integrity(filename,result,0)
 ]]></Implementation>
 </Method>
 </Class>
@@ -16576,6 +16415,1952 @@ w ##class(apptools.core.type).GetValidNumeric("14,650.00")</Description>
 	i price[","&&(price[".") s price=$tr(price,",")
 	i price["," s price=$tr(price,",",".")
 	q $tr(price," "_$c(160)) ;remove the spaces
+]]></Implementation>
+</Method>
+</Class>
+
+
+<Class name="apptools.lte.adminStatic">
+<Description>
+https://adminlte.io</Description>
+<Abstract>1</Abstract>
+<IncludeCode>apptools.core</IncludeCode>
+<TimeChanged>65805,81045.525033</TimeChanged>
+<TimeCreated>64127,58953.319558</TimeCreated>
+
+<Method name="GetMain">
+<Description>
+http://localhost:52773/apptoolsrest/a/permiss-autoload=snapshot
+http://localhost:52773/apptoolsrest/a/infochest
+http://localhost:52773/apptoolsrest/a/smarthome-autoload-snapshot</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>parameter</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if 0,parameter="apptools.core.Action.cls" {
+		;set $$$AppL("MSW","req")=$$$AppObJs(%request)
+	 	;merge $$$AppL("MSW","%request.Data")=%request.Data
+		;set $$$AppL("MSW","%request.AppData")=%request.AppData
+		w  quit $$$OK ;$classmethod("apptools.core.Action","OnPage",.parameter)
+	}
+	set h=##class(apptools.core.rest).getStatic("apptools.lte.adminStatic:html")
+	set app=$p(parameter,"-")
+	set class="apptools.lte."_app
+	if '##class(apptools.core.sys).ClassExist(class) quit $$$ERROR($$$GeneralError,"class does not exist "_class)
+	;s appdinamic=%request.Application_"get-files/"
+	
+	set path="/apptools/adminlte/"
+	set h=$replace(h,"=path=",path)
+	
+	set st=$classmethod(class,"MainParameter",.h,path,$p(parameter,"-",2,*)) 
+
+	d ##class(apptools.core.rest).WriteStatic("html",,,,,h)
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<XData name="html">
+<Description>
+s h=##class(apptools.core.rest).getStatic("apptools.Uikit.AdminLTE:html") w !,h,!</Description>
+<MimeType>application/yaml</MimeType>
+<Data><![CDATA[
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>=titleAppToolsadmin=</title>
+
+  <!-- Google Font: Source Sans Pro -->
+  <!--<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">-->
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="=path=plugins/fontawesome-free/css/all.min.css">
+  <!-- overlayScrollbars -->
+  <link rel="stylesheet" href="=path=plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="=path=dist/css/adminlte.min.css">
+  <!--=LinkIcon=-->
+  <!--=Links=-->
+</head>
+<body class="hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
+<div class="wrapper">
+
+  <!-- Preloader -->
+  <div class="preloader flex-column justify-content-center align-items-center">
+    <img class="animation__wobble" src="=path=dist/img/ApptoolsLogo.png" alt="ApptoolLogo" height="60" width="60">
+  </div>
+
+  <!-- Navbar -->
+  <nav class="main-header navbar navbar-expand navbar-dark">
+    <!-- Left navbar links -->
+	
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="#" onclick="document.location.reload();" class="nav-link">Home</a>
+      </li>
+    </ul>
+
+    <!-- Right navbar links -->
+	<ul class="navbar-nav ml-auto">
+      <!-- =Navbar Search= -->
+      <!--<li class="nav-item">
+        <div class="navbar-search-block">
+          <form class="form-inline">
+            <div class="input-group input-group-sm">
+              <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
+              <div class="input-group-append">
+                <button class="btn btn-navbar" type="submit">
+                  <i class="fas fa-search"></i>
+                </button>
+                <button class="btn btn-navbar" type="button" data-widget="navbar-search">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </li>-->
+
+      <!-- Notifications Dropdown Menu -->
+	  <!-- =Item Dropdown Menu= -->
+
+      <li class="nav-item">
+        <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+          <i class="fas fa-expand-arrows-alt"></i>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <!-- /.navbar -->
+
+  <!-- Main Sidebar Container -->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="#" onclick="document.location.reload();" class="brand-link">
+      <img src="=path=dist/img/=Logo-png=" alt="ApptoolsLogo" class="brand-image img-circle elevation-3" style="opacity: .8">
+      <span class="brand-text font-weight-light">=Brand-Text=</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      
+	  <!-- Sidebar user panel (optional) -->
+	  <!--
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="image">
+          <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+        </div>
+        <div class="info">
+          <a href="#" class="d-block">Alexander Pierce</a>
+        </div>
+      </div>
+		-->
+
+      <!-- SidebarSearch Form -->
+	  <div class="form-inline">
+        <div class="input-group" data-widget="sidebar-search">
+          <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
+          <div class="input-group-append">
+            <button class="btn btn-sidebar">
+              <i class="fas fa-search fa-fw"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar Menu -->
+      <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+          <!-- Add icons to the links using the .nav-icon class
+               with font-awesome or any other icon font library -->
+          <!-- =Sidebar Menu= -->
+        </ul>
+      </nav>
+      <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+  </aside>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <!-- Info boxes -->
+       <div class="row">
+       
+       <!-- Uikit Tab start -->
+	    <div class="uk-width-1-1 uk-margin-left uk-margin-right " style='overflow: auto;' id="mainApp" >
+			<ul id='tabMenu' class="uk-tab uk-tab-grid uk-tab-top" data-uk-tab="{connect:'#tabList', animation: 'fade'}">
+				<li id='t1' class="uk-active"><a href="#"><font color=Lightsteelblue>Welcom</font></a></li>
+			</ul>
+			<ul id="tabList" class="uk-switcher uk-margin uk-tab-content">
+				<li id='ta1' >
+			 	<div class="uk-alert-success" uk-alert>
+					<p> Sample of simple application</p>
+			 	</div>
+				</li>
+			</ul>
+		</div>
+		<!-- Uikit Tab start -->
+	
+   
+      </div>
+       <!-- /.row -->
+		</div><!--/. container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
+
+  <!-- Main Footer -->
+  <footer class="main-footer">
+    <strong>Applications Tools for Admin.</strong>
+   
+    <div class="float-right d-none d-sm-inline-block">
+      <!--<b>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a> All rights reserved. Version</b> 3.1.0-rc-->
+    </div>
+  </footer>
+</div>
+<!-- ./wrapper -->
+
+<!-- REQUIRED SCRIPTS -->
+<!-- jQuery -->
+<script src="=path=plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap -->
+<script src="=path=plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- overlayScrollbars -->
+<script src="=path=plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+<!-- AdminLTE App -->
+<script src="=path=dist/js/adminlte.js"></script>
+
+<!-- PAGE PLUGINS -->
+<!-- jQuery Mapael -->
+<script src="=path=plugins/jquery-mousewheel/jquery.mousewheel.js"></script>
+<script src="=path=plugins/raphael/raphael.min.js"></script>
+<script src="=path=plugins/jquery-mapael/jquery.mapael.min.js"></script>
+<script src="=path=plugins/jquery-mapael/maps/usa_states.min.js"></script>
+<script src="=path=plugins/jquery/jquery.blockui.js"></script>
+<!-- ChartJS -->
+<script src="=path=plugins/chart.js/Chart.min.js"></script>
+
+<!-- AdminLTE for demo purposes -->
+<!--<script src="dist/js/demo.js"></script>-->
+<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+<!--<script src="dist/js/pages/dashboard2.js"></script>-->
+ <div id='MainHidden' style='display:none;'></div>
+ <div id="dialog" title="Dialog Title">
+	<div id=dialogContent></div>
+ </div>
+<!--=JS-Autoload=-->
+</body>
+</html>
+]]></Data>
+</XData>
+</Class>
+
+
+<Class name="apptools.lte.adminTabs">
+<Description>
+The template GUI of the application selector and tabs on the basis jQueryUi, Uikit</Description>
+<ClassType/>
+<IncludeCode>apptools.core</IncludeCode>
+<ProcedureBlock>1</ProcedureBlock>
+<Super>%CSP.Page</Super>
+<TimeChanged>65804,72536.996891</TimeChanged>
+<TimeCreated>65065,36454.902831</TimeCreated>
+<DependsOn>apptools.core.msg</DependsOn>
+
+<Parameter name="HeaderText">
+<Description>
+The application title</Description>
+<Default>AdminTabsApplication</Default>
+</Parameter>
+
+<Parameter name="GNStore">
+<Description>
+Global Name Store Referens files and id sessions</Description>
+<Default>^%apptools.ui</Default>
+</Parameter>
+
+<Parameter name="PreLoad">
+<Description>
+For Redirect </Description>
+</Parameter>
+
+<Method name="IsPermiss">
+<Description>
+is there a right to work with this form</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>role</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[	q $roles[role||($roles["%All")
+]]></Implementation>
+</Method>
+
+<Method name="GetAppIcon">
+<Description>
+Icon from png</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>path,ext</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	if path'="" {
+		quit "<link rel=""icon"" href="""_path_"."_ext_""" type=""image/x-"_ext_"""/><link rel=""shortcut icon"" href="""_path_"."_ext_""" type=""image/x-"_ext_"""/>"
+	}
+	else {
+		;hammer gray
+		quit "<link rel=""icon"" type=""image/x-icon"" href="""_##class(apptools.core.rest).getStatic("apptools.Tabs.PanelUikit:IconTools")_"""/>"		
+		;grammophon
+		;quit "<link rel=""icon"" type=""image/x-icon"" href=""data:image/x-icon;base64,AAABAAEAEBAAAAAAAABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8AJCQk/yQkJP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/0ZGRv8XFxf/////AP///wD///8A////AP///////////////+7u7v9OTk7/sbGx/11dXf9KSkr///////////+lpaX/4eHh/////wD///8A////AAAAAP8AAAD///////////+8vLz///////X19f/t7e3/gICA/5eXl////////////wAAAP8AAAD/////AKysrP8AAAD/AAAA/wAAAP+enp7/////////////////////////////////5OTk/wAAAP8AAAD/AAAA/6ysrP////8A////AP///wCurq6PlJSUzP///wD///8A////AP///wD///8A////AJSUlMyQkJDY////AP///wD///8A////AP///wD///8AAAAA/wAAAP////8A////AP///wD///8A////AP///wAAAAD/AAAA/////wD///8A////AP///wD///8AAAAA/wAAAP8AAAD/////AP///wD///8A////AP///wD///8AAAAA/wAAAP8AAAD/////AP///wD///8ACwsL/wAAAP8AAAD/lJSU2AAAAP8AAAD/cnJy/1hYWP8AAAD/AAAA/2FhYdgHBwf/AAAA/wAAAP////8A////AP///wD///8A////AP///wAAAAD/s7Oz/wAAAP8AAAD/x8fH/wAAAP////8A////AP///wD///8A////AP///wD///8A////AP///wAAAAD/AAAA/////wAAAAD/AAAA/////wAAAAD/AAAA/////wD///8A////AP///wD///8A////AP///wD///8AAAAA/wAAAP+qqqqlAAAA/wAAAP9lZWXjAAAA/wAAAP////8A////AP///wD///8A////AP///wD///8A////ALa2tv////8A9vb2UQAAAP8AAAD/////Uf///wDAwMD/////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wBcXFz/AAAA/////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A//8AAP//AADAAwAAwAMAAIABAAAAAAAA5+cAAOfnAADH4wAAgAEAAPgfAADyTwAA8A8AAPZvAAD+fwAA//8AAA==""/>"
+	}
+]]></Implementation>
+</Method>
+
+<Method name="RepaceParameter">
+<Description>
+Replace parameters</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[&h,path,url="",&par]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ set p=""
+ for { set p=$Order(par(p)) quit:p=""
+ 	set h=$replace(h,p,par(p))
+ }
+ ;links 
+ set linkjqueyuikit= ##class(apptools.core.LogInfoPane).GetLink()
+ set linkjqueyuikit2= ##class(apptools.core.LogInfoPane).AddJsScripts() 
+ set js= ..GetStringJs($namespace,..%ClassName(1),0)
+ set h=$replace(h,"<!--=Links=-->",
+ 				linkjqueyuikit_$$$NL_
+ 				linkjqueyuikit2_$$$NL_
+ 				js_$$$NL
+ 	)
+ set menu=..DrawMenu() ;sidebar
+ set h=$replace(h,"<!-- =Sidebar Menu= -->",menu)
+ set menuTop=..DrawMenuTop() ;top think
+ set h=$replace(h,"<!-- =Item Dropdown Menu= -->",menuTop)
+ if url["autoload=" set autoload=$p($p($p(url,"autoload=",2),"-"),"&")
+ set js= ..GetStringJs($namespace,..%ClassName(1),1,$G(autoload))
+  set h=$replace(h,"<!--=JS-Autoload=-->",js)
+ quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetStringJs">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>ns,cls,postload=0,autoload=""</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+ set io=$i
+ OPEN 2:$j USE 2
+ if postload {
+	 write $$$NL
+ $$$jsstart write $$$NL
+ 	write ##class(apptools.core.Action).WriteActJs(%request,"","account_status",..%ClassName(1),"DrawStatus","")_$$$NL
+ 	set enter=##class(apptools.core.Action).WriteActJs(%request,"","MainHidden",..%ClassName(1),"ShowTab","&appPar=Search&Searchstr='+document.getElementById('searchstr').value")_$$$NL
+ 	write "$('#searchstr').keydown(function (e) { if (e.keyCode == 13) { "_enter_" }});"_$$$NL
+  	if autoload="" {
+	 	do ..GetAllApps(.opt) 
+	 	set i="" 
+	 	for { set i=$o(opt(i)) q:i=""
+	 		if $GET(opt(i,"Active")) write "$('#Menu"_opt(i,"id")_"').trigger('click');"_$$$NL
+	 	}
+ 	} else {
+	 	write "$('#Menu"_autoload_"').trigger('click');"_$$$NL
+ 	}
+ 	write $$$NL
+ $$$jsstop write $$$NL
+ }
+ else {
+ 	do ##class(apptools.core.LogInfoPane).AddJS(ns,cls)
+ 	do ##class(apptools.core.LogInfoPane).AddStyle()
+ }
+ set i=""
+ 	,js=""
+ for { set i=$o(^SPOOL($j,i),1,s) q:i=""
+		set js=js_s_$$$NL
+ 	}
+ 	KILL ^SPOOL($j)
+
+ use io
+ quit js
+]]></Implementation>
+</Method>
+
+<Method name="GetAllApps">
+<Description>
+what are the available modes</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>opt</FormalSpec>
+<ReturnType>%Status</ReturnType>
+</Method>
+
+<Method name="DrawMenuTop">
+<Description>
+the rendering top menu </Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	do ..GetAllApps(.opt) 
+	do ..GetAllMenu(.opt,.menu,1)
+	set m="",ret=""
+	for { set m=$o(menu(m)) quit:m=""
+		set i=""
+		  set iditem="id_top_item"_m
+		  if m=99 set iditem="account_status" //account - with submenu
+		 s ret=ret_"<li class=""nav-item dropdown"">"_
+        	"<a class=""nav-link"" data-toggle=""dropdown"" href=""#"">"_
+          	 "<span id="""_iditem_""">"_$lg(menu(m),2)_"</span>"_
+        	"</a>"_
+        	"<div class=""dropdown-menu dropdown-menu-lg dropdown-menu-right"">"
+			for { set i=$o(menu(m,i)) quit:i=""
+				set onclick=##class(apptools.core.Action).WriteActJs(%request,"","MainHidden",..%ClassName(1),"ShowTab","&appPar="_i)
+				set ret=ret_
+			     "<div class=""dropdown-divider""></div>"_
+          		"<a href=""#"" class=""dropdown-item"" id='Menu"_$g(opt(i,"id"))_"' onclick="""_onclick_""">"_
+           		 "<i class=""fas fa-file333 mr-2""></i>"_
+            	 "<span class=""float-right text-muted text-sm"">"_$g(opt(i))_"</span>"_
+          		"</a>"
+			}
+ 			s ret=ret_ 
+    	    	"</div>"_
+	      	"</li>"
+		}
+	
+  quit ret
+]]></Implementation>
+</Method>
+
+<Method name="DrawMenu">
+<Description>
+render side menu </Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	do ..GetAllApps(.opt) 
+	do ..GetAllMenu(.opt,.menu)
+	set m="",ret=""
+	for { set m=$o(menu(m)) quit:m=""
+		set i=""
+		set active=$s($lg(menu(m),3):"menu-open",1:"")
+		set ret=ret_
+		"<li class=""nav-item "_active_""">"_
+            "<a href=""#"" class=""nav-link"" >"_
+              //"<i class=""nav-icon fas fa-chart-pie""></i>"_
+              "<i class=""nav-icon fas fa-copy""></i>"_
+              "<p>"_$lg(menu(m),2)_
+                "<i class=""right fas fa-angle-left""></i>"_
+              "</p>"_
+            "</a>"
+		
+		;s ret=ret_
+		;	"<li class='has-children overview "_active_"'><a href='#'>"_
+		;	$lg(menu(m),2)_
+		;	"</a><ul>"
+		for { set i=$o(menu(m,i)) quit:i=""
+	   		set onclick=##class(apptools.core.Action).WriteActJs(%request,"","MainHidden",..%ClassName(1),"ShowTab","&appPar="_i)
+		 	set ret=ret_	
+			"<ul class=""nav nav-treeview"">"_
+              "<li class=""nav-item"">"_
+                "<a id='Menu"_$g(opt(i,"id"))_"' href=""#"" onclick="""_onclick_""" class=""nav-link"">"_
+                //"<i class=""far fa-circle nav-icon""></i>"_
+                "<i class=""nav-icon fas fa-ellipsis-h""></i>"_
+                			
+                  "<p>"_$g(opt(i))_"</p>"_
+                "</a>"_
+              "</li>"_
+            "</ul>"
+			;set ret=ret_
+			;	"<li><a id='Menu"_$g(opt(i,"id"))_
+			;	"' href='#' onclick="""_onclick_""">"_
+			;	$g(opt(i))_
+			;	"</a></li>"
+		}
+		;s ret=ret_"</ul></li>"
+	}
+	set ret=ret_"</li>"
+  quit ret
+]]></Implementation>
+</Method>
+
+<Method name="GetSupportInfo">
+<Description>
+To obtain information on the support</Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set msg=$$$aText("Software complex to debug. Try to log in later, or contact tech support:","")
+	quit msg_"Support info mailto: sergey.mikhaylenko@gmail.com"
+]]></Implementation>
+</Method>
+
+<Method name="IsDebugMode">
+<Description>
+To add to the form js code if development mode</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>mode=0</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ if mode,'%request.Get("debug") { 
+	$$$jsstart
+	  write $$$blockui(..GetSupportInfo())
+	$$$jsstop
+  quit $$$OK
+ }
+	quit 0
+]]></Implementation>
+</Method>
+
+<Method name="DrawStatus">
+<Description>
+rendering status of the user</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ set fio=##class(apptools.core.sys).GetFullName($username)
+ set:fio="" fio=$$$aText("The user","")
+ write "<span class='tip' title='"_fio_"-"_$j_"-"_$zu(5)_"'>"_$username_"</span>"
+ quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetAllMenu">
+<Description>
+To menu</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>opt,menu,top=0</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ set i="" for { s i=$o(opt(i)) q:i=""
+	if 'top,$d(opt(i,"Menu")) { 
+		set m=$lg(opt(i,"Menu"),1)
+		set:'$d(menu(m)) menu(m)=opt(i,"Menu")
+		set menu(m,i)=""
+	}
+	if top,$d(opt(i,"MenuTop")) { 
+		set m=$lg(opt(i,"MenuTop"),1)
+		set:'$d(menu(m)) menu(m)=opt(i,"MenuTop")
+		set menu(m,i)=""
+	} else {
+		;s:'$d(menu(99)) menu(99)=$lb(0,"---",0)
+		;s menu(99,i)=""
+	}
+  }
+]]></Implementation>
+</Method>
+
+<Method name="ShowTabSearch">
+<Description>
+drawing Tabs search
+Par - code menu item from the GetAllApps ..</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>key=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ ;do ..GetAllApps(.opt) 
+ ;if $g(opt(key,"Disable")) write ..GetSupportInfo() quit $$$OK
+ ;set NSpace=$zu(5)
+ write $$$aText("Context","")_" :"_$g(key)
+ ;set pref=$g(opt(key,"id"))
+]]></Implementation>
+</Method>
+
+<Method name="ShowTab">
+<Description>
+the render Tab on the menu
+Par - code menu item from the GetAllApps ..</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if $g(Par("appPar"))'="" set Par=Par("appPar")
+	do ..GetAllApps(.opt) 
+	do ..ShowTabApps(.Par,.opt)
+]]></Implementation>
+</Method>
+
+<Method name="ShowTabApps">
+<Description>
+the render Tab on the menu
+Par - code menu item from the GetAllApps ..</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par,opt</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if Par="Search" {
+		set Searchstr=$g(Par("%request.Data","Searchstr"),Par("Searchstr"))
+		if Searchstr="" q $$$OK
+		;s tr=$tr(##class(apptools.MSW.type).Transliteration(Searchstr)," №`()\/*;'"":%","_N---")
+		;s tr=$tr($zts,".,") 
+		set tr=$e($tr(Searchstr," №`()\/*;'"":%?$@&.,",""),1,10)_$i(@..#GNStore@("jobs",$j))
+		set key=tr ;Searchstr
+		MERGE opt(key)=opt(Par)
+		set opt(key)=opt(key)_tr ;Searchstr
+		if $g(opt(Par,"TabMenu","Mode"))=1 { ;mode add a new tab 
+			set opt(key,"id")=opt(key,"id")_tr
+		} else { ;mode add a new replace the old 
+			set tabId="tab-"_opt(Par,"id")
+			set tabIdMenu="tabMenu-"_opt(Par,"id")
+			$$$jsstart
+		  	 write "$('#"_tabId_"').remove();"
+		  	 write "$('#"_tabIdMenu_"').remove();"
+		  	$$$jsstop
+		}
+		s opt(key,"CGIvar")="&Searchstr="_Searchstr ;$zconvert(Searchstr,"O","URI")
+		s opt(key,"TabName")=opt(key,"TabName")_tr 
+		s Par=key
+
+	}
+	set tabId="tab-"_opt(Par,"id")
+	set tabIdMenu="tabMenu-"_opt(Par,"id")
+	if $g(opt(Par,"TabMenu","Close"))'="" s IconMenu="<span class=""uk-margin-small-left uk-icon uk-close"" uk-icon=""close"" onclick=""$(\'#"_tabIdMenu_",#"_tabId_"\').remove();""></span>"
+ 	if $DATA(opt(Par,"TabMenu","Close"))>9 { //there are more points
+ 		;TODO
+ 	}
+ 	$$$jsstart
+ 	 if $g(opt(Par,"MethodUrlNewWin"))'="" {
+	 	 if $g(opt(Par,"Disable")) { w "alert('"_$$$aText("Mode debugging","")_"');"}
+	 	 else {write "window.open('"_$g(opt(Par,"MethodUrlNewWin"))_"','_blank');"
+	 	 }
+ 	}
+	else {
+ 	 write "if (!$('li').is('#"_tabId_"')) { $('.uk-active').removeClass('uk-active');"_$c(13,10)
+ 		write " $('#tabList').append('<li id="_tabId_"></li>');"_$c(13,10)
+ 		write " $('#tabMenu').append('<li id="_tabIdMenu_"><a><font color=Lightsteelblue>"_$g(opt(Par,"TabName"))_"</font>"_$g(IconMenu)_"</a></li>');"_$c(13,10)
+ 		write " $('#t1,#ta1').hide();"_$c(13,10) //" $('#t1').prop('disabled',true);"
+ 		if $g(opt(Par,"Disable")) {
+	 		;write "$('#"_tabId_"').load('apptools.core.Action.cls','appClass="_..%ClassName(1)_"&appMethod=ShowTabAbout&appNsp="_$zu(5)_"&appPar="_Par_"');"
+	 		write ##class(apptools.core.Action).WriteActJs(%request,"",tabId,..%ClassName(1),"ShowTabAbout","&appPar="_Par_$g(opt(Par,"CGIvar")))
+ 		}
+ 		elseif $g(opt(Par,"MethodUrl"))'="" {
+	 		write "$('#"_tabId_"').load('"_$g(opt(Par,"MethodUrl"))_"');"
+ 		}
+ 		else {
+	 		;write "$('#"_tabId_"').load('apptools.core.Action.cls','appClass="_$g(opt(Par,"ClassName"))_"&appMethod="_$g(opt(Par,"Method"))_"&appNsp="_$zu(5)_"&appPar="_Par_"');"
+	 		write ##class(apptools.core.Action).WriteActJs(%request,"",tabId,$g(opt(Par,"ClassName")),$g(opt(Par,"Method")),"&appPar="_Par_$g(opt(Par,"CGIvar")))
+ 		}
+ 	 write "};"
+ 	 write " UIkit.tab('#tabMenu').show($('#"_tabIdMenu_"'));"
+	}
+	$$$jsstop
+]]></Implementation>
+</Method>
+
+<Method name="Logout">
+<Description>
+Return in a single string</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ if $g(Par("appPar"))'="" set Par=Par("appPar")
+ do ##class(apptools.core.sys).logout()
+ do ..GetAllApps(.opt) 
+ $$$jsstart
+ set i=""
+ for { set i=$o(opt(i)) q:i=""
+ 	continue:i=Par
+ 	set tabId="tab-"_opt(i,"id")
+	set tabIdMenu="tabMenu-"_opt(i,"id")
+ 	write "$('#"_tabIdMenu_",#"_tabId_"').remove();"
+ }
+ $$$jsstop
+ set onclick = "top.document.location.reload();"
+ &html<
+ <br>
+ <div class="uk-align-center uk-width-1-1 uk-margin-left uk-margin-right ">
+	<div class="uk-alert-warning" uk-alert>
+	<p>#($$$aText("The output of System produced",""))#</p>
+	</div>
+	<center>
+		<button class="uk-button uk-button-primary uk-margin-small-right" type="button" onclick="#(onclick)#" >
+		<span class="uk-margin-small-left uk-icon" uk-icon="sign-in">
+		</span>#($$$aText("Login",""))#</button>
+	</center>
+</div>
+>
+ 	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="ButtonAgain">
+<Description>
+The output of the First button</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>divId="",key=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set mhead=divId_"MainHeader"
+	set mcont=divId_"MainContent"
+	set onclick="$('#"_mcont_"').empty();"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",mhead,..%ClassName(1),divId_"FirstHead","&key="_key_"&divId="_divId)
+	;AppAct('"_divId_"MainForm','"_mhead_"','AppAct="_$zu(5)_":"_..%ClassName(1)_":"_divId_"FirstHead:&divId="_divId_"&key="_key_"');"
+	quit $$$appButton("appButtonExit","onclick="""_$g(onclick)_"""",$$$aText("Again",""))
+]]></Implementation>
+</Method>
+
+<Method name="ShowTabAbout">
+<Description>
+the render Tab On the program"
+Par - code menu item from the GetAllApps ..</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>key=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if $g(key("appPar"))'="" set key=key("appPar")
+	do ..GetAllApps(.opt) 
+	if $g(opt(key,"Disable")) write ..GetSupportInfo() quit $$$OK
+	set divId=$g(opt(key,"id"))
+	write "Hello world! Parameter: "_key
+	write ..ButtonAgain(divId,key)
+]]></Implementation>
+</Method>
+
+<Method name="ShowInIFrame">
+<Description>
+rendering the Tab previously submitted
+Par - code menu item from the GetAllApps ..</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>key=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ if $g(key("appPar"))'="" set key=key("appPar")
+ do ..GetAllApps(.opt) 
+ if $g(opt(key,"Disable")) write ..GetSupportInfo() quit $$$OK
+ set NSpace=$zu(5)
+ set pref=$g(opt(key,"id"))
+ set mhead=pref_"MainHeader"
+ set mcont=pref_"MainContent"
+ &html<
+<form id="#(pref_"MainForm")#">
+<div class="uk-grid">
+    <iframe id="#(mcont)#" width="100%" height="100%" style='overflow: auto;' src='#($g(opt(key,"InFrameUrl")))#' ></iframe>
+    </div>
+</div>
+</form>
+>
+ $$$jsstart
+  ;	; to calculate the height of the container as a result of wijetunge victory container-Taba height of the container header
+ 	write "$('#"_mcont_"').height($(window).height()-($('#t1').height()+$('#MainNavbar').height()+150));"
+  ;	w $$$blockui($$$aText("Loading...",""))
+ $$$jsstop
+ quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="ShowTabSample">
+<Description>
+rendering the Tab previously submitted
+Par - code menu item from the GetAllApps ..</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>key=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ if $g(key("appPar"))'="" set key=key("appPar")
+ do ..GetAllApps(.opt) 
+ if $g(opt(key,"Disable")) write ..GetSupportInfo() quit $$$OK
+ set NSpace=$zu(5)
+ set pref=$g(opt(key,"id"))
+ set mhead=pref_"MainHeader"
+ set mcont=pref_"MainContent"
+ &html<
+<form id="#(pref_"MainForm")#">
+<div class="uk-grid">
+    <div class="uk-width-1-1 "id="#(mhead)#" ></div>
+    <div style='overflow: auto;' class="uk-width-1-1 uk-margin-top uk-margin-left" id="#(mcont)#"></div>
+</div>
+</form>
+>
+ ;d ##class(apptools.core.LogInfoPane).AddJS(NSpace,..%ClassName(1))
+ 
+ $$$jsstart
+  	; to calculate the height of the container as a result of wijetunge victory container-Taba height of the container header
+    write ##class(apptools.core.Action).WriteActJs(%request,pref_"MainForm",mhead,..%ClassName(1),pref_"FirstHead","&divId="_pref_"&key="_key)
+	write "$('#"_mcont_"').height($(window).height()-($('#"_mhead_"').height()+$('#t1').height()+$('#MainNavbar').height()+300));"_$c(13,10)
+  	write $$$blockui($$$aText("Loading...",""))
+ $$$jsstop
+ quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="LighboxDrawJson">
+<Description>
+Lighbox Draw JSON
+List - files array 
+subdir - application static</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>List,subdir="",appdynamic,gn=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ set i=""
+ for { set i=$o(List(i)) q:i=""
+ 	if $lv($g(List(i))),$lg($g(List(i)),2)="F" {
+		 	set fullpath=$lg($g(List(i)),1)
+		 	set ItemName=$lg($g(List(i)),4)
+ 	} else {
+ 		set ItemName=$g(List(i,"ItemName"))
+ 		set fullpath=$g(List(i,"Name"))
+ 	}
+ 	set ext=$p(ItemName,".",*)
+ 	set mimetype=##class(apptools.core.filesMimeTypes).GetMimeTypes4ext(ext)
+ 	set type=$s(mimetype[("video"):"video",(mimetype)[("image"):"image",1:"iframe")
+ 	if subdir'="" {
+ 		write "{source: '"_subdir_ItemName_"', caption: '"_ItemName_"', type: '"_type_"'}",$c(13,10)
+ 	} else {
+	 	set fileId=##class(apptools.core.files).GetFileIdView(fullpath,gn) 
+		write "{source: '"_appdynamic_fileId_"', caption: '"_ItemName_"', type: '"_type_"'}",$c(13,10)
+ 	}
+	write:$o(List(i))'="" ","
+ }
+]]></Implementation>
+</Method>
+
+<Method name="EnCode">
+<Description>
+Encode string to URL</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>s</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set s=$zconvert(s,"O","URL")
+	quit s
+]]></Implementation>
+</Method>
+
+<Method name="DeCode">
+<Description>
+Decode string from URL</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>s</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[	quit $zconvert(s,"I","URL")
+]]></Implementation>
+</Method>
+
+<Method name="DrawTableUi">
+<Description>
+Draw Tables UiKit</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[mode="beg",divId="tab2",attr="",&Enum]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if mode="beg" {
+	&html<
+ <div #(attr)# id="#(divId)#" >
+    <table class="uk-table uk-table-hover uk-table-middle uk-table-divider">
+        <thead>
+           <tr>
+          >
+          set i=""  for {  s i=$o(Enum(i)) quit:i=""
+            write " <th "_$GET(Enum(i,"attr"))_" >"_$g(Enum(i))_"</th>"
+          }
+               /* <th class="uk-table-shrink">Preserve</th>
+                <th class="uk-table-expand">Expand + Link</th>
+                <th class="uk-width-small">Truncate</th>
+                <th class="uk-table-shrink uk-text-nowrap">Shrink + Nowrap</th> */
+    &html<
+            </tr>
+        </thead>
+        <tbody>
+        >
+	}
+    elseif mode="tr" {
+			write "<tr>"
+            set i=""  for {  set i=$o(Enum(i)) quit:i=""
+				write "<td "_$GET(Enum(i,"attr"))_"><font color=Lightblue>"_$GET(Enum(i))_"</font></td>"
+               
+               /* <td><input class="uk-checkbox" type="checkbox"></td>
+               <td><img class="uk-preserve-width uk-border-circle" src="image/msw.jpg" width="40" alt=""></td>
+                <td class="uk-table-link">
+                    <a class="uk-link-reset" href="">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</a>
+                </td>
+                <td class="uk-text-truncate">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</td>
+                <td class="uk-text-nowrap">Lorem ipsum dolor</td>*/
+            } 			
+            w "</tr>"
+	}
+	elseif mode="end" {
+		&html<
+		   </tbody>
+ 	 	 </table>
+ 		</div>
+    	>
+	} else {
+	}
+]]></Implementation>
+</Method>
+</Class>
+
+
+<Class name="apptools.lte.adminsample">
+<ClassType/>
+<IncludeCode>apptools.core</IncludeCode>
+<ProcedureBlock>1</ProcedureBlock>
+<Super>apptools.lte.adminTabs</Super>
+<TimeChanged>65804,68912.16189</TimeChanged>
+<TimeCreated>65065,36454.902831</TimeCreated>
+<DependsOn>apptools.core.msg</DependsOn>
+
+<Parameter name="HeaderText">
+<Description>
+Application title</Description>
+<Default>Admin Sample</Default>
+</Parameter>
+
+<Parameter name="GNStore">
+<Description>
+Global Name Store Referens files</Description>
+<Default>^apptools.Permissions</Default>
+</Parameter>
+
+<Parameter name="AppRoles">
+<Default>ui_Permissions</Default>
+</Parameter>
+
+<Method name="MainParameter">
+<Description>
+Replace parameters</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[&h,path,url=""]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ set par("=Brand-Text=")="Admin Sample Panel"
+ set par("=Logo-png=")="ApptoolsLogo.png"
+ set par("=titleAppToolsadmin=")=..#HeaderText
+ set par("<!--=LinkIcon=-->")=..GetAppIcon(path_"dist/img/ApptoolsLogo","png")
+ quit ..RepaceParameter(.h, path, url,.par)
+]]></Implementation>
+</Method>
+
+<Method name="GetAllApps">
+<Description>
+what are the available modes</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>opt</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	;make them zavisimye from the area
+	;------------ sidebar
+	s key="menu-first"
+	s opt(key)="Find users" ;The name of the menu
+	s opt(key,"id")="Find" ;use methods: FindFirstHead FindResult
+	s opt(key,"TabName")="finding users" ;the name of the tab
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabSample"
+	s opt(key,"Disable")=0 ;developed
+	s opt(key,"TabMenu","Close")=1
+	s opt(key,"Menu")=$lb(1,"Mode",1) ;$lg(,3)=1 - open menu level 1
+	s opt(key,"Active")=1 ;active menu item
+
+	s key="menu-first2"
+	s opt(key)="Sample gallery" ;The name of the menu
+	s opt(key,"id")="Lighbox" ;use methods: LighboxFirstHead LighboxResult
+	s opt(key,"TabName")="Gallery" ;the name of the tab
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabSample"
+	s opt(key,"Disable")=0 ;developed
+	s opt(key,"TabMenu","Close")=1
+	s opt(key,"Menu")=$lb(1,"Mode",1) ;$lg(,3)=1 - open menu level 1
+	
+	s key="menu-second"
+	s opt(key)="Help"
+	s opt(key,"id")="Help"
+	s opt(key,"TabName")="Help"
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"MethodUrl")="http://ShowTabAbout.cls"
+	s opt(key,"Disable")=1 ;developed
+	s opt(key,"Menu")=$lb(2,"About the program",0)
+
+	s key="menu-second2"
+	s opt(key)="Menu 3"
+	s opt(key,"id")="About"
+	s opt(key,"TabName")="Menu 3"
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabAbout"
+	s opt(key,"Disable")=1 ;developed
+	s opt(key,"Menu")=$lb(2,"About the program")
+
+	s key="menu-second3"
+	s opt(key)="Support"
+	s opt(key,"id")="Support"
+	s opt(key,"TabName")="Support"
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"MethodUrlNewWin")="http://ShowTabAbout.cls"
+	s opt(key,"Disable")=1 ;developed
+	s opt(key,"Menu")=$lb(2,"About the program")
+	
+	;------------ one-level upper menu 
+	s key="menu-topLern"
+	s opt(key)="Menu 2"
+	s opt(key,"id")="Menu2"
+	s opt(key,"TabName")="Menu 2"
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabAbout"
+	s opt(key,"MenuTop")=$lb(1,"Menu 2") ;has no sub-items
+
+	s key="menu-topOpt"
+	s opt(key)="Option"
+	s opt(key,"id")="Option"
+	s opt(key,"TabName")="Option"
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabAbout"
+	s opt(key,"MenuTop")=$lb(2,"Option") ;has no sub-items
+
+	;------------ top menu the top-accoun
+	s key="menu-top-accoun"
+	s opt(key)=$$$aText("Profile","")
+	s opt(key,"id")="AccountProf"
+	s opt(key,"TabName")=$$$aText("Profile","")
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabAbout"
+	s opt(key,"MenuTop")=$lb(99,"Account") ;only 99-account has sub-items
+
+	s key="menu-top-account3"
+	s opt(key)=$$$aText("Exit","")
+	s opt(key,"id")="AccountExit"
+	s opt(key,"TabName")=$$$aText("Exit","")
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="Logout"
+	s opt(key,"MenuTop")=$lb(99,"Account") ;only 99-account has sub-items
+	
+	;----- Setup the search in the top menu
+	s key="Search"
+	s opt(key)=$$$aText("Search","")
+	s opt(key,"id")="Search-"
+	s opt(key,"TabName")=$$$aText("Search","")_"-"
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabSearch"
+	s opt(key,"TabMenu","Close")=1
+	s opt(key,"TabMenu","Mode")=0 ;1 - for each new search bar to make new tab, 0-tab is always the same
+	
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="FindFirstHead">
+<Description>
+download template forms search</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set onclick=$$$blockui("Load...")_";"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainContent",..%ClassName(1),divId_"Result","~key="_key_"~divId="_divId_"~mode=*")
+	;ActionJs('"_divId_"MainForm','"_divId_"MainContent','','"_divId_"Result','key="_key_"~divId="_divId_"~mode=*');"
+		&html<
+		<table width="90%" style="border-radius: 10px; border: 1px solid #72a7cf" cellpadding="2" cellspacing="0" class="DetailTable" bgcolor="#c4d6d6" >
+		<tr>
+			<td>
+		Context name users
+			</td>
+			<td>
+				#($$$appText(divId_"textName","title='context in Name'","s"))#
+			</td>		
+			<td>
+				#($$$appText(divId_"textDesc","title='context in FullName'","m"))#
+			</td>
+			<td>
+			</td>
+			<td>
+		
+			</td>
+			<td>
+
+			</td>
+		</tr>
+		<tr>
+			<td>
+			
+			</td>
+			<td>
+			#($$$appButton(divId_"appButtonResult1","onclick="""_$tr(onclick,"*",1)_"""","Find USERS"))#
+			</td>
+			<td>
+			</td>
+			<td>
+			</td>
+			<td>
+			
+			</td>
+			<td>
+
+			</td>
+		</tr>
+		</table>
+	>
+ $$$jsstart
+ 	//for all identifiers starting with "_divId_"text by pressing Enter, click on the button (ending with $("[id$='txtTitle']"))
+ 	write "$('[id^="""_divId_"text""]').keydown(function (e) { if (e.keyCode == 13) { $('#"_divId_"appButtonResult1').click(); }});"_$c(13,10)
+ $$$jsstop
+	
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="FindResult">
+<Description>
+Search result</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set mode=Par("mode")
+	;Geting elements from form and prepare array Par
+	set Name=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"textName")	
+	set Desc=$g(Par("%request.Data",divId_"textDesc"))
+	set st=$$$OK
+	if mode=1 {
+		write ..ButtonAgain(divId,key)
+		if Name="" w $$$appError($$$aText("Context is empty","")) quit $$$OK
+		zn "%sys"
+		set sql="select ID,name,EmailAddress,fullName from Security.Users where Enabled [ '1' "
+		if Name'="" s sql=sql_" and (name like '%"_Name_"%') "
+		if Desc'="" s sql=sql_" and (fullName like '%"_Desc_"%') "
+		set msg="Query: "_sql
+
+		set exec="##class(apptools.core.LogInfo).MarkRed(%AppLogInfoVal,"""_Name_","_Desc_""")"
+		set st=##class(apptools.core.LogInfoPane).DrawSQL(sql,100000,$zu(5),msg,exec)
+		if 'st  w $$$appError($System.Status.GetErrorText(st))
+		quit $$$OK
+
+	} 
+	write "<br>"
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="LighboxFirstHead">
+<Description>
+download template forms search</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set onclick=$$$blockui("Load...")_";"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainContent",..%ClassName(1),divId_"Result","~key="_key_"~divId="_divId_"~mode=*")
+	Set path=$p($p($zu(86),"*",1),$$$slash,1,*-1)
+	Set path1=path_$tr("\csp\broker\images\","\",$$$slash)
+	Set path2=path_$tr("\docs\","\",$$$slash)
+		&html<
+		<table width="90%" style="border-radius: 10px; border: 1px solid #72a7cf" cellpadding="2" cellspacing="0" class="DetailTable" bgcolor="#c4d6d6" >
+		<tr>
+			<td>
+				#($$$appText(divId_"path1","size=50 title='path to images'",path1))#
+			</td>
+			<td>
+				#($$$appText(divId_"path2","size=50 title='path to images docs'",path2))#
+			</td>
+		</tr>
+		<tr>
+			<td>
+			#($$$appButton(divId_"appButtonResult1"," onclick="""_$tr(onclick,"*",1)_"""","Generate gallery via App /csp/broker"))#			
+			</td>
+			<td>
+			#($$$appButton(divId_"appButtonResult2"," onclick="""_$tr(onclick,"*",2)_"""","Generate gallery dinamic rest"))#			
+			</td>
+		</tr>
+		</table>
+	>
+ $$$jsstart
+ 	;for all identifiers starting with "_divId_"text by pressing Enter, click on the button (ending with $("[id$='txtTitle']"))
+ 	write "$('[id^="""_divId_"path""]').keydown(function (e) { if (e.keyCode == 13) { $('#"_divId_"appButtonResult2').click(); }});"_$c(13,10)
+ $$$jsstop
+	
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="LighboxResult">
+<Description>
+Its result</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set mode=Par("mode")
+	;Geting elements from form and prepare array Par
+	set path1=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"path1")	
+	set path2=$g(Par("%request.Data",divId_"path2"))
+	set st=$$$OK
+	set wc=##class(apptools.core.filesMimeTypes).GetTypesWildcards("image")_##class(apptools.core.filesMimeTypes).GetTypesWildcards("video")
+	if mode=1 {
+	 do ##class(apptools.core.files).GetList(path1,wc,.List)
+	 set cspappstatic="/csp/broker/images/"
+	 ;zw List
+	 $$$jsstart
+ 		write "UIkit.lightboxPanel({"
+   		write "items: [ "
+		  do ..LighboxDrawJson(.List,cspappstatic)
+  		write " ] }).show();"
+	 $$$jsstop
+	} 
+	elseIF mode=2 {
+	;	w path2
+	 do ##class(apptools.core.files).GetList(path2,wc,.List)
+	 ;zw List
+	 set appdinamic=%request.Application_"get-files/"
+	 $$$jsstart
+ 		write "UIkit.lightboxPanel({"
+   		write "items: [ "
+		  do ..LighboxDrawJson(.List,,appdinamic,..#GNStore)
+  		write " ] }).show();"
+	 $$$jsstop
+	}
+	write "<br>"
+	quit $$$OK
+]]></Implementation>
+</Method>
+</Class>
+
+
+<Class name="apptools.lte.infochest">
+<ClassType/>
+<IncludeCode>apptools.core</IncludeCode>
+<ProcedureBlock>1</ProcedureBlock>
+<Super>apptools.lte.adminTabs</Super>
+<TimeChanged>65806,36361.895289</TimeChanged>
+<TimeCreated>65065,36454.902831</TimeCreated>
+<DependsOn>apptools.core.msg</DependsOn>
+
+<Parameter name="HeaderText">
+<Description>
+Application title</Description>
+<Default>Info Chest</Default>
+</Parameter>
+
+<Parameter name="GNStore">
+<Description>
+Global Name Store Referens files</Description>
+<Default>^apptools.infochest</Default>
+</Parameter>
+
+<Parameter name="AppRoles">
+</Parameter>
+
+<Method name="MainParameter">
+<Description>
+Replace parameters</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[&h,path,url=""]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ set par("=Brand-Text=")="Info Chest"
+ set par("=Logo-png=")="infochest.png"
+ set par("=titleAppToolsadmin=")=..#HeaderText
+ set par("<!--=LinkIcon=-->")=..GetAppIcon(path_"dist/img/infochest","png")
+ quit ..RepaceParameter(.h, path, url,.par)
+ quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetAppRootdir">
+<Description>
+write ##class(apptools.lte.infochest).GetAppRootdir()</Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set rootdir="d:\files\"
+	if $zversion(1)=3 s rootdir="/home/project/shared/photo/"
+	set rootdir= ##class(%File).GetDirectory($zu(86))_"/mgr/.modules/"_$namespace_"/apptools-admin/1.1.4/files/"
+	quit ##class(%File).GetDirectory(rootdir)
+]]></Implementation>
+</Method>
+
+<Method name="GetAllApps">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>opt</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if ..IsPermiss(..#AppRoles) {
+	;------------ side menu
+	s LeftMenuName="Treasure Сhest" i $i(LeftMenuNumer)
+	s rootdir=..GetAppRootdir()
+
+	s key="camera"
+	s List(key,"ItemName")="Photo & Video"
+	s key="audio"
+	s List(key,"ItemName")="Music"
+	s key="books"
+	s List(key,"ItemName")="Books"
+ 	
+ 	s i="" for { s i=$o(List(i)) q:i=""  
+ 	s ItemName=$g(List(i,"ItemName"))
+ 	i $i(count)
+ 	s key="find-"_i
+	s opt(key)=ItemName 
+	s opt(key,"id")="GDiv"_i
+	s opt(key,"TabName")=ItemName_"-"
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabS"
+	s opt(key,"TabMenu","Close")=1
+	s opt(key,"Menu")=$lb(LeftMenuNumer,LeftMenuName,1)
+	s:count=1 opt(key,"Active")=1
+	s opt(key,"Dir")=rootdir_i
+ }
+ if ..IsPermiss("%All") {	
+ 	i $i(LeftMenuNumer)
+	s key="menu-topOpt"
+	s opt(key)="Parameter"
+	s opt(key,"id")="Option"
+	s opt(key,"TabName")="Parameter"
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabSamples"
+	s opt(key,"Menu")=$lb(LeftMenuNumer,"Option") ;has no sub-items
+ }
+	;------------ top-accoun
+	s LeftMenuName="Account",LeftMenuNumer=99
+
+	s key="menu-top-account3"
+	s opt(key)="Exit"
+	s opt(key,"id")="AccountExit"
+	s opt(key,"TabName")="Exit" 
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="Logout"
+	s opt(key,"MenuTop")=$lb(LeftMenuNumer,LeftMenuName)
+	
+	s key="Search"
+	s opt(key)="Искать"
+	s opt(key,"id")="Search-"
+	s opt(key,"TabName")="Search-"
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabSearch"
+	s opt(key,"TabMenu","Close")=1
+	s opt(key,"TabMenu","Mode")=0
+	}
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="ShowTabSearch">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>key=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ ;do ..GetAllApps(.opt) 
+ ;if $g(opt(key,"Disable")) write ..GetSupportInfo() quit $$$OK
+ ;set NSpace=$zu(5)
+ w $$$aText("Context","")_" :"_$g(key)
+ q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="ShowTabS">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ if $g(Par("appPar"))'="" set key=Par("appPar")
+ do ..GetAllApps(.opt) 
+ set divId=$g(opt(key,"id"))
+ set mcont=divId_"MainContent"
+ set mhead=divId_"MainHeader"
+ if $g(Par("dir"))'="" set opt(key,"Dir")=..DeCode(Par("dir"))
+ &html<
+<form id="#(divId_"MainForm")#">
+<div class="uk-grid">
+    <div class="uk-width-1-1 "id="#(mhead)#" >
+    >   
+ ;Folders icon
+ set srcFolder="data:image/gif;base64,R0lGODlhEAAOALMAAOazToeHh0tLS/7LZv/0jvb29t/f3//Ub//ge8WSLf/rhf/3kdbW1mxsbP//mf///yH5BAAAAAAALAAAAAAQAA4AAARe8L1Ekyky67QZ1hLnjM5UUde0ECwLJoExKcppV0aCcGCmTIHEIUEqjgaORCMxIC6e0CcguWw6aFjsVMkkIr7g77ZKPJjPZqIyd7sJAgVGoEGv2xsBxqNgYPj/gAwXEQA7"
+ set dir=$g(opt(key,"Dir"),"!")
+
+ do ..GetSortedList(key,dir,.List,.sort)
+
+ if '$d(List) { write "No files and directories"
+	 quit $$$OK }
+ ;If there are no directories, then we will immediately show the files
+ if '$d(sort("n","D")) {
+	 do ..FilesShow(.Par,dir,.sort)
+	 quit $$$OK
+ }
+ 
+ set on=$$$blockui("Ждите...")_";"_##class(apptools.core.Action).WriteActJs(%request,"",mcont,..%ClassName(1),"NexLevelTree","&key="_key_"&divId="_divId_"&count=*&dir=***")
+
+ s IdTab=$tr($p($zts,",",2),".")
+ s fields(1)="<img class='uk-preserve-width uk-border-circle' src='"_$g(sort("icon"))_"' width='40' alt=''>" ;,fields(1,"attr")="class='uk-table-shrink'"
+ s fields(2)="Name",fields(2,"attr")="class='uk-table-expand'"
+ d ..DrawTableUi("beg","Table"_IdTab,"style='overflow: auto; height: 300px;'",.fields)
+ 
+ ;If there are files then show them
+ if $d(sort("n","F")) {
+	s on2=$replace(on,"***",..EnCode(dir))
+ 	s on2=$replace(on2,"*",(IdTab))
+ 	if key["camera" { s on2=$replace(on2,"NexLevelTree","FilesShow") ;we will replace it with the show program
+ 	} else { s on2=$replace(on2,"NexLevelTree","NextLevelInDir")
+ 	}
+ 	s row(2)=$G(sort("n"))_" в '"_$p(dir,$$$slash,*)_"' - "_$G(sort("n","F"))
+ 	s row(2,"attr")="class='uk-table-expand' onclick="""_on2_""""
+ 	s row(1)="<img class='uk-preserve-width uk-border-circle' src='"_$g(sort("icon"))_"' width='40' alt=''>"
+ 	d ..DrawTableUi("tr",,,.row)
+ }
+ s i=""
+  for { s i=$o(List(i)) q:i=""  
+ 	s ItemName=$g(List(i,"ItemName"))
+ 	continue:$g(List(i,"Type"))="F"
+ 	k sort2
+	d ..GetSortedList(key,dir_$$$slash_ItemName,,.sort2)
+	;w "<li>"_ItemName_" "_key zw sort2
+	i '$d(sort2("n","F"))&&('$d(sort2("n","D"))) continue
+	s on2=on
+	i '$d(sort2("n","D")) {
+ 		s:key["camera" on2=$replace(on2,"NexLevelTree","FilesShow") ;we will replace it with the show program
+	}
+ 	i $i(count)
+  	s on2=$replace(on2,"***",..EnCode(dir_$$$slash_ItemName))
+ 	s on2=$replace(on2,"*",(IdTab+count))
+ 	s row(2)=ItemName_" - "_$tr($G(sort2("n","F")),"'")
+ 	s row(2,"attr")="class='uk-table-expand' onclick="""_on2_""""
+ 	s row(1)="<img class='uk-preserve-width uk-border-circle' src='"_srcFolder_"' width='40' alt=''>"
+ 	d ..DrawTableUi("tr",,,.row)
+ }
+ d ..DrawTableUi("end")
+ &html<
+  </div>
+  <div id="#(mcont)#"></div>
+ </div>
+</form>
+>
+  $$$jsstart
+	w "$('#Table"_IdTab_"').height($(window).height()-($('#t1').height()+$('#MainNavbar').height()+200));"_$c(13,10)
+  $$$jsstop
+ quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="NextLevelInDir">
+<Description>
+Show files in the root of the directory</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	s Par("InDir")=1
+	d ..NexLevelTree(.Par)
+]]></Implementation>
+</Method>
+
+<Method name="NexLevelTree">
+<Description>
+Create a tab with the next level</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set dir=..DeCode(Par("dir"))
+	set count=$g(Par("count"))
+ 	do ..GetAllApps(.opt)
+ 	if '$d(opt(key)) {
+	 	i key["audio" s key="find-audio"
+	 	i key["camera" s key="find-camera"
+	 	i key["books" s key="find-books"
+	 	s count=count+10  ;костыль
+ 	}
+ 	s key2=key_count
+ 	m opt(key2)=opt(key)
+ 	s opt(key2,"id")=$s(divId'="":divId,1:opt(key,"id"))_count
+ 	if $g(Par("InDir")) {
+	 	s addtab="--"
+	 	s opt(key2,"Method")="FilesShow"
+ 	}
+	s opt(key2,"TabName")=opt(key,"TabName")_$p($p(dir,$$$slash,*),".")_$g(addtab)
+	
+ 	s opt(key2,"Dir")=dir
+ 	s opt(key2,"CGIvar")="&dir="_..EnCode(dir)
+ 	s Par=key2
+ 	;w dir
+    d ..ShowTabApps(.Par,.opt)
+    q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetSortedList">
+<Description>
+Get a sorted list of files and directories</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>key,dir,List,sort</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    d ##class(apptools.core.files).GetList(dir,"*.*",.List)
+	if key["audio" {
+		s wc=##class(apptools.core.filesMimeTypes).GetTypesWildcards("audio")
+		s sort("n")="Listen"
+		;Gramophone icon (G)
+		s sort("icon")="data:image/ico;base64,AAABAAEAICAQAAAAAADoAgAAFgAAACgAAAAgAAAAQAAAAAEABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAACAAAAAgIAAgAAAAIAAgACAgAAAwMDAAICAgAAAAP8AAP8AAAD//wD/AAAA/wD/AP//AAD///8AEREREREREREREAAAAAAAABk5OTk5OTk5MREAAAARERETk5OTk5OTk5EREQAAERERGTk5OTk5OTkxEREQABEREROTk5OTk5OTkRG7sAAAAAAZOTk5OTk5OTERERAAAAAAEREREREREREREREQAPAAAAF3d3d3dwd3d3EREADwCAAAEXd3dwAAd3d3cRAAALAAAAAQERAAAAEREREQAICwgAAAC/AAAAAAAA//AAcIuwAAD7sAAAAAAAAA/wB3C7sAAPu7AAAAAAAADw8HeAu7DAC/sAAAAAAAAA8Ad3CLu4gA+7AAAAAAAAAAB3ewi7uwAL+wAAAA8AAAAHd7cIu7sAALuwAAAAd4B3e3t7C7u7AAD7u3u7e3t3t7e3twu7vwAAALu7v7+/v39/f38Lu7uAAAAA+7u7u7u7u7u7C7u7gAAAAAAPv797u7u7uw+7uwAAAAAAAAALu7u7u7sLu7sAAAAAAAAAAAD7+/v7C7u7AAAAAAAAAAAIAA+/vwu7uwAAAAAAAAAAAAAA+/sIu7sAAAAAAAAAAAAAAA+/CLu4gAAAAAAAAAAAAAAA+3C7sAAAAAAAAAAAAAAAAA+wu7AAAAAAAAAAAAAAAAAA8IuwAAAAAAAAAAAAAAAAAAcLCAAAAAAAAAAAAAAAAAAACwAAAAAAAAAAAAAAAAAAAACAAAAB//AAAPwAAAAwAAAAFAAAAAfwAAAf8AAAHfAAABw8AAAcPwAAGB4AHjAcCB8gGBw+gAg//oAIP/8ACD8AAAwAAAAMAAAADAAAAA+AAAAP4AAAD/wAAA//wAAP//AAD///AA///4AP///AH///4B////Af///4H////D////4w=="
+	}
+	elseif key["camera" {
+		s wc=##class(apptools.core.filesMimeTypes).GetTypesWildcards("image")_";"_##class(apptools.core.filesMimeTypes).GetTypesWildcards("video")
+		s sort("n")="Watch"
+		;Camera icon
+		s sort("icon")="data:image/gif;base64,R0lGODlhEAAQAKIAAAAAAHt7AL29vXt7e/8AAP///wAAAAAAACH5BAkIAAEALAAAAAAQABAAAANJGBrT7iuOQmsRI6ppqSiZ1FFACYijB4RMqjbY01DwWn4CIGDroJcBk27nu/w2uyTPltsQdr/i7RQUCivNBSeV3biMEqW4W7VaEwA7"
+	} else {
+		s wc="*.fb2;*.zip;*.doc*"
+		s sort("n")="To read"
+		;Reader icon
+		s sort("icon")="data:image/ico;base64,AAABAAIAICAQAAAAAADoAgAAJgAAABAQEAAAAAAAKAEAAA4DAAAoAAAAIAAAAEAAAAABAAQAAAAAAIACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAgAAAAICAAIAAAACAAIAAgIAAAICAgADAwMAAAAD/AAD/AAAA//8A/wAAAP8A/wD//wAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACIAAAAAAAAAAAAAAAAAACQd4gAAAAAAAAAAAAAAAAJkHd3iAAAAAAAAAAAAAAAmZgAd3eIAAAAAAAAAAAACZmAmQB3d4gAAAAAAAAAAJmYCZmZAHd3AAAAAAAAAAmZgJmZmZkAdwAAAAAAAACZmAmZmZmZmQAAAAAAAAAJmYCZmZmZmZmZAAAAAAAAmZgJmZmZmZmZmQAAAAAAAJmAmZmZmZmZmZAAAAAAAACYCZmZmZmZmZkAAAAAAAAAgJmZmZmZmZmQAAAAAAAAAACZmZmZmZmZAAAAAAAAAAAAAJmZmZmZkAAAAAAAAAAAAAAAmZmZmQAAAAAAAAAAAAAAAACZmZAAAAAAAAAAAAAAAAAAAJkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////////////////////////////////////////x////4H///8Af//+AB///AAH//gAAf/wAAP/4AAD/8AAA/+AAAH/AAAD/wAAB/8AAA//AAAf/4AAP//gAH//+AD///4B////g////+f///////////////////////////8oAAAAEAAAACAAAAABAAQAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAgAAAAICAAIAAAACAAIAAgIAAAICAgADAwMAAAAD/AAD/AAAA//8A/wAAAP8A/wD//wAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAkHAAAAAAAAmAeIAAAAAAmAAHeAAAAAmAmZAHAAAAmAmZmZAAAACAmZmZkAAAAAmZmZkAAAAAAJmZkAAAAAAAAJkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//8AAP//AAD//wAA/48AAP8DAAD+AAAA/AEAAPgBAADwAAAA8AEAAPADAAD4BwAA/g8AAP+fAAD//wAA//8AAA=="
+	}
+    s i="" 	s sort("d")=wc
+	 for { s i=$o(List(i)) q:i=""  
+ 		s ItemName=$g(List(i,"ItemName"))
+ 		s DateModified=$tr($g(List(i,"DateModified")),"- :")
+ 		s type=$g(List(i,"Type"))
+	 	if type="F" {
+		 	s ext=$p(ItemName,".",*)
+		 	continue:wc'[("*."_ext)
+	 	}
+	 	s sort("d",type,DateModified,$i(sort(type,DateModified)))=$lb(i,ItemName) ;sort by date
+	 	s sort("n",type,ItemName)=$lb(i) ;sort by name
+	 	i $i(sort("n",type))
+	 }
+	 q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="FilesShow">
+<Description>
+Show pictures</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par="",dir="",sort</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	do ##class(apptools.core.Form).BlockUI(0)
+	s key=$g(Par)
+	set divId=$g(Par("divId"))
+	s:key="" key=$g(Par("appPar"))
+	s:key="" key=$g(Par("key"))
+	s:dir="" dir=..DeCode($g(Par("dir")))
+	set dynamic=%request.Application_"get-files/" ;dynamic path
+	if '$d(sort) {
+		d ..GetSortedList(Par, dir, .List, .sort)
+	}
+	s IdTab=$tr($p($zts,",",2),".")
+	
+	if key["-audio" { ;Show playlist
+	 ;Header
+	 s fields(1)="<img class='uk-preserve-width uk-border-circle' src='"_$g(sort("icon"))_"' width='40' alt=''>"
+ 	 s fields(2)=$p(dir,$$$slash,*),fields(2,"attr")="class='uk-table-expand'"
+ 	d ..DrawTableUi("beg","TableAudio"_IdTab,"style='overflow: auto; height: 300px;'",.fields)
+	 s i="" for num=1:1 { s i=$o(sort("n","F",i)) q:i=""
+	  	s row(2)=$p($p($lg(sort("n","F",i),1),$$$slash,*),".",1,*-1)
+ 		s row(2,"attr")="class='uk-table-expand' "
+ 		set fileId=##class(apptools.core.files).GetFileIdView($lg(sort("n","F",i),1)) 
+ 		s nextrack="Track"_IdTab_"-"_$S($o(sort("n","F",i))="":1,1:num+1)
+ 		s row(1)="<audio id='Track"_IdTab_"-"_num_"'  src="""_dynamic_fileId_""" onended=""document.getElementById('"_nextrack_"').play();"" controls preload=""metadata""></audio>"
+ 		d ..DrawTableUi("tr",,,.row)
+ 		}
+ 	d ..DrawTableUi("end")
+	$$$jsstart
+	w "$('#TableAudio"_IdTab_"').height($(window).height()-($('#t1').height()+$('#MainNavbar').height()+200));"_$c(13,10)
+
+	w "$('audio').on(""play"", function (me) {"_$C(13,10)
+    w " $('audio').each(function (i,e) {"_$C(13,10)
+    w "  if (e !== me.currentTarget) {"_$C(13,10)
+    w "   this.pause(); "_$C(13,10)
+	w "      }"_$C(13,10)
+    w " });"_$C(13,10)
+    w "});"_$C(13,10)
+	 $$$jsstop
+	q $$$OK
+	} 
+	elseif key["-books" { ;Show books
+	 ;Header
+	 s fields(1)="<img class='uk-preserve-width uk-border-circle' src='"_$g(sort("icon"))_"' width='40' alt=''>"
+ 	 s fields(2)=$p(dir,$$$slash,*),fields(2,"attr")="class='uk-table-expand'"
+ 	d ..DrawTableUi("beg","TableBooks"_IdTab,"style='overflow: auto; height: 300px;'",.fields)
+	 s i="" for { s i=$o(sort("n","F",i)) q:i=""
+	  	s row(2)=$p($p($lg(sort("n","F",i),1),$$$slash,*),".",1,*-1)
+ 		s row(2,"attr")="class='uk-table-expand' "
+ 		set fileId=##class(apptools.core.files).GetFileIdView($lg(sort("n","F",i),1),,"application/force-download") 
+ 		s row(1)="<a href="""_dynamic_fileId_""">Download</a>"
+ 		d ..DrawTableUi("tr",,,.row)
+ 		}
+ 	d ..DrawTableUi("end")
+	$$$jsstart
+	w "$('#TableBooks"_IdTab_"').height($(window).height()-($('#t1').height()+$('#MainNavbar').height()+200));"_$c(13,10)
+	$$$jsstop
+	}
+	else {
+		;Show pictures sorted by modification date
+		k List
+		s i="" for { s i=$o(sort("d","F",i)) q:i=""
+			s ii="" for { s ii=$o(sort("d","F",i,ii)) q:ii=""
+				s List($i(List),"ItemName")=$lg(sort("d","F",i,ii),2)
+				s List(List,"Name")=$lg(sort("d","F",i,ii),1)
+			}
+		}
+		;zw List
+		 $$$jsstart
+	 	 write "UIkit.lightboxPanel({"
+	   		write "items: [ "
+			  do ..LighboxDrawJson(.List,,dynamic)
+	  		write " ] }).show();"
+		$$$jsstop
+	}
+	quit $$$OK
+]]></Implementation>
+</Method>
+</Class>
+
+
+<Class name="apptools.lte.permiss">
+<ClassType/>
+<IncludeCode>apptools.core</IncludeCode>
+<ProcedureBlock>1</ProcedureBlock>
+<Super>apptools.lte.adminTabs</Super>
+<TimeChanged>65804,68678.831294</TimeChanged>
+<TimeCreated>65065,36454.902831</TimeCreated>
+<DependsOn>apptools.core.msg</DependsOn>
+
+<Parameter name="HeaderText">
+<Description>
+Application title</Description>
+<Default>Permissions</Default>
+</Parameter>
+
+<Parameter name="GNStore">
+<Description>
+Global Name Store Referens files</Description>
+<Default>^apptools.Permissions</Default>
+</Parameter>
+
+<Parameter name="AppRoles">
+<Default>ui_Permissions</Default>
+</Parameter>
+
+<Method name="MainParameter">
+<Description>
+Replace parameters</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[&h,path,url=""]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ ;set path=$$$PATHCSP
+ set par("=Brand-Text=")="AppTools-admin"
+ set par("=Logo-png=")="ApptoolsLogo.png"
+ set par("=titleAppToolsadmin=")=..#HeaderText
+ set par("<!--=LinkIcon=-->")=..GetAppIcon(path_"dist/img/ApptoolsLogo","png")
+ quit ..RepaceParameter(.h, path, url,.par)
+ quit $$$OK
+ quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetAllApps">
+<Description>
+what modes are available</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>opt</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if ..IsPermiss("%All") {	
+	s LeftMenuName="Permission",LeftMenuNumer=1
+	s key="MenuMatrix"
+	s opt(key)=$$$aText("The matrix","") ;The name of the menu
+	s opt(key,"id")="Matrix"
+	s opt(key,"TabName")=$$$aText("The matrix","") ;the name of the tab
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabSample"
+	s opt(key,"Disable")=0 ;developed
+	s opt(key,"TabMenu","Close")=1
+	s opt(key,"Menu")=$lb(LeftMenuNumer,LeftMenuName,1) ;$lg(,3)=1 - level 1 open menu
+	s opt(key,"Active")=1 ;active menu item
+
+	s LeftMenuName="Account",LeftMenuNumer=99
+	s key="menu-top-account3"
+	s opt(key)="Exit"
+	s opt(key,"id")="AccountExit"
+	s opt(key,"TabName")="Logoit" 
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="Logout"
+	s opt(key,"MenuTop")=$lb(LeftMenuNumer,LeftMenuName) ; 99-account has nested items
+
+	}
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="MatrixFirstHead">
+<Description>
+download form template search users and roles</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	do ##class(apptools.core.Form).BlockUI(0)
+	s key=Par("key")
+	s divId=Par("divId")
+	s %ui=1
+	;set onclick=$$$blockui($$$aText("Loading...",""))_";AppAct('"_divId_"MainForm','"_divId_"MainContent','AppAct="_$zu(5)_":"_..%ClassName(1)_":"_divId_"Result:&key="_key_"&divId="_divId_"&mode=*');"
+	set onclick=$$$blockui("Load...")_";"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainContent",..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
+	;ActionJs('"_divId_"MainForm','"_divId_"MainContent','','"_divId_"Result','key="_key_"~divId="_divId_"~mode=*');"
+
+	&html<
+		<table>
+		<tr>
+			<td>
+ 	Login <br>#($$$appText(divId_"name","title='"_$$$aText("Names separated by a comma or by context","")_"'","s"))#
+			</td>
+			<td>
+	Roles <br>#($$$appText(divId_"roles","title='"_$$$aText("Roles separated by a comma or by context","")_"'","d"))#
+			</td>
+			<td> <br>
+	#($$$appButton(divId_"appButtonResult1","onclick="""_$tr(onclick,"*",1)_"""",""_$$$aText("User roles","")))#
+			</td>
+		</tr>
+		</table>
+	>
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="MatrixResult">
+<Description>
+Search result </Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set %ui=1
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set mode=Par("mode")
+
+	;Geting elements from form and prepare array Par
+	s name=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"name")	
+	set roles=$g(Par("%request.Data",divId_"roles"))
+
+
+	write ..ButtonAgain(divId,key)
+	d ##class(apptools.Tabs.security).UiMatrixPermission(name,roles,divId,key,"apptools.Tabs.security","UiSavePermiss")
+	q $$$OK
+]]></Implementation>
+</Method>
+</Class>
+
+
+<Class name="apptools.lte.smarthome">
+<ClassType/>
+<IncludeCode>apptools.core</IncludeCode>
+<ProcedureBlock>1</ProcedureBlock>
+<Super>apptools.lte.adminTabs</Super>
+<TimeChanged>65804,68896.639905</TimeChanged>
+<TimeCreated>65065,36454.902831</TimeCreated>
+<DependsOn>apptools.core.msg</DependsOn>
+
+<Parameter name="HeaderText">
+<Description>
+Application title</Description>
+<Default>Home, smart home</Default>
+</Parameter>
+
+<Parameter name="GNStore">
+<Description>
+Global Name Store Referens files</Description>
+<Default>^appmsw.smarthome.ui</Default>
+</Parameter>
+
+<Parameter name="AppRoles">
+<Default>%All</Default>
+</Parameter>
+
+<Method name="MainParameter">
+<Description>
+Replace parameters</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[&h,path,url=""]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ set par("=Brand-Text=")="Smart Home"
+ set par("=Logo-png=")="smarthome.png"
+ set par("=titleAppToolsadmin=")=..#HeaderText
+ set par("<!--=LinkIcon=-->")=..GetAppIcon(path_"dist/img/smarthome","png")
+ quit ..RepaceParameter(.h, path, url,.par)
+ quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetAllApps">
+<Description>
+what modes are available</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>opt</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if ..IsPermiss("%All") {	
+	;make them zavisimye from the area
+	;------------ sidebar
+	s key="menu-first"
+	set Level1=$lb(1,"Home",1) ;$lg(,3)=1 - open menu level 1
+	s opt(key)="Sensor values" ;The name of the menu
+	s opt(key,"id")="Find" ;use methods: FindFirstHead FindResult
+	s opt(key,"TabName")="Sensors" ;the name of the tab
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabSample"
+	s opt(key,"Disable")=0 ;developed
+	s opt(key,"TabMenu","Close")=1
+	s opt(key,"Menu")=Level1
+	s opt(key,"Active")=1 ;active menu item
+
+	s key="menu-first2"
+	s opt(key)="Snapshots" ;Pictures from cameras
+	s opt(key,"id")="Lighbox" ;use methods: LighboxFirstHead LighboxResult
+	s opt(key,"TabName")="Snapshots" ;the name of the tab
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabSample"
+	s opt(key,"Disable")=0 ;developed
+	s opt(key,"TabMenu","Close")=1
+	s opt(key,"Menu")=Level1
+
+	;----------
+	s key="menu-second"
+	set Level2=$lb(2,"Tablo",0)
+	s opt(key)="Tenis"
+	s opt(key,"id")="Tenis"
+	s opt(key,"TabName")="Ping pong scores"
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"MethodUrl")="http://ShowTabAbout.cls"
+	s opt(key,"Disable")=1 ;developed
+	s opt(key,"TabMenu","Close")=1
+	s opt(key,"Menu")=Level2
+
+	s key="menu-second2"
+	s opt(key)="About"
+	s opt(key,"id")="About"
+	s opt(key,"TabName")="About"
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabAbout"
+	s opt(key,"Disable")=1 ;developed
+	s opt(key,"TabMenu","Close")=1
+	s opt(key,"Menu")=Level2
+
+	
+	;------------ one-level upper menu 
+		s key="menu-topOpt"
+	s opt(key)="Option"
+	s opt(key,"id")="Option"
+	s opt(key,"TabName")="Option"
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabAbout"
+	s opt(key,"TabMenu","Close")=1
+	s opt(key,"MenuTop")=$lb(2,"Option") ;has no sub-items
+
+	;------------ top menu the top-accoun
+	s key="menu-top-accoun"
+	set Level99=$lb(99,"Account") ;only 99-account has sub-items
+	s opt(key)="Profile"
+	s opt(key,"id")="AccountProf"
+	s opt(key,"TabName")="Profile"
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabAbout"
+	s opt(key,"TabMenu","Close")=1
+	s opt(key,"MenuTop")=Level99
+
+	s key="menu-top-account3"
+	s opt(key)="Exit"
+	s opt(key,"id")="AccountExit"
+	s opt(key,"TabName")="Exit"
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="Logout"
+	s opt(key,"TabMenu","Close")=1
+	s opt(key,"MenuTop")=Level99
+	
+	;----- Setup the search in the top menu
+	s key="Search"
+	s opt(key)="Search"
+	s opt(key,"id")="Search-"
+	s opt(key,"TabName")="Search"_"-"
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabSearch"
+	s opt(key,"TabMenu","Close")=1
+	s opt(key,"TabMenu","Mode")=0 ;1 - for each new search bar to make new tab, 0-tab is always the same
+	
+	}
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="MatrixFirstHead">
+<Description>
+download form template search users and roles</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	do ##class(apptools.core.Form).BlockUI(0)
+	s key=Par("key")
+	s divId=Par("divId")
+	s %ui=1
+	;set onclick=$$$blockui($$$aText("Loading...",""))_";AppAct('"_divId_"MainForm','"_divId_"MainContent','AppAct="_$zu(5)_":"_..%ClassName(1)_":"_divId_"Result:&key="_key_"&divId="_divId_"&mode=*');"
+	set onclick=$$$blockui("Load...")_";"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainContent",..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
+	;ActionJs('"_divId_"MainForm','"_divId_"MainContent','','"_divId_"Result','key="_key_"~divId="_divId_"~mode=*');"
+
+	&html<
+		<table>
+		<tr>
+			<td>
+ 	Login <br>#($$$appText(divId_"name","title='"_$$$aText("Names separated by a comma or by context","")_"'","s"))#
+			</td>
+			<td>
+	Roles <br>#($$$appText(divId_"roles","title='"_$$$aText("Roles separated by a comma or by context","")_"'","d"))#
+			</td>
+			<td> <br>
+	#($$$appButton(divId_"appButtonResult1","onclick="""_$tr(onclick,"*",1)_"""",""_$$$aText("User roles","")))#
+			</td>
+		</tr>
+		</table>
+	>
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="MatrixResult">
+<Description>
+Search result </Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	s %ui=1
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set mode=Par("mode")
+
+	;Geting elements from form and prepare array Par
+	s name=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"name")	
+	set roles=$g(Par("%request.Data",divId_"roles"))
+
+
+	write ..ButtonAgain(divId,key)
+	d ##class(apptools.Tabs.security).UiMatrixPermission(name,roles,divId,key,"apptools.Tabs.security","UiSavePermiss")
+	q $$$OK
 ]]></Implementation>
 </Method>
 </Class>

@@ -75,7 +75,7 @@ ClassMethod OnPage(parameter = "") As %Status
 
  &html<
 	
-<link rel="stylesheet" href="#(path)#/uikit-dark-admin/css/nav.css"> <!-- CSS reset -->
+<link rel="stylesheet" href="#(path)#apptools-uikit-dark-admin/css/nav.css"> <!-- CSS reset -->
 	
 </head>
 <body>
@@ -129,7 +129,7 @@ ClassMethod OnPage(parameter = "") As %Status
 		</div> <!-- .content-wrapper -->
 	</main> <!-- .cd-main-content -->
 
-<script src="#(path)#/uikit-dark-admin/js/main.js"></script> <!-- Resource jQuery -->
+<script src="#(path)#apptools-uikit-dark-admin/js/main.js"></script> <!-- Resource jQuery -->
 
  <script language="javascript">
 

@@ -135,11 +135,42 @@ ClassMethod GetImgJqUi(code)
 /// d ##class(apptools.core.LogInfo).ExportProjects("/backup/iris/source/",.file)
 ClassMethod ExportProjects(Dir, files) As %Status
 {
-	$$$NspGoto(curNs,"APP")
-	d ..ExportAppProj(Dir,"app",.files)
+	$$$NspGoto(curNs,"apptools")
+	d ..ExportAppProj(Dir,"apptools",.files)
 	$$$NspReturn(curNs)
 	d ##class(apptools.core.net).SendFilesToEmail($zn,Dir,.files)
 	q $$$OK
+}
+
+/// xec do ##class(apptools.core.LogInfo).ExtSQL()
+ClassMethod ExtSQL(gn, DSN = "", h = "", v = "") As %Status
+{
+	if '$d(@gn) w "It's node undefined" q $$$OK
+	if $d(@gn@(-3,"sql")) {
+		s sql=$replace( $lg(@gn@(-3,"sql"),1), $c(34)_$c(9)_$c(34) , "")
+		if h'="" s h="CHARACTERISTIC = '"_h_"'"
+		if v'="" s v="CHARACTERISTICSPGZENUM like '%"_v_"%'"
+		i h'="" s sql=$replace(sql,"where","where "_h_" and "_v_" and ")
+		w "<b>"_sql_"</b>"
+		set MaxNode=10000
+		if $g(sql)'="" {
+			if DSN'="" {
+				set gnTemp=$na(@$$$TEMPORYGN@($username))
+				KILL @gnTemp
+				set st=##class(apptools.core.sys).SqlToDSN(sql,DSN,gnTemp,MaxNode)
+				if $d(@gnTemp) {
+					set st=##class(apptools.core.LogInfoPane).DrawSQL("result "_gnTemp,MaxNode,$NameSpace,"DSN: "_DSN_", Query: <br>"_$g(sql)_"<br>"_gnTemp,$g(ExecuteDraw))
+				}
+			}
+			else {
+					set st=##class(apptools.core.LogInfoPane).DrawSQL(sql,MaxNode,$NameSpace,"Namespace: "_$NameSpace_" "_$g(msg),$g(ExecuteDraw))
+			}
+			if $$$ISERR(st) write "<br>Error :"_##class(%CSP.Page).EscapeHTML(sql_"; "_$SYSTEM.OBJ.DisplayError(st))_"<br>"
+		}
+	} else {
+		w "Not found nnode -3,""sql"")"
+	}
+	quit $$$OK
 }
 
 /// Export all projects to XML
@@ -166,8 +197,8 @@ If exporting multiple items, separate them with commas, pass the items("item")="
 	new $namespace
 	try {
 	s pFileName=Dir_$zu(110)_"-"_$zu(5)_"-"_proj_"-"_$tr(##class(apptools.core.type).GetDateTime($h),":T","-_")_".xml"
-	s list("App*.CLS")=""
-	s list("App*.INC")=""
+	s list("apptools*.CLS")=""
+	s list("apptools*.INC")=""
 	s list("apptools.core.ParameterD.GBL")=""
 	s st=$SYSTEM.OBJ.Export(.list, pFileName)
 	i st w !,pFileName s files(pFileName)=""

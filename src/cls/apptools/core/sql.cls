@@ -6,7 +6,7 @@ Class apptools.core.sql [ Abstract ]
 
 /// s sql=##class(apptools.core.sql).getSQL("apptools.core.sql:TestXData",0,.desc) w !,sql,!!,desc
 /// s sql=##class(apptools.core.sql).getSQL("TestQuery",0,.desc) w !,sql,!!,desc
-ClassMethod getSQL(name As %String, removeNL = {$$$NO}, ByRef Description) As %String
+ClassMethod getSQL(name As %String, removeNL = {$$$NO}, ByRef Description, today = 1) As %String
 {
 	#dim sc As %Status = $$$OK
 	
@@ -32,7 +32,7 @@ ClassMethod getSQL(name As %String, removeNL = {$$$NO}, ByRef Description) As %S
 	}
 	
 	set:(removeNL = $$$YES) sql = $replace(sql, $$$NL, " ")
-	return sql_" -- Today "_$zd($h,3)_" "_$g(ssm)
+	return sql_$s(today:" -- Today "_$zd($h,3)_" "_$g(ssm),1:"")
 }
 
 /// test query

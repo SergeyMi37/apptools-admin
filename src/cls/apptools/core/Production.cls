@@ -467,12 +467,13 @@ ClassMethod ShowGlobals(gn, nspaces) As %String
 
 /// Get a list of product errors per day or more for one namespace
 /// d ##class(apptools.core.Production).GetListErrProducts(1,"USER".res)
-ClassMethod GetListErrProducts(day, NS, r) As %String
+ClassMethod GetListErrProducts(day, NS, result) As %String
 {
 
 	new $namespace
 	set sql="select ConfigName,Text,TimeLogged from Ens_Util.Log where Type='2' and TimeLogged>'"_##class(apptools.core.type).getYYYYMMDD($h-day)_" 21:00' order by id desc"
-	set GN=##class(apptools.core.Production).#SettingsGN
+	set listns= ##class(apptools.core.sys).ListNS(.info,"NotPre,Ens")
+	set GN="info" ;##class(apptools.core.Production).#SettingsGN
 	if $D(@GN@(NS)) {
 		zn NS
 		if $Namespace'=NS quit ""
@@ -483,7 +484,11 @@ ClassMethod GetListErrProducts(day, NS, r) As %String
 		if PN="" q ""
 		set gn="^||tmpErrEnsam" kill @gn
 		do ##class(apptools.core.sys).SaveSQL(sql,gn)
-		for i=1:1:10 {  if $d(@gn@(i)) k r m r(1)=@gn@(i)	zw r
+		for i=1:1:10 {  
+			if $d(@gn@(i)) {
+			;k r m r(1)=@gn@(i)	;zw r  
+			m result(i)=@gn@(i)
+			}
 		}
 	}
  q $$$OK
@@ -493,10 +498,17 @@ ClassMethod GetListErrProducts(day, NS, r) As %String
 /// d ##class(apptools.core.Production).GetStatusProducts(0,.res)
 ClassMethod GetStatusProducts(day, result) As %String
 {
-	if day=0 s result="OK" w "OK" quit 1 ;
+	set result("server")=$zu(110)
+		, result("version")=$zv
+		
+	if day=0 	quit $$$OK ;
 	set sql="select * from Ens_Util.Log where Type='2' and TimeLogged>'"_##class(apptools.core.type).getYYYYMMDD($h-day)_" 21:00' order by id desc"
-	set GN=##class(apptools.core.Production).#SettingsGN
-	set NS=""
+	set listns= ##class(apptools.core.sys).ListNS(.info,"NotPre,Ens")
+	set GN="info" ;##class(apptools.core.Production).#SettingsGN
+ 	set NS=""
+	set sql2=$replace(sql,"*","count(*)")
+	set result("sql")=sql2
+	set result("listns")=listns
 	for { s NS=$o(@GN@(NS)) q:NS=""
 		$$$NspGoto(curNs,NS)
 		if $Namespace'=NS  continue
@@ -506,11 +518,130 @@ ClassMethod GetStatusProducts(day, result) As %String
 			if $lg($g(@GN@(NS,"Ens",p)),1)[$$$EnsProductStatusRun s PN=p quit
 		}
 		if PN="" continue
-		set sql2=$replace(sql,"*","count(*)")
-		set gn="^||tmpErrEns"
+
+		set gn="^||tmpErrEns" kill @gn
 		do ##class(apptools.core.sys).SaveSQL(sql2,gn)
 		set result(NS,"CountErrors")=$lg(@gn@(1),1)
 	}
+	quit $$$OK
+}
+
+/// Get the status of products for a day or more to Json
+/// d ##class(apptools.core.Production).GetStatusProductsJson(1,"system-stat",.res) zw res
+/// d ##class(apptools.core.Production).GetStatusProductsJson(1,"count-errors",.res) zw res
+/// d ##class(apptools.core.Production).GetStatusProductsJson(1,"list-errors-SPGZ",.res) zw res
+ClassMethod GetStatusProductsJson(day, mode = 0, result) As %String
+{
+	set result={} 
+	set result.server=$zu(110)
+	set result.version=$zv		
+
+	if mode="system-stat" {
+		quit $$$OK
+	}
+	set result.ns=[]
+	set sql="select * from Ens_Util.Log where Type='2' and TimeLogged>'"_##class(apptools.core.type).getYYYYMMDD($h-day)_" 21:00' order by id desc"
+	set listns= ##class(apptools.core.sys).ListNS(.info,"NotPre,Ens")
+	set gn="^||tmpErrEns" kill @gn
+	if mode="count-errors" {
+		set sql2=$replace(sql,"*","count(*)")
+	}
+	elseif mode["list-errors" {
+		set sql2=$replace(sql,"*","ConfigName,Text,TimeLogged ")
+		set NSpace=$p(mode,"list-errors-",2)
+	}
+
+	set NS=""
+	for { s NS=$o(info(NS)) q:NS=""
+		$$$NspGoto(curNs,NS)
+		if $Namespace'=NS  continue
+		if $GET(NSpace)'="",NS'=NSpace continue 
+		if '$D(info(NS)) continue
+		set PN=""
+		set p="" for { s p=$o(info(NS,"Ens",p)) q:p=""
+			if $lg($g(info(NS,"Ens",p)),1)[$$$EnsProductStatusRun s PN=p quit
+		}
+		if PN="" continue
+
+		do ##class(apptools.core.sys).SaveSQL(sql2,gn)
+		set prod = {}
+		set prod.namespace = $namespace
+		set prod.nameproduction = PN
+		if mode="count-errors" {
+			set prod.counterrors = $lg(@gn@(1),1)
+		}
+		elseif mode["list-errors" {
+			set prod.errors = []
+			for i=1:1:10 {  if $d(@gn@(i)) {
+				set err = {}
+				set err.ConfigName=$lg(@gn@(i),1)
+				set err.Text=$lg(@gn@(i),2)
+				set err.TimeLogged=$lg(@gn@(i),3)
+				do prod.errors.%Push(err)
+				}
+			}
+		}
+		
+		do result.ns.%Push(prod)
+		
+	}
+}
+
+/// Stoped production and dismount. Later mounted 
+/// d ##class(apptools.core.Production).StopProdAndDismount("AAA")
+/// w $System.Status.GetErrorText(##class(apptools.core.sys).MountListDB("AAA"))
+ClassMethod StopProdAndDismount(ns) As %String
+{
+	new $namespace
+	try {
+		set $namespace=ns
+		s sc=##class(Ens.Director).StopProduction(..#TIMEOUTSTOP)
+		if 'sc {
+			s sc2=##class(Ens.Director).StopProduction(..#TIMEOUTSTOP,1) 
+			if 'sc2 write $System.Status.DisplayError(sc2) q
+			set sc=$$$OK
+		}
+		set $namespace="%SYS"
+		set sc=##class(apptools.core.sys).DismountListDB(ns)
+		if 'sc {
+			write $System.Status.DisplayError(sc) q
+		}
+		else {
+			write !,"Dismount "_ns
+		}
+	} catch ex {
+	   Set sc = $g(%objlasterror, $$$OK)
+	   Set sc = $$$ADDSC(sc, ex.AsStatus())
+	   write "Error type   "_ex.Name,!
+	   write "Error code   "_ex.Code,!
+	   write "Error location "_ex.Location,!
+ 	}
+}
+
+/// GetSettings
+/// write ##class(apptools.core.Production).GetSettings("ProductionName","ItemName","SettName",.val)
+ClassMethod GetSettings(ProductName = "", ItemName = "", SettingName = "", ByRef Value) As %Status
+{
+
+ #dim p As Ens.Config.Production
+ Set p = ##class(Ens.Config.Production).%OpenId(ProductName)
+ quit:p="" $$$ERROR($$$GeneralError,"Production not found: "_ProductName)
+ #dim item As Ens.Config.Item
+ #dim sett As Ens.Config.Setting
+ set st=0
+ for i=1:1:p.Items.Count() {
+	 s item=p.Items.GetAt(i)
+	 ;w !,item.Name
+	 if item.Name=ItemName 	{
+	 	for s=1:1:item.Settings.Count() {
+	 		set sett=item.Settings.GetAt(s)
+	 		;w !,sett.Name
+	 		if sett.Name=SettingName set Value=sett.Value, st=$$$OK quit
+	 	}
+	 }
+ }
+ if 'st q $$$ERROR($$$GeneralError,"Settings or ItemName not found")
+ quit st
 }
 
 }

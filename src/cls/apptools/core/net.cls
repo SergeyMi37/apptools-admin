@@ -97,6 +97,14 @@ ClassMethod LoadFileHttp(aURL = "", aDATA, TempDir = "", fileName) As %Status
 	q sc
 }
 
+/// if ##class(apptools.core.net).GetResult("http://localhost/apptoolsrest/productslist/-","user","pass",.json) do json.%ToJSON()
+ClassMethod GetResult(url As %String, user = "", pass = "", ByRef result As %ZEN.proxyObject)
+{
+	$$$TOE(sc, ..GetHttp(url, .aData,,,user,pass))  
+	set stream =  aData("content")
+	quit ##class(Ens.Util.JSON).JSONStreamToObject(stream,.result)
+}
+
 /// To receive from the data server at the URL
 /// If TempDir is specified, then the file will be written there 
 /// w ##class(apptools.core.net).GetHttp("https://codeload.github.com/SergeyMi37/cache-iris-app-tools/zip/master",.out2,"D:\temp\")
@@ -192,16 +200,21 @@ ClassMethod PostHttp(ServerPort, method, user, pass, ByRef body, ByRef out) As %
 	}
 	s ht.ContentType="text/html;  charset=UTF-8"
 	;s ht.ContentType="application/json; charset=UTF-8"
-	i $p(ServerPort,":",2)'="" set ht.Port = $p(ServerPort,":",2)
+	set port=$p(ServerPort,":",2)
+	i $p(ServerPort,":",2)'="" set ht.Port = port
 	
-	;set ht.Https=1
-	;set ht.Port = 443
-	;set ht.SSLConfiguration=..CheckSSLCertificate("DefaultSSL")
+	if port=443 {
+		set ht.Https=1
+		;set ht.Port = 443
+		set ht.SSLConfiguration=..CheckSSLCertificate("DefaultSSL")
+	}
 	
 	Do ht.EntityBody.Write($g(body))
 	if $d(body)>1 s i="" f  s i=$o(body(i)) q:i=""  Do ht.EntityBody.Write(body(i))
 	
-	Do ht.Post(method)
+	s st=ht.Post(method)
+	if 'st w !,$System.Status.GetErrorText(st)  q ""
+
 	;Do ht.HttpResponse.OutputToDevice()
 	S out=ht.HttpResponse.StatusLine
 	;s ^z1=ht.HttpResponse.ContentLength
@@ -385,6 +398,31 @@ ClassMethod GetURI(Properties) As %String
 	set Status=##Class(Config.Startup).Get(.Properties)
 	if Status s ServerPort="http://"_$zu(110)_":"_$g(Properties("WebServerPort"),57772)
 	quit $G(ServerPort)
+}
+
+/// /* Install ZPM, ZAPM */ set $namespace="%SYS", name="DefaultSSL" do:'##class(Security.SSLConfigs).Exists(name) ##class(Security.SSLConfigs).Create(name) set url="https://pm.community.intersystems.com/packages/zpm/latest/installer" Do ##class(%Net.URLParser).Parse(url,.comp) set ht = ##class(%Net.HttpRequest).%New(), ht.Server = comp("host"), ht.Port = 443, ht.Https=1, ht.SSLConfiguration=name, st=ht.Get(comp("path")) quit:'st $System.Status.GetErrorText(st) set xml=##class(%File).TempFilename("xml"), tFile = ##class(%Stream.FileBinary).%New(), tFile.Filename = xml do tFile.CopyFromAndSave(ht.HttpResponse.Data) do ht.%Close(), $system.OBJ.Load(xml,"ck") do ##class(%File).Delete(xml) zpm "install zapm"
+/// w ##class(apptools.core.net).loadzpm()
+ClassMethod loadzpm() As %Status
+{
+  SET $NAMESPACE="%SYS"
+  set name="DefaultSSL" DO:'##class(Security.SSLConfigs).Exists(name) ##class(Security.SSLConfigs).Create(name)
+  set url="https://pm.community.intersystems.com/packages/zpm/latest/installer" write !,url
+  Do ##class(%Net.URLParser).Parse(url,.comp)
+  set ht = ##class(%Net.HttpRequest).%New()
+  set ht.Server = comp("host")
+  set ht.Port = 443
+  set ht.Https=1
+  set ht.SSLConfiguration=name
+  set st=ht.Get(comp("path"))
+  quit:'st $System.Status.GetErrorText(st) 
+  set xml=##class(%File).TempFilename("xml")
+  Set tFileBinStream = ##class(%Stream.FileBinary).%New()
+  Set tFileBinStream.Filename = xml
+  do tFileBinStream.CopyFromAndSave(ht.HttpResponse.Data)      
+  do ht.%Close()
+  do $system.OBJ.Load(xml,"ck")
+  do ##class(%File).Delete(xml)
+  quit 1
 }
 
 }

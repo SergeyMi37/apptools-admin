@@ -13,6 +13,8 @@ Parameter ISCPREFIX = "isc_cache";
 XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 {
 <Routes>
+<Route Url="/a/:text" Method="GET" Call="apptools.lte.adminStatic:GetMain"/>
+
 <Route Url="/get-html/:text" Method="GET" Call="Index"/>
 <Route Url="/post-json" Method="POST" Call="jsonrpc"/>
 <Route Url="/get-files/:text" Method="GET" Call="Files"/>
@@ -214,7 +216,8 @@ ClassMethod FindUser(text = "") As %Status
 }
 
 /// Calls StaticContent.Write method or sends not modified header. Type have to be "css" or "js"
-ClassMethod WriteStatic(type As %String, ContentType As %String = "", xDataClass = "apptools.core.rest", ClassCSPPage = "", IsCached = 0) [ Private ]
+/// d ##class(apptools.core.rest).WriteStatic("html",,,,,text)
+ClassMethod WriteStatic(type As %String, ContentType As %String = "", xDataClass = "apptools.core.rest", ClassCSPPage = "", IsCached = 0, Content = "")
 {
     #define CompileTime ##Expression("""" _ $zd($h, 11) _ ", "_ $zdt($NOW(0), 2,1) _ " GMT""")
     set %response.CharSet = "utf-8"
@@ -232,6 +235,9 @@ ClassMethod WriteStatic(type As %String, ContentType As %String = "", xDataClass
 	    if IsCached,(%request.GetCgiEnv("HTTP_IF_MODIFIED_SINCE")=$$$CompileTime) {
 	        set %response.Status = "304 Not Modified"
 	    } 
+	    elseif Content'="" {
+		    write Content
+	    }
 	    elseif ClassCSPPage'="" {
 		    s param=$p(ClassCSPPage,"?",2,*)
 		    s ClassCSPPage=$p(ClassCSPPage,"?")
@@ -247,7 +253,7 @@ ClassMethod WriteStatic(type As %String, ContentType As %String = "", xDataClass
 	    }
     }
     catch e { 
-    	w $ze
+    	write $ze
     	set %response.Status = "501 Not Implemented" ;"405 Method Not Allowed" ;"400 Bad Request"
     }
 }
@@ -354,13 +360,13 @@ ClassMethod getDirSize(path = "", ByRef res, minsize = 10) As %Status
 ClassMethod getDBsize(prefix = {..#ISCPREFIX_"_dbsize"}, dbname, int = 1, all = 0) As %Status
 {
 	set nl = $c(10)
-	set curNs=$zu(5)
-	zn "%sys"
-	set st=##class(apptools.core.sys).SaveQuery("SYS.Database:FreeSpace","^||db")
-	set r=$q(^||db("")) ;to the first link
-	set r=$na(^||db($qs(r,1),$qs(r,2))) ;take the first 2 of the index in the link
-	set listDb=$$$DBCACHESizeMon
-	if listDb="" s listDb=##class(apptools.core.sys).ListDB(.info,"NotPre,NotTemp")
+	new $namespace
+	set $namespace="%sys"
+	set gn="^||db"
+	set st=##class(apptools.core.sys).SaveQuery("SYS.Database:FreeSpace",gn)
+	set r=$q(@gn@("")) ;to the first link
+	set r=$na(@gn@($qs(r,1),$qs(r,2))) ;take the first 2 of the index in the link
+	s listDb=##class(apptools.core.sys).ListDB(.info,"NotPre,NotTemp")
 	for i=1:1 { q:'$d(@r@(i))   ;pass the loop through the entire report
 		continue:$g(@r@(i,1))=""
 		;by default, we give all sizes to Gigabytes
@@ -383,25 +389,36 @@ ClassMethod getDBsize(prefix = {..#ISCPREFIX_"_dbsize"}, dbname, int = 1, all = 
 		write:'int prefix_"_"_name_" "_size_nl
 		write:'int prefix_"_"_name_"_DiskFreeSpace "_(+free)_nl
 	}
-	zn curNs
 	write nl
 	quit $$$OK
 }
 
-ClassMethod getListErrProducts(nspace) As %Status
+/// http://localhost:57772/apptoolsrest/productslist/-SPGZ
+ClassMethod getListErrProducts(nspace = "") As %Status
 {
-	d ##class(apptools.core.Production).GetListErrProducts(1,nspace)
+	;d ##class(apptools.core.Production).GetListErrProducts(1,nspace)
+	do ##class(apptools.core.Production).GetStatusProductsJson(1,"list-errors"_nspace,.res)
+	do res.%ToJSON()
 	q $$$OK
 }
 
+/// http://localhost:57772/apptoolsrest/products/0
 ClassMethod getProductions(day = "1") As %Status
 {
-	d ##class(apptools.core.Production).GetStatusProducts(day,.errors)
-	s ns=""
-	for { s ns=$o(errors(ns)) q:ns=""
-		s co=+$g(errors(ns,"CountErrors"))
-		w $s(co:"/",1:"\")_"server_"_$zu(110)_"_"_ns_" Errors: "_co_$$$NL
+	if 'day {
+		do ##class(apptools.core.Production).GetStatusProductsJson(0,"system-stat",.res) 
+		do res.%ToJSON()
 	}
+	else {
+		do ##class(apptools.core.Production).GetStatusProductsJson(day,"count-errors",.res)
+		 do res.%ToJSON()
+	}
+	;d ##class(apptools.core.Production).GetStatusProducts(day,.errors)
+	;s ns=""
+	;for { s ns=$o(errors(ns)) q:ns=""
+	;	s co=+$g(errors(ns,"CountErrors"))
+	;	w $s(co:"/",1:"\")_"server_"_$zu(110)_"_"_ns_" Errors: "_co_$$$NL
+	;}
 	q $$$OK
 }
 

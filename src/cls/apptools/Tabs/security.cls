@@ -75,7 +75,7 @@ ClassMethod UiMatrixPermission(name = "", rolesmask = "", divId = "", key = "", 
 		
 		set onclick=$$$blockui("Load...")_";"_##class(apptools.core.Action).WriteActJs(%request,divId_"FormContentSave",divId_"ContentSave",class,Method,"&key="_key_"&divId="_divId_"&mode=Save")
 		;ActionJs('"_divId_"MainForm','"_divId_"MainContent','','"_divId_"Result','key="_key_"~divId="_divId_"~mode=*');"
-
+        ;set %ui=1
 		set butt=$$$appButton(divId_"appButtonSavePermiss","onclick="""_onclick_"""",$$$aText("Save access rights",""))
 		write butt_"<br><br>"
 		write "<form id='"_divId_"FormContentSave' >"

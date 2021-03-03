@@ -32,7 +32,6 @@ ClassMethod CreateProjection(cls As %String, ByRef params) As %Status
 	}
 	if $g(@$$$GNEnsConf@("HomeNamespace"))="" {
 	;Filling the global default values
-	 set @$$$GNEnsConf@("DBCACHESizeMon")="CACHESYS,CACHEAUDIT"
 	 set @$$$GNEnsConf@("EMAILAUTH")="user_from_send_mail@server.com"
 	 set @$$$GNEnsConf@("EMAILAUTHPASS")=12345
 	 set @$$$GNEnsConf@("EMAILSERVERIP")="127.0.0.1"
@@ -121,10 +120,6 @@ ClassMethod CreateProjection(cls As %String, ByRef params) As %Status
     }
 	do ..AddExtentions()
 	do ..AddFavorites()
-	try { //;add to %ZLANGC00.mac
-    	do ##class(apptools.util.zapp).UpdateLanguageExtensions()
-    } 
-    catch ex {}
 	$$$NspReturn(curNs)
     return st
 }

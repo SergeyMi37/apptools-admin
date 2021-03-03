@@ -335,9 +335,11 @@ ClassMethod SqlToDSN(sql, DSN, result, top = 100000) As %Status
 {
 	#dim %JDBCGateway As %Net.Remote.Java.JDBCGateway
 	s hr=$h,ts=$$$AppDT(hr)
+	kill %objlasterror
 	set conn = $system.SQLGateway.GetJDBCConnection(DSN)
 	if (conn = "") {
-			set sc = $$$ERROR($$$GeneralError, "Cannot get connection for " _ DSN)
+		   	Set sc = $g(%objlasterror, $$$OK)
+   			Set sc = $$$ADDSC(sc, $$$ERROR($$$GeneralError, "Cannot get connection for " _ DSN))
 			quit sc
 	}
 	set st = %JDBCGateway.prepareStatement(conn, sql)
@@ -462,19 +464,19 @@ ClassMethod SaveGateway(sql, pDSN, usr, pwd, result, top = 100000)
  	Quit sc
 }
 
-/// Sample  w ##class(apptools.core.sys).GetFullName("superuser")
+/// Sample  write ##class(apptools.core.sys).GetFullName("superuser")
 ClassMethod GetFullName(login) As %String
 {
- try {
-	$$$NspGoto(curNs,"%SYS")
+  new $namespace
+  set $namespace="%SYS"
+  try {
 	if ##class(Security.Users).Exists(login,.User,.Status) {
 			if $isobject(User) {
 				s fullName=User.FullName 
 			}
 		}
-  $$$NspReturn(curNs) 
- } catch e {}
-  q $g(fullName)
+  } catch e {}
+  quit $GET(fullName)
 }
 
 /// Sample  w ##class(apptools.core.sys).GetRoles(mask,.roles)
@@ -505,18 +507,30 @@ ClassMethod GetRoles(mask = "", ByRef list) As %String
 }
 
 /// Get system users
-/// w ##class(apptools.core.sys).GetUsers("super",.users)
-ClassMethod GetUsers(mask = "", ByRef list) As %String
+/// kill users w ##class(App.sys).GetUsers("super",.users,.sql) w !,sql,! zw users 
+/// kill users w ##class(App.sys).GetUsers("sup%,adm%",.users,.sql) w !,sql,! zw users 
+/// kill users w ##class(App.sys).GetUsers("sup%,admin",.users,.sql) w !,sql,! zw users 
+ClassMethod GetUsers(mask = "", ByRef list, ByRef sql) As %String
 {
   NEW $NAMESPACE
   SET $NAMESPACE = "%SYS"
   set mask=$zconvert(mask,"L")
-  set sql="select NameLowerCase,FullName,Comment,Roles,EmailAddress FROM Security.Users"
-  if mask["," { set mask=$replace($ZStrip(mask,"<>W"),",","','")
-  	set sql=sql_" where NameLowerCase in ('"_mask_"')"
+  set sql="select NameLowerCase,FullName,Comment,Roles,EmailAddress FROM Security.Users where (1=1)"
+  if mask[",",mask'["%" { set mask=$replace($ZStrip(mask,"<>W"),",","','")
+  	set sql=sql_" and NameLowerCase in ('"_mask_"')"
   } 
+  elseif mask["%" {
+	  set sql=sql_" and ( "
+	  for i=1:1:$l(mask,",") {
+		if $p(mask,",",i)="" continue
+		if i>1 set sql=sql_" or "
+	  	if $p(mask,",",i)["%" set sql=sql_" NameLowerCase like '"_$p(mask,",",i)_"'"
+	  	else  set sql=sql_" NameLowerCase = '"_$p(mask,",",i)_"'"
+	  }
+	  set sql=sql_" ) "
+  }
   elseif mask'="" {
-	  set sql=sql_" where NameLowerCase like '%"_mask_"%'"
+	  set sql=sql_" and NameLowerCase like '%"_mask_"%'"
   }
 	set result=##CLASS(%ResultSet).%New("%DynamicQuery:SQL")
 	set tSC=result.Prepare(sql)
@@ -682,6 +696,56 @@ ClassMethod MountListDB(Database) As %Status
 		if st2 q st2
 	} else { q st }
 	q $$$OK
+}
+
+/// write $System.Status.GetErrorText(##class(apptools.core.sys).GetDirDB("APPTOOLS",.d,.dir,0))
+ClassMethod GetDirDB(nspace, ByRef db, ByRef dirlist, IRIS = 1) As %Status
+{
+	new $namespace
+	zn "%sys"
+	set Status=##Class(Config.Namespaces).Get(nspace,.p)
+	Q:'Status Status
+	set db="",dirlist=""
+	for { set db=$o(p(db)) q:db=""
+		if 'IRIS,p(db)["IRIS" continue
+		set db(p(db))=""
+	}
+	s st=$$$OK
+	for { set db=$o(db(db)) quit:db=""
+		If ##Class(Config.Databases).Get(db,.Properties) {
+  			Set Directory = $G(Properties("Directory"))
+  			set dirlist=dirlist_$lb(Directory)
+  			set db(db)=Directory
+		} Else {
+			set err="Database " _ db _ " does not exist" 
+			Set st = $$$ERROR($$$GeneralError,err)
+			q
+		}
+	}
+	quit st
+}
+
+/// write $System.Status.GetErrorText(##class(apptools.core.sys).Integrity("APPTOOLS,APP,USER"))
+ClassMethod Integrity(nspace, dir = "/backup/iris-backup/integrity/", adddir = "") As %Status
+{
+	new $namespace
+	zn "%sys"
+	$$$TOE(st, ##class(%File).CreateDirectoryChain(dir))
+	set result=""
+	for i=1:1:$L(nspace,",") {
+		s ns=$P(nspace,",",i)
+		continue:ns=""
+		s st=##class(apptools.core.sys).GetDirDB(ns,.d,,0)
+	}
+	set d=""
+	for { set d=$o(d(d)) q:d=""
+		set result=result_$lb($g(d(d)))
+	}
+	if adddir'="" set result=result_adddir
+	set filename=dir_$zd($h,3)_"-"_nspace_".log"
+	write !,filename zw result
+	
+	quit $$Silent^Integrity(filename,result,0)
 }
 
 }

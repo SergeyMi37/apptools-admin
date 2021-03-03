@@ -46,6 +46,12 @@ Index idxTimeStamp On TimeStamp [ Type = bitslice ];
 
 Index idxClientIPAddress On ClientIPAddress;
 
+/// apptools_core.Log_ConvertOutHTML(txt)
+ClassMethod ConvertOutHTML(text As %String) As %String [ SqlProc ]
+{
+	q $zcvt(text, "O", "HTML")
+}
+
 /// Determine user IP address
 /// write ##class(apptools.core.Log).GetClientAddress()
 ClassMethod GetClientAddress()

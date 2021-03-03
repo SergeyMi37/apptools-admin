@@ -3,6 +3,8 @@ Include apptools.core
 Class apptools.core.LogInfoPane Extends %CSP.Util.Pane [ DependsOn = apptools.core.msg ]
 {
 
+Parameter version = "1.0.24";
+
 Parameter XMLTYPE = "apptools.core";
 
 ClassMethod GetLink()
@@ -48,7 +50,26 @@ ClassMethod AddJsScripts(mode)
 }
 
 /// add javascript
-/// /// /*! \example d ##class(apptools.core.LogInfoPane).AddJS("MSW")*/
+/// /// /*! \example do ##class(apptools.core.LogInfoPane).AddJScopyToClipboard()*/
+ClassMethod AddJScopyToClipboard()
+{
+ 	$$$jsstart	
+ &js<	
+
+ function copyToClipboard(elementId) {
+	 var aux = document.createElement("input"); 
+	 aux.setAttribute("value", document.getElementById(elementId).innerHTML);
+	 document.body.appendChild(aux);
+	 aux.select();
+	 document.execCommand("copy");
+	 document.body.removeChild(aux); 
+  }
+>
+	$$$jsstop
+}
+
+/// add javascript
+/// /// /*! \example do ##class(apptools.core.LogInfoPane).AddJS("MSW")*/
 ClassMethod AddJS(ns = "", class = "")
 {
  	$$$jsstart	
@@ -320,9 +341,9 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 	if $p(what,"-p",2)?1n.n set exp=$p(what,"-p",2),what=$p(what,"-p")
 	set (%DSN,DSN)=%request.Get("selectDSN")
 	set SDNum=%request.Get("SDNum")
-
+	
 	//code to use when displaying tables
-	set ExecuteDraw=%request.Get("ExecuteDraw") 
+	set ExecuteDraw=%request.Get("ExecuteDraw")
 	set:$e(ExecuteDraw,1)="(" ExecuteDraw="##class"_ExecuteDraw_"(.%AppLogInfoVal,%AppLogInfoCol,%AppLogInfoHead,.%AppLogInfoTemp,"""_NSpace_""","""_DSN_""")"
 
 	// Preparing variables for export to Excel
@@ -339,7 +360,7 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 		set ExecuteDraw="##class(apptools.core.LogInfoPane).DrawHelp(.%AppLogInfoVal,%AppLogInfoCol,%AppLogInfoHead,.%AppLogInfoTemp,"""_NSpace_""","""_DSN_""")"
 	}
 	#; queries and query results
-	elseif ",query,result,select,insert,s,q,r,begin,"[(","_$zconvert($p(what," ",1),"L")_",") {
+	elseif ",query,result,select,delete,insert,s,q,r,begin,"[(","_$zconvert($p(what," ",1),"L")_",") {
 			set sql=what
 			if sql["p.party_id( )" s sql=$replace(sql,"p.party_id( )","p.party_id(+)")
 	}
@@ -433,6 +454,7 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 			<td>
 				<span class='ui-icon ui-icon-play' name="show" id="show" onclick="document.forms['loginfo'].submit();" >#($$$aText("Execute",""))#</span>
 				<input type="submit" name="show2" id="show2" value='#($$$aText("Execute",""))#'>
+				<input type="button" name="exe2" id="exe2" value='#($$$aText("ExecutePost",""))#'>
 				#(##class(apptools.core.LogInfo).GetInfoImg("help"))# 
 	 			#(##class(apptools.core.LogInfo).ClearFields("NSP,MaxNode,Filtr,Next,WHAT,tWHAT,exportXLS,exportXLSfile,exportXLSfileEmail,selectDSN,SDNum"))# 
 		 		#($$$aText("Upload to file Excel",""))#  
@@ -459,7 +481,10 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 	>
 	do ##class(apptools.core.LogInfoPane).AddJS(NSpace) 
 	if $g(execute)'="" {
-		write "<H3>"_$$$aText("Executing the command","")_" "_execute_"</H3>"
+		write "<H5>"_$$$aText("Executing the command","")_" "_execute_"</H5>"
+		if ..GetCodeExtensionNamespace(execute,.code) {
+			set execute=code
+		}
 		x execute
 		quit $$$OK
 	}
@@ -496,10 +521,19 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 	#; arbitrary query
 	if $g(sql)'="" {
 		if DSN'="" {
-			set gnTemp=$na(@$$$TEMPORYGN@($username))
+			set gnTemp=$na(@"^tmpLogInfo"@($j))  ;$$$TEMPORYGN@($j))
 			KILL @gnTemp
-			if $G(listDSN(DSN))'="" set st=##class(apptools.core.sys).SaveGateway(sql,$G(listDSN(DSN)),%request.Get("User"),%request.Get("Password"),gnTemp,MaxNode) 
-			else  set st=##class(apptools.core.sys).SqlToDSN(sql,DSN,gnTemp,MaxNode)
+			if $G(listDSN(DSN))'="" {
+				set st=##class(apptools.core.sys).SaveGateway(sql,$G(listDSN(DSN)),%request.Get("User"),%request.Get("Password"),gnTemp,MaxNode) 
+			}
+			else {
+				//do ##class(%SYS.System).WriteToConsoleLog("job "_$j_" sql "_$tr(sql,$c(13,10)," "),,0)
+				KILL %objlasterror
+				set st=##class(apptools.core.sys).SqlToDSN(sql,DSN,gnTemp,MaxNode)
+				if 'st write "<font color=red>"_$System.Status.GetErrorText(st)_"</font>"
+				Set sc = $g(%objlasterror, $$$OK)
+				if 'sc write "<font color=red>"_$System.Status.GetErrorText(sc)_"</font>"
+			}
 			if $d(@gnTemp) {
 				set st=..DrawSQL("result "_gnTemp,MaxNode,NSpace,"DSN: "_DSN_", Query: <br>"_$g(sql)_"<br>"_gnTemp,$g(ExecuteDraw),$lb(exportXLS,exportXLSfile,exportXLSfileEmail))
 			}
@@ -545,6 +579,16 @@ AddExp(title,gn,Next="",Filtr="",MaxNode)
 errors
  	write !,$ze
  	quit $$$OK
+}
+
+/// do ##class(apptools.core.LogInfoPane).GetCodeExtensionNamespace("ShowGlobals^log**",.code)
+ClassMethod GetCodeExtensionNamespace(Node, ByRef code) As %Status
+{
+	set code=""
+	set Node=$E(Node,1,200)
+	if $D(@$$$GNExtentions@("%All",Node)) set code=$e($G(@$$$GNExtentions@("%All",Node,"Xecute")),5,*) quit $$$OK
+	if $D(@$$$GNExtentions@($namespace,Node)) set code=$e($G(@$$$GNExtentions@($namespace,Node,"Xecute")),5,*) quit $$$OK
+	quit $$$ERROR($$$GeneralError,"No find")
 }
 
 ClassMethod ListExtensionNamespace()
@@ -1136,7 +1180,7 @@ ClassMethod CloseXLSfile(fileXLS, ByRef exportXLSfileEmail, ByRef exportXLSfile,
 		s sc=##class(apptools.core.LogInfo).SendEmail(exportXLSfileEmail, $$$aText("Send file","")_" "_exportXLSfile, $g(msg)_"<br> "_$$$aText("Namespace","")_" :"_$Namespace_"<br> "_$$$aText("Query","")_": "_SQL, exportXLSfile)
 		;i 'sc ;s $$$AppL("APP","CloseXLSfile-SendEmail")=$System.Status.GetErrorText(sc) 
 		}
-	write !,"<br><h3>"_$$$aText("Query result","")_" ("_(+count)_" "_$$$aText("lines) uploaded to file","")_" "_exportXLSfile_"</h3>"
+	write !,"<br><h5>"_$$$aText("Query result","")_" ("_(+count)_" "_$$$aText("lines) uploaded to file","")_" "_exportXLSfile_"</h5>"
 	quit
 }
 
@@ -1145,7 +1189,7 @@ ClassMethod CloseXLSfile(fileXLS, ByRef exportXLSfileEmail, ByRef exportXLSfile,
 ///  $lg(fileXLS,1) =1 flag 
 /// 	s exportXLSfileEmail=$lg(fileXLS,3) - parcel addresses separated by commas, to which to send the file
 /// 	s exportXLSfile=$lg(fileXLS,2) - full path to the file where to write the table
-ClassMethod DrawSQL(SQL As %String = "", MaxNode = {$$$MAXSHOW}, NSpace = "", msg = "", Execute = "", fileXLS = "", Mode = "") As %Status
+ClassMethod DrawSQL(SQL As %String = "", MaxNode = {$$$MAXSHOW}, NSpace = "", msg = "", Execute = "", fileXLS = "", Mode = "", FiltrRow = "") As %Status
 {
 	if ($zconvert($e(SQL,1),"L")="q") {
 		try { set st=1
@@ -1234,8 +1278,9 @@ ClassMethod DrawSQL(SQL As %String = "", MaxNode = {$$$MAXSHOW}, NSpace = "", ms
 	s %AppLogInfoHead=0 //We process lines
 	if $g(resGN)'="" { set i=0
 		for { set i=$order(@resGN@(i))   quit:i=""
+			if FiltrRow'="",'$D(@FiltrRow@(i)) continue 
 			for ii=1:1:ColCount set GetData(ii)=$s($lv($GET(@resGN@(i),"?")):$lg(@resGN@(i),ii),1:$GET(@resGN@(i,ii)))
-			d qNext(.GetData) q:$g(stopWrite)
+			d qNext(.GetData,i) q:$g(stopWrite)
 		}
 	}
 	else {
@@ -1266,10 +1311,10 @@ ClassMethod DrawSQL(SQL As %String = "", MaxNode = {$$$MAXSHOW}, NSpace = "", ms
 	}
 	quit $$$OK
  // Handling one query string
-qNext(GetData)
+qNext(GetData,cou="")
 		set count=count+1
 		write "<tr class=trs >"
-		if 'Mode write "<th>"_(count)_"</th>"
+		if 'Mode write "<th>"_$s(cou="":count,1:cou)_"</th>"
 		if count>MaxNode w "<th style='color:red'>... "_$$$aText("More entries","")_" "_MaxNode_"</th></tr>" s stopWrite=1 QUIT
 		for ii=1:1:ColCount {	
 			set %AppLogInfoVal=$g(GetData(ii))
@@ -1507,6 +1552,12 @@ ClassMethod GetHelp(help)
 	;$$$sH(" "_$$$addAppL("post http://User:pass@localhost:57772/apptoolsrest/jsonrpc"_$c(13,10)_"{""jsonrpc"":""2.0"",""method"":""server.shutdown"",""params"":{""server"":""42""},""id"":1}")_" --- Perform http request with POST method with a JSON body")
 	;$$$sH(" "_$$$addAppL("get https://openexchange.intersystems.com/index.html")_" --- to Perform http request with POST method with a JSON body")
 	$$$sH(" ")
+	
+	/*
+	##;3. Prevent page refresh at session end - #;YSD2224 
+	%SYS> -  %CSP.Util.AutoPage).DrawAutoLogout()  
+	;	If %request.URL '[ "UtilSqlQuery.csp" && ( %request.URL '[ "/apptools.") && ( %request.URL '[ "/App.") { ##; MSW
+	*/
 }
 
 }
