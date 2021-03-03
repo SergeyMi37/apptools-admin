@@ -384,11 +384,6 @@ ClassMethod ShowInIFrame(key = "") As %Status
 </div>
 </form>
 >
- $$$jsstart
-  ;	; to calculate the height of the container as a result of wijetunge victory container-Taba height of the container header
- 	write "$('#"_mcont_"').height($(window).height()-($('#t1').height()+$('#MainNavbar').height()+150));"
-  ;	w $$$blockui($$$aText("Loading...",""))
- $$$jsstop
  quit $$$OK
 }
 
@@ -416,7 +411,6 @@ ClassMethod ShowTabSample(key = "") As %Status
  $$$jsstart
   	; to calculate the height of the container as a result of wijetunge victory container-Taba height of the container header
     write ##class(apptools.core.Action).WriteActJs(%request,pref_"MainForm",mhead,..%ClassName(1),pref_"FirstHead","&divId="_pref_"&key="_key)
-	write "$('#"_mcont_"').height($(window).height()-($('#"_mhead_"').height()+$('#t1').height()+$('#MainNavbar').height()+300));"_$c(13,10)
   	write $$$blockui($$$aText("Loading...",""))
  $$$jsstop
  quit $$$OK

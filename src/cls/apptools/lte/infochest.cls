@@ -27,8 +27,20 @@ ClassMethod GetAppRootdir() As %String
 {
 	set rootdir="d:\files\"
 	if $zversion(1)=3 s rootdir="/home/project/shared/photo/"
-	set rootdir= ##class(%File).GetDirectory($zu(86))_"/mgr/.modules/"_$namespace_"/apptools-admin/1.1.4/files/"
+	if $data(@..#GNStore@("rootdir"),data) {
+		set rootdir=data
+	}
+	else {
+		set rootdir= ##class(%File).GetDirectory($zu(86))_"/mgr/.modules/"_$namespace_"/apptools-admin/1.1.4/files/"
+	}
 	quit ##class(%File).GetDirectory(rootdir)
+}
+
+/// do ##class(apptools.lte.infochest).SetAppRootdir("d:\!\")
+ClassMethod SetAppRootdir(path) As %String
+{
+	set @..#GNStore@("rootdir")=path
+	quit $$$OK
 }
 
 ClassMethod GetAllApps(opt) As %Status
@@ -64,9 +76,10 @@ ClassMethod GetAllApps(opt) As %Status
 	s key="menu-topOpt"
 	s opt(key)="Parameter"
 	s opt(key,"id")="Option"
+	s opt(key,"TabMenu","Close")=1
 	s opt(key,"TabName")="Parameter"
 	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"Method")="ShowTabSamples"
+	s opt(key,"Method")="ShowTabSample"
 	s opt(key,"Menu")=$lb(LeftMenuNumer,"Option") ;has no sub-items
  }
 	;------------ top-accoun
@@ -130,10 +143,10 @@ ClassMethod ShowTabS(Par = "") As %Status
  
  set on=$$$blockui("Ждите...")_";"_##class(apptools.core.Action).WriteActJs(%request,"",mcont,..%ClassName(1),"NexLevelTree","&key="_key_"&divId="_divId_"&count=*&dir=***")
 
- s IdTab=$tr($p($zts,",",2),".")
- s fields(1)="<img class='uk-preserve-width uk-border-circle' src='"_$g(sort("icon"))_"' width='40' alt=''>" ;,fields(1,"attr")="class='uk-table-shrink'"
- s fields(2)="Name",fields(2,"attr")="class='uk-table-expand'"
- d ..DrawTableUi("beg","Table"_IdTab,"style='overflow: auto; height: 300px;'",.fields)
+ set IdTab=$tr($p($zts,",",2),".")
+ set fields(1)="<img class='uk-preserve-width uk-border-circle' src='"_$g(sort("icon"))_"' width='40' alt=''>" ;,fields(1,"attr")="class='uk-table-shrink'"
+ set fields(2)="Name",fields(2,"attr")="class='uk-table-expand'"
+ do ..DrawTableUi("beg","Table"_IdTab,"style='overflow: auto;'",.fields)
  
  ;If there are files then show them
  if $d(sort("n","F")) {
@@ -174,9 +187,6 @@ ClassMethod ShowTabS(Par = "") As %Status
  </div>
 </form>
 >
-  $$$jsstart
-	w "$('#Table"_IdTab_"').height($(window).height()-($('#t1').height()+$('#MainNavbar').height()+200));"_$c(13,10)
-  $$$jsstop
  quit $$$OK
 }
 
@@ -273,10 +283,10 @@ ClassMethod FilesShow(Par = "", dir = "", sort) As %Status
 	
 	if key["-audio" { ;Show playlist
 	 ;Header
-	 s fields(1)="<img class='uk-preserve-width uk-border-circle' src='"_$g(sort("icon"))_"' width='40' alt=''>"
- 	 s fields(2)=$p(dir,$$$slash,*),fields(2,"attr")="class='uk-table-expand'"
- 	d ..DrawTableUi("beg","TableAudio"_IdTab,"style='overflow: auto; height: 300px;'",.fields)
-	 s i="" for num=1:1 { s i=$o(sort("n","F",i)) q:i=""
+	 set fields(1)="<img class='uk-preserve-width uk-border-circle' src='"_$g(sort("icon"))_"' width='40' alt=''>"
+ 	 set fields(2)=$p(dir,$$$slash,*),fields(2,"attr")="class='uk-table-expand'"
+ 	 do ..DrawTableUi("beg","TableAudio"_IdTab,"style='overflow: auto;'",.fields)
+	 set i="" for num=1:1 { s i=$o(sort("n","F",i)) q:i=""
 	  	s row(2)=$p($p($lg(sort("n","F",i),1),$$$slash,*),".",1,*-1)
  		s row(2,"attr")="class='uk-table-expand' "
  		set fileId=##class(apptools.core.files).GetFileIdView($lg(sort("n","F",i),1)) 
@@ -286,8 +296,6 @@ ClassMethod FilesShow(Par = "", dir = "", sort) As %Status
  		}
  	d ..DrawTableUi("end")
 	$$$jsstart
-	w "$('#TableAudio"_IdTab_"').height($(window).height()-($('#t1').height()+$('#MainNavbar').height()+200));"_$c(13,10)
-
 	w "$('audio').on(""play"", function (me) {"_$C(13,10)
     w " $('audio').each(function (i,e) {"_$C(13,10)
     w "  if (e !== me.currentTarget) {"_$C(13,10)
@@ -300,10 +308,10 @@ ClassMethod FilesShow(Par = "", dir = "", sort) As %Status
 	} 
 	elseif key["-books" { ;Show books
 	 ;Header
-	 s fields(1)="<img class='uk-preserve-width uk-border-circle' src='"_$g(sort("icon"))_"' width='40' alt=''>"
- 	 s fields(2)=$p(dir,$$$slash,*),fields(2,"attr")="class='uk-table-expand'"
- 	d ..DrawTableUi("beg","TableBooks"_IdTab,"style='overflow: auto; height: 300px;'",.fields)
-	 s i="" for { s i=$o(sort("n","F",i)) q:i=""
+	 set fields(1)="<img class='uk-preserve-width uk-border-circle' src='"_$g(sort("icon"))_"' width='40' alt=''>"
+ 	 set fields(2)=$p(dir,$$$slash,*),fields(2,"attr")="class='uk-table-expand'"
+ 	 do ..DrawTableUi("beg","TableBooks"_IdTab,"style='overflow: auto;'",.fields)
+	 set i="" for { s i=$o(sort("n","F",i)) q:i=""
 	  	s row(2)=$p($p($lg(sort("n","F",i),1),$$$slash,*),".",1,*-1)
  		s row(2,"attr")="class='uk-table-expand' "
  		set fileId=##class(apptools.core.files).GetFileIdView($lg(sort("n","F",i),1),,"application/force-download") 
@@ -311,9 +319,6 @@ ClassMethod FilesShow(Par = "", dir = "", sort) As %Status
  		d ..DrawTableUi("tr",,,.row)
  		}
  	d ..DrawTableUi("end")
-	$$$jsstart
-	w "$('#TableBooks"_IdTab_"').height($(window).height()-($('#t1').height()+$('#MainNavbar').height()+200));"_$c(13,10)
-	$$$jsstop
 	}
 	else {
 		;Show pictures sorted by modification date
@@ -332,6 +337,57 @@ ClassMethod FilesShow(Par = "", dir = "", sort) As %Status
 	  		write " ] }).show();"
 		$$$jsstop
 	}
+	quit $$$OK
+}
+
+/// download template forms search
+ClassMethod OptionFirstHead(Par = "") As %Status
+{
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	s path= ##class(apptools.lte.infochest).GetAppRootdir()
+	set onclick=$$$blockui("Load...")_";"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainContent",..%ClassName(1),divId_"Result","~key="_key_"~divId="_divId_"~mode=*")
+		&html<
+		<table width="90%" style="border-radius: 10px; border: 1px solid #72a7cf" cellpadding="2" cellspacing="0" class="DetailTable" bgcolor="#c4d6d6" >
+		<tr>
+			<td>
+		Path to files
+			</td>
+			<td>
+				#($$$appText(divId_"Path_to_files","title='path to files' size=80 ",path))#
+			</td>		
+		</tr>
+		<tr>
+			<td>
+			
+			</td>
+			<td>
+			#($$$appButton(divId_"appButtonResult1","onclick="""_$tr(onclick,"*",1)_"""","Save"))#
+			</td>
+		</tr>
+		</table>
+	>
+	quit $$$OK
+}
+
+/// Search result
+ClassMethod OptionResult(Par = "") As %Status
+{
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set mode=Par("mode")
+	;Geting elements from form and prepare array Par
+	set Name=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"Path_to_files")	
+	set st=$$$OK
+	if mode=1 {
+		write ..ButtonAgain(divId,key)
+		if Name="" w $$$appError($$$aText("Context is empty","")) quit $$$OK
+		do ##class(apptools.lte.infochest).SetAppRootdir(Name)
+		write $$$appMsg(Name_" saved")
+	} 
+	write "<br>"
 	quit $$$OK
 }
 

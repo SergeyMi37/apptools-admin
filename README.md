@@ -6,6 +6,22 @@ Application tools for technical support and DBMS administrator. View and edit ar
 
 This solution can be installed in earlier versions of Caché and Ensemble (tested 2016.1+). This can be done by importing xml.
 
+## What's new
+This project is not only a set of [tools for the administrator] (https://community.intersystems.com/post/intersystems-full-stack-contest-winners), but a platform for the rapid creation of a prototype of any solution.
+For example, Photo Album, Music Player, and Personal Library all come together in a user-friendly treasure chest design.
+
+Load http://host:port/apptoolsrest/a/infochest
+
+Change the path to your treasure files and start viewing, listening or reading from any convenient device: desktop, tablet or smartphone.
+
+![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/chest/Screenshot_1.png)
+The example will be located at ${CSPdir}/apptools/files
+![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/chest/Screenshot_2.png)
+![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/chest/Screenshot_3.png)
+![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/chest/Screenshot_4.png)
+![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/chest/Screenshot_5.png)
+![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/chest/Screenshot_6.png)
+
 ## Installation with ZPM
 
 If ZPM the current instance is not installed, then in one line you can install the latest version of ZPM.
@@ -49,7 +65,7 @@ USER>
 USER>zpm
 zpm:USER>install apptools-admin
 ```
-![SQL](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_7-perm.png)
+
 ## Panel for admins & developers
 
  Load http://your-host:your-port/apptools/apptools.core.LogInfo.cls?WHAT=%3F
