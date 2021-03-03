@@ -1,9 +1,8 @@
 ![](https://github.com/SergeyMi37/apptools-admin/blob/master/doc/hammer-red.png)
 ## apptools-admin
-[![Gitter](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/apptools-admin-1)
+[![Gitter](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/apptools-admin)
 
 Application tools for technical support and DBMS administrator. View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files. A few simple graphs on the protocols of the system.
-
 This solution can be installed in earlier versions of Caché and Ensemble (tested 2016.1+). This can be done by importing xml.
 
 ## What's new
@@ -18,9 +17,16 @@ Change the path to your treasure files and start viewing, listening or reading f
 
 The example will be located at ${CSPdir}/apptools/files
 ![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/chest/Screenshot_2.png)
+
+After saving and updating the panel, you can select a music track.
 ![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/chest/Screenshot_3.png)
+
+The built-in HTML5 player is used to play music.
 ![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/chest/Screenshot_4.png)
+
 ![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/chest/Screenshot_5.png)
+
+The Lightbox Component is used to view pictures and videos: UiKit.
 ![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/chest/Screenshot_6.png)
 
 ## Installation with ZPM
