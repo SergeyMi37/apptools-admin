@@ -1,5 +1,6 @@
 Include apptools.core
 
+/// http://hp-msw:52773/apptoolsrest/a/adminsample
 Class apptools.lte.adminsample Extends apptools.lte.adminTabs [ ClassType = "", DependsOn = apptools.core.msg, ProcedureBlock ]
 {
 

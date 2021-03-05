@@ -1,5 +1,6 @@
 Include apptools.core
 
+/// http://hp-msw:52773/apptoolsrest/a/smarthome
 Class apptools.lte.smarthome Extends apptools.lte.adminTabs [ ClassType = "", DependsOn = apptools.core.msg, ProcedureBlock ]
 {
 
