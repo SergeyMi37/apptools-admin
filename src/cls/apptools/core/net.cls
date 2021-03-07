@@ -389,6 +389,21 @@ ClassMethod GetIP(host = "") As %String
 	q $P($ZU(54,13,host),",",1)
 }
 
+/// Get IP address external
+/// do ##class(apptools.core.net).GetIPext(,.ip) zw ip
+ClassMethod GetIPext(url = {"https://pr-cy.ru/browser-details/"}, ByRef ip) As %Status
+{
+	If url="" Quit $$$ERROR($$$GeneralError,"Invalid - URL - not supplied")
+	set st=$$$OK 
+	set st=##class(apptools.core.net).GetHttp(url,.out)
+	if st {
+		do ##class(apptools.core.files).Stream2String(out("content"),.str)
+		;s out("stream")=str
+		set ip=$p($p($p(str,"<input type=""text"" name=""host"" ",2),"value=""",2),$c(34),1)
+	}
+    quit st
+}
+
 /// Get current URI
 /// write ##class(apptools.core.net).GetURI(.prop)
 ClassMethod GetURI(Properties) As %String

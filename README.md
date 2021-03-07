@@ -1,4 +1,4 @@
-![](https://github.com/SergeyMi37/apptools-admin/blob/master/doc/hammer-red.png)
+![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/hammer-red.png)
 ## apptools-admin
 [![Gitter](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/apptools-admin)
 
@@ -8,26 +8,6 @@ This solution can be installed in earlier versions of Caché and Ensemble (teste
 ## What's new
 This project is not only a set of [tools for the administrator](#PanelAdmin), but a platform for the rapid creation of a prototype of any solution.
 For example, Photo Album, Music Player, and Personal Books Library all come together in a user-friendly treasure chest design.
-
-Load http:// your-host:your-port/apptoolsrest/a/infochest
-
-Change the path to your treasure files and start viewing, listening or reading from any convenient device: desktop, tablet or smartphone.
-
-![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/chest/Screenshot_1.png)
-
-The example will be located at ${CSPdir}/apptools/files
-![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/chest/Screenshot_2.png)
-
-After saving and updating the panel, you can select a music track.
-![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/chest/Screenshot_3.png)
-
-The built-in HTML5 player is used to play music.
-![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/chest/Screenshot_4.png)
-
-![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/chest/Screenshot_5.png)
-
-The Lightbox Component is used to view pictures and videos: UiKit.
-![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/chest/Screenshot_6.png)
 
 ## Installation with ZPM
 

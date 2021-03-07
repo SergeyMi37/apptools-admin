@@ -3,9 +3,15 @@
   <Document name="apptools-admin.ZPM">
     <Module>
       <Name>apptools-admin</Name>
-      <Version>1.1.5</Version>
-      <Description>Application tools for technical support and DBMS administrator.View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files</Description>
+      <Version>1.1.6</Version>
+      <Description>Application tools for technical support and DBMS administrator. View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files</Description>
       <Packaging>module</Packaging>
+	  <Keywords>Application tools admin</Keywords>
+		<Author>
+		<Person>Mikhaylenko Sergey</Person>
+		<CopyrightDate>2021</CopyrightDate>
+		<License>MIT</License>
+		</Author>
       <SourcesRoot>src</SourcesRoot>
 	  <Invokes>
         <Invoke Class="apptools.core.Installer" Method="AddFavorites"></Invoke>
