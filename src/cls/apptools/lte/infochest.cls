@@ -40,7 +40,7 @@ ClassMethod GetAppRootdir() As %String
 		set rootdir=data
 	}
 	else {
-		set rootdir= ##class(%File).GetDirectory($zu(86))_"/mgr/.modules/"_$namespace_"/apptools-admin/1.1.4/files/"
+		set rootdir= ##class(%File).GetDirectory($zu(86))_"/mgr/.modules/"_$namespace_"/apptools-admin/1.1.5/web/files/"
 	}
 	quit ##class(%File).GetDirectory(rootdir)
 }
@@ -241,7 +241,8 @@ ClassMethod NexLevelTree(Par = "") As %Status
 /// Get a sorted list of files and directories
 ClassMethod GetSortedList(key, dir, List, sort) As %Status
 {
-    d ##class(apptools.core.files).GetList(dir,"*.*",.List)
+	set wildcard=$s($zversion(1)=3:"*",1:"*.*")
+    d ##class(apptools.core.files).GetList(dir,wildcard,.List)
 	if key["audio" {
 		s wc=##class(apptools.core.filesMimeTypes).GetTypesWildcards("audio")
 		s sort("n")="Listen"
