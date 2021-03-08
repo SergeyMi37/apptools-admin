@@ -71,6 +71,7 @@ ClassMethod zipFile(dir, fileName As %String, newfileName As %String, tempdir As
 /// w ##class(apptools.core.files).GetList("D:\dev\app1\src\","*.xml",.List)
 ClassMethod GetList(directory As %String, ext As %String = "*.*", ByRef list) As %Status
 {
+	set:ext="*.*" ext=$s($zversion(1)=3:"*",1:"*.*")
 	set st = $$$OK
 	try {
 		set directory = ##class(%File).NormalizeDirectory(directory)

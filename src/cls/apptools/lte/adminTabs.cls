@@ -443,14 +443,15 @@ ClassMethod LighboxDrawJson(List, subdir = "", appdynamic, gn = "") As %Status
 /// Encode string to URL
 ClassMethod EnCode(s) As %Status
 {
-	set s=$zconvert(s,"O","URL")
+	set:$zversion(1)'=3 s=$zconvert(s,"O","URL")
 	quit s
 }
 
 /// Decode string from URL
 ClassMethod DeCode(s) As %Status
 {
-	quit $zconvert(s,"I","URL")
+	set:$zversion(1)'=3 s=$zconvert(s,"I","URL")
+	quit s
 }
 
 /// Draw Tables UiKit
