@@ -12,6 +12,14 @@ Parameter GNStore = "^appmsw.smarthome.ui";
 
 Parameter AppRoles = "%All";
 
+/// do ##class(apptools.lte.adminsample).Init()
+ClassMethod Init() As %Status
+{
+	set ServerPort=##class(apptools.core.net).GetURI(.prop)
+	write !,"Open in browser "
+    do ##class(apptools.core.Installer).AddAndWriteFavorite(##class(apptools.core.Installer).#AppName_" SampleAdminPanel","/"_##class(apptools.core.Installer).#AppCSP_"rest/a/smarthome",ServerPort)
+}
+
 /// Replace parameters
 ClassMethod MainParameter(ByRef h, path, url = "") As %Status
 {

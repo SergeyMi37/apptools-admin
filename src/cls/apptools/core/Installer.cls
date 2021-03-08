@@ -152,12 +152,11 @@ ClassMethod AddFavorites() As %Status
 	if Status s ServerPort="http://"_$zu(110)_":"_$g(Properties("WebServerPort"),52773) write !
     do ..AddAndWriteFavorite(..#AppName,"/"_..#AppCSP_"/apptools.core.LogInfo.cls",$g(ServerPort))
     do ..AddAndWriteFavorite(..#AppName_" Permission Matrx","/"_..#AppCSP_"/apptools.Tabs.PanelUikitPermissMatrx.cls?autoload=Matrix",$g(ServerPort))
-    do ..AddAndWriteFavorite(..#AppName_" SampleAdminPanel","/"_..#AppCSP_"rest/a/adminsample",$g(ServerPort))
     do:$$$JSLibLocal ..AddAndWriteFavorite(..#AppName_" Samples Admin Panel","/"_..#AppCSP_"/apptools.Tabs.PanelUikitAdmin.cls?autoload=Matrix",$g(ServerPort))
     do:$$$JSLibLocal ..AddAndWriteFavorite(..#AppName_" REST service Admin Panel","/"_..#AppCSP_"rest/get-html/apptools.Tabs.PanelUikitAdmin.cls?autoload=Find",$g(ServerPort))
 }
 
-/// AddFavorite
+/// AddFavorite 
 ClassMethod AddAndWriteFavorite(name As %String, url, ServerPort) As %Status
 {
     Set tSC = ##class(%SYS.Portal.Users).%AddFavorite(name,url) 

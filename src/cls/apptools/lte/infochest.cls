@@ -12,6 +12,14 @@ Parameter GNStore = "^apptools.infochest";
 
 Parameter AppRoles;
 
+/// do ##class(apptools.lte.adminsample).Init()
+ClassMethod Init() As %Status
+{
+	set ServerPort=##class(apptools.core.net).GetURI(.prop)
+	write !,"Open in browser "
+    do ##class(apptools.core.Installer).AddAndWriteFavorite(##class(apptools.core.Installer).#AppName_" SampleAdminPanel","/"_##class(apptools.core.Installer).#AppCSP_"rest/a/infochest",ServerPort)
+}
+
 /// Replace parameters
 ClassMethod MainParameter(ByRef h, path, url = "") As %Status
 {
@@ -134,7 +142,7 @@ ClassMethod ShowTabS(Par = "") As %Status
 
  do ..GetSortedList(key,dir,.List,.sort)
 
- if '$d(List) { write "No files and directories"
+ if '$d(List) { write "No files and directories "_dir
 	 quit $$$OK }
  ;If there are no directories, then we will immediately show the files
  if '$d(sort("n","D")) {

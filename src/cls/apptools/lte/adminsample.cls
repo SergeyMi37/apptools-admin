@@ -12,6 +12,15 @@ Parameter GNStore = "^apptools.Permissions";
 
 Parameter AppRoles = "ui_Permissions";
 
+/// do ##class(apptools.lte.adminsample).Init()
+ClassMethod Init() As %Status
+{
+	set ServerPort=##class(apptools.core.net).GetURI(.prop)
+	write !,"Open in browser "
+    do ##class(apptools.core.Installer).AddAndWriteFavorite(##class(apptools.core.Installer).#AppName_" SampleAdminPanel","/"_##class(apptools.core.Installer).#AppCSP_"rest/a/adminsample",ServerPort)
+    do ##class(apptools.core.Installer).AddAndWriteFavorite(##class(apptools.core.Installer).#AppName_" SampleMatrixPermiss","/"_##class(apptools.core.Installer).#AppCSP_"rest/a/permiss",ServerPort)
+}
+
 /// Replace parameters
 ClassMethod MainParameter(ByRef h, path, url = "") As %Status
 {
