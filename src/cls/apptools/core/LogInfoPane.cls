@@ -360,7 +360,7 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 		set ExecuteDraw="##class(apptools.core.LogInfoPane).DrawHelp(.%AppLogInfoVal,%AppLogInfoCol,%AppLogInfoHead,.%AppLogInfoTemp,"""_NSpace_""","""_DSN_""")"
 	}
 	#; queries and query results
-	elseif ",query,result,select,delete,insert,s,q,r,begin,"[(","_$zconvert($p(what," ",1),"L")_",") {
+	elseif ",query,result,select,call,delete,insert,s,q,r,begin,"[(","_$zconvert($p(what," ",1),"L")_",") {
 			set sql=what
 			if sql["p.party_id( )" s sql=$replace(sql,"p.party_id( )","p.party_id(+)")
 	}

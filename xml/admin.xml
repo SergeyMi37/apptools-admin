@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2020.1 (Build 215U)" ts="2021-03-08 19:34:06">
+<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2020.1 (Build 215U)" ts="2021-03-14 22:58:36">
 <Class name="apptools.Chart.Chart">
 <Super>apptools.core.AutoPage</Super>
 <TimeChanged>65428,53141.445298</TimeChanged>
@@ -6536,7 +6536,7 @@ do ##class(apptools.core.Form).DrawTable(.matrix) </Description>
 </Class>
 
 
-<Routine name="apptools.core" type="INC" timestamp="65803,41545.091914"><![CDATA[
+<Routine name="apptools.core" type="INC" timestamp="65815,70355.223316"><![CDATA[
 #Include %occMessages
 #include %occReference
 
@@ -6563,6 +6563,7 @@ do ##class(apptools.core.Form).DrawTable(.matrix) </Description>
 #define CurrentClass 	##Expression($$$quote(%classname))
 #define CurrentMethod 	##Expression($$$quote(%methodname))
 #define slash $s($zversion(1)=3:"/",1:"\")
+#define FileTempDir	$zu(140,17)
 
 #define formatJSON 		"aelotwc"
 #define formatJSONSQL	"tw"
@@ -7947,7 +7948,7 @@ If exporting multiple items, separate them with commas, pass the items("item")="
 <Class name="apptools.core.LogInfoPane">
 <IncludeCode>apptools.core</IncludeCode>
 <Super>%CSP.Util.Pane</Super>
-<TimeChanged>65792,59612.939436</TimeChanged>
+<TimeChanged>65813,57866.855811</TimeChanged>
 <TimeCreated>65607,76510.552235</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -8339,7 +8340,7 @@ Drawing the form to enter information</Description>
 		set ExecuteDraw="##class(apptools.core.LogInfoPane).DrawHelp(.%AppLogInfoVal,%AppLogInfoCol,%AppLogInfoHead,.%AppLogInfoTemp,"""_NSpace_""","""_DSN_""")"
 	}
 	#; queries and query results
-	elseif ",query,result,select,delete,insert,s,q,r,begin,"[(","_$zconvert($p(what," ",1),"L")_",") {
+	elseif ",query,result,select,call,delete,insert,s,q,r,begin,"[(","_$zconvert($p(what," ",1),"L")_",") {
 			set sql=what
 			if sql["p.party_id( )" s sql=$replace(sql,"p.party_id( )","p.party_id(+)")
 	}
