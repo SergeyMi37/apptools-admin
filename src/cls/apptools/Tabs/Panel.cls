@@ -230,7 +230,7 @@ ClassMethod FindResult(Par = "") As %Status
 	set divId=Par("divId")
 	set mode=Par("mode")
 	set Name=$g(Par("%request.Data",divId_"Name"))
-	set Desc="test"
+	set Desc="test2"
 	write ..ButtonAgain(divId,,key)
 	if mode=1 {
 		if Name="" w $$$appError($$$aText("Context is empty","")) q $$$OK

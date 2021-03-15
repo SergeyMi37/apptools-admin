@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2020.1 (Build 215U)" ts="2021-03-15 22:25:41">
+<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2020.1 (Build 215U)" ts="2021-03-15 22:50:17">
 <Class name="apptools.Chart.Chart">
 <Super>apptools.core.AutoPage</Super>
 <TimeChanged>65428,53141.445298</TimeChanged>
@@ -1103,7 +1103,7 @@ The template GUI of the application selector and tabs on the basis jQueryUi</Des
 <IncludeCode>apptools.core</IncludeCode>
 <ProcedureBlock>1</ProcedureBlock>
 <Super>%CSP.Page</Super>
-<TimeChanged>65818,80705.520554</TimeChanged>
+<TimeChanged>65818,82189.762386</TimeChanged>
 <TimeCreated>65065,36454.902831</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -1378,7 +1378,7 @@ Search result</Description>
 	set divId=Par("divId")
 	set mode=Par("mode")
 	set Name=$g(Par("%request.Data",divId_"Name"))
-	set Desc="test"
+	set Desc="test2"
 	write ..ButtonAgain(divId,,key)
 	if mode=1 {
 		if Name="" w $$$appError($$$aText("Context is empty","")) q $$$OK
