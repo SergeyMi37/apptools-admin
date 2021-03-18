@@ -2,8 +2,8 @@
 ## apptools-admin
 [![Gitter](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/apptools-admin) 
 [![license](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub all releases](https://img.shields.io/badge/GoTo-GitHub-blue)](https://github.com/SergeyMi37/apptools-admin)
-[![Habr](https://img.shields.io/badge/GoTo-HabraHabr-9cf)](https://habr.com/en/post/436042/)
+[![GitHub all releases](https://img.shields.io/badge/Available%20on-GitHub-black)](https://github.com/SergeyMi37/apptools-admin)
+[![Habr](https://img.shields.io/badge/Available%20on-Habra%20Habr-Lightseagreen)](https://habr.com/en/post/436042/)
 
 Application tools for technical support and DBMS administrator. View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files. A few simple graphs on the protocols of the system.
 This solution can be installed in earlier versions of Caché and Ensemble (tested 2016.1+). This can be done by importing xml.
