@@ -557,7 +557,7 @@ ClassMethod FindResult(Par = "") As %Status
 	set divId=Par("divId")
 	set mode=Par("mode")
 	;Geting elements from form and prepare array Par
-	s Name=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"textName")	
+	set Name=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"textName")	
 	set Desc=$g(Par("%request.Data",divId_"textDesc"))
 	set st=$$$OK
 	if mode=1 {

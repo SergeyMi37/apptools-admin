@@ -5,12 +5,12 @@ Class apptools.core.Action Extends %CSP.Page [ ClassType = "", DependsOn = appto
 {
 
 /// s par=##class(apptools.core.Action).GetParam(.%request,"ns",param)
-ClassMethod GetParam(req, paramName, param) As %Status
+ClassMethod GetParam(req, paramName, param, del = "&") As %Status
 {
  if $d(req) { 
  	q $tr(req.Get(paramName),"#")
  }
- else { set val=$p($p(param,("&"_paramName_"="),2),"&",1)
+ else { set val=$p($p(param,(del_paramName_"="),2),del,1)
  	quit val
  }
 }
@@ -172,7 +172,7 @@ ClassMethod ParseJson(jsonStr, appClass, appMethod, appPar) As %Status
 /// w ##class(apptools.core.Action).WriteWinOpenREST(%request)
 ClassMethod WriteWinOpenREST(req) As %String
 {
-  	if req.URL[(req.Application_"get-html")||(req.URL[(req.Application_"post-json")) { //is static content
+  	if req.URL[(req.Application_"get-html")||(req.URL[(req.Application_"post-json"))||(req.URL[(req.Application_"a")) { //is static content
   		q req.Application_"post-json"
   	} else {
   		q ""
@@ -185,8 +185,8 @@ ClassMethod WriteAppAct(req, fornId, resultDivId, ns, classname, method, CGIVar 
 {
   	;s $$$AppL("MML","%request-WriteActJs-")=$$$AppObJs(req)
   	set:CGIVar'["'" CGIVar=CGIVar_"'"
-  	if req.URL[(req.Application_"get-html")||(req.URL[(req.Application_"post-json")) { //is static content
-  		q "AppRpc('"_fornId_"','"_resultDivId_"','"_$zu(5)_":"_classname_":"_method_":"_CGIVar_",'"_req.Application_"post-json');"
+  	if req.URL[(req.Application_"get-html")||(req.URL[(req.Application_"post-json"))||(req.URL[(req.Application_"a")) { //is static content
+  		q "AppRpc('"_fornId_"','"_resultDivId_"','"_ns_":"_classname_":"_method_":"_CGIVar_",'"_req.Application_"post-json');"
   	} else {
 	  	q "AppAct('"_fornId_"','"_resultDivId_"','AppAct="_ns_":"_classname_":"_method_":"_CGIVar_");"
   		
@@ -196,14 +196,15 @@ ClassMethod WriteAppAct(req, fornId, resultDivId, ns, classname, method, CGIVar 
 
 /// Write Action Js 
 /// w ##class(apptools.core.Action).WriteActJs(%request,pref_"MainForm",mhead,..%ClassName(1),pref_"FirstHead",key)
-ClassMethod WriteActJs(req, fornId, resultDivId, classname, method, CGIVar = "") As %Status
+ClassMethod WriteActJs(req, fornId, resultDivId, classname, method, CGIVar = "", ns = {$namespace}) As %Status
 {
-  	s $$$AppL("MML","%request-WriteActJs-")=$$$AppObJs(req)
+  	;s $$$AppL("MML","%request-WriteActJs-")=$$$AppObJs(req)
   	set:CGIVar'["'" CGIVar=CGIVar_"'"
   	if req.URL[(req.Application_"get-html")||
   		(req.URL[(req.Application_"post-json"))||
   		(req.URL[(req.Application_"a")) { //is static content
-  		q "AppRpc('"_fornId_"','"_resultDivId_"','"_$zu(5)_":"_classname_":"_method_":"_CGIVar_",'"_req.Application_"post-json');"
+  		set:ns="" ns=$namespace
+  		q "AppRpc('"_fornId_"','"_resultDivId_"','"_ns_":"_classname_":"_method_":"_CGIVar_",'"_req.Application_"post-json');"
   	} else {
   		q "ActionJs('"_fornId_"','"_resultDivId_"','"_classname_"','"_method_"','"_CGIVar_");"
   	}

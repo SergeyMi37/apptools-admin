@@ -14,6 +14,7 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 {
 <Routes>
 <Route Url="/a/:text" Method="GET" Call="apptools.lte.adminStatic:GetMain"/>
+<Route Url="/ad/:text" Method="GET" Call="apptools.MVK.adminStatic:GetMvkApp"/>
 
 <Route Url="/get-html/:text" Method="GET" Call="Index"/>
 <Route Url="/post-json" Method="POST" Call="jsonrpc"/>

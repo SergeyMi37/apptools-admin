@@ -13,29 +13,69 @@ Parameter GNStore = "^%apptools.ui";
 /// For Redirect 
 Parameter PreLoad;
 
+Parameter ToAdmin = "You need to contact <a target=_new href='https://github.com/SergeyMi37'> technical support.";
+
+Parameter AppRoles;
+
 /// is there a right to work with this form
 ClassMethod IsPermiss(role) As %Status
 {
-	q $roles[role||($roles["%All")
+	if $roles["%All" quit $$$OK
+	set st=""
+	for i=1:1:$L(role,",") { continue:$P(role,",",i)=""
+		if (","_$roles_",")[(","_$P(role,",",i)_",") set st=$$$OK quit
+	}
+	if 'st quit $$$ERROR($$$GeneralError,"Protect")
+	quit st
+}
+
+ClassMethod CheckPermiss(ByRef par) As %Status
+{
+ do ..GetAllApps(.opt)
+ if '..IsPermiss(..#AppRoles) {
+	set par("=Message-default=")="You are missing access rights. "_..#ToAdmin
+ 	set par("=Tab=")="Error"
+ }
+ elseif '$d(opt) {
+	set par("=Message-default=")="You don't have a single menu item. "_..#ToAdmin
+ 	set par("=Tab=")="Message"
+ }
+ else {
+	set par("=Message-default=")=" "
+ 	set par("=Tab=")=" "
+ }
+ quit $$$OK
+}
+
+ClassMethod CheckRoleMenu(ByRef opt) As %Status
+{
+	set i="" for { set i=$Order(opt(i)) quit:i=""
+		if $GET(opt(i,"Roles"))'="" 
+	}
 }
 
 /// Icon from png
-ClassMethod GetAppIcon(path, ext) As %String
+ClassMethod GetAppIcon(path = "", ext = "", base64 = "") As %String
 {
 	if path'="" {
 		quit "<link rel=""icon"" href="""_path_"."_ext_""" type=""image/x-"_ext_"""/><link rel=""shortcut icon"" href="""_path_"."_ext_""" type=""image/x-"_ext_"""/>"
 	}
+	elseif base64'="" {
+		quit "<link rel=""icon"" type=""image/x-"_ext_""" href="""_base64_"""/>"		
+	}
 	else {
 		;hammer gray
-		quit "<link rel=""icon"" type=""image/x-icon"" href="""_##class(apptools.core.rest).getStatic("apptools.Tabs.PanelUikit:IconTools")_"""/>"		
-		;grammophon
+	   quit "<link rel=""icon"" type=""image/x-icon"" href="""_##class(apptools.core.rest).getStatic("apptools.Tabs.PanelUikit:IconTools")_"""/>"		
+		; raisen
 		;quit "<link rel=""icon"" type=""image/x-icon"" href=""data:image/x-icon;base64,AAABAAEAEBAAAAAAAABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8AJCQk/yQkJP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/0ZGRv8XFxf/////AP///wD///8A////AP///////////////+7u7v9OTk7/sbGx/11dXf9KSkr///////////+lpaX/4eHh/////wD///8A////AAAAAP8AAAD///////////+8vLz///////X19f/t7e3/gICA/5eXl////////////wAAAP8AAAD/////AKysrP8AAAD/AAAA/wAAAP+enp7/////////////////////////////////5OTk/wAAAP8AAAD/AAAA/6ysrP////8A////AP///wCurq6PlJSUzP///wD///8A////AP///wD///8A////AJSUlMyQkJDY////AP///wD///8A////AP///wD///8AAAAA/wAAAP////8A////AP///wD///8A////AP///wAAAAD/AAAA/////wD///8A////AP///wD///8AAAAA/wAAAP8AAAD/////AP///wD///8A////AP///wD///8AAAAA/wAAAP8AAAD/////AP///wD///8ACwsL/wAAAP8AAAD/lJSU2AAAAP8AAAD/cnJy/1hYWP8AAAD/AAAA/2FhYdgHBwf/AAAA/wAAAP////8A////AP///wD///8A////AP///wAAAAD/s7Oz/wAAAP8AAAD/x8fH/wAAAP////8A////AP///wD///8A////AP///wD///8A////AP///wAAAAD/AAAA/////wAAAAD/AAAA/////wAAAAD/AAAA/////wD///8A////AP///wD///8A////AP///wD///8AAAAA/wAAAP+qqqqlAAAA/wAAAP9lZWXjAAAA/wAAAP////8A////AP///wD///8A////AP///wD///8A////ALa2tv////8A9vb2UQAAAP8AAAD/////Uf///wDAwMD/////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wBcXFz/AAAA/////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A//8AAP//AADAAwAAwAMAAIABAAAAAAAA5+cAAOfnAADH4wAAgAEAAPgfAADyTwAA8A8AAPZvAAD+fwAA//8AAA==""/>"
 	}
 }
 
 /// Replace parameters
-ClassMethod RepaceParameter(ByRef h, path, url = "", ByRef par) As %Status
+ClassMethod RepaceParameter(ByRef h, ByRef par) As %Status
 {
+ set url=par("input-cgivar")
+ set path=par("=path=")
  set p=""
  for { set p=$Order(par(p)) quit:p=""
  	set h=$replace(h,p,par(p))
@@ -117,7 +157,8 @@ ClassMethod DrawMenuTop(Par) As %String
         	"</a>"_
         	"<div class=""dropdown-menu dropdown-menu-lg dropdown-menu-right"">"
 			for { set i=$o(menu(m,i)) quit:i=""
-				set onclick=##class(apptools.core.Action).WriteActJs(%request,"","MainHidden",..%ClassName(1),"ShowTab","&appPar="_i)
+				set ns=$GET(opt(i,"Namespace"))
+				set onclick=##class(apptools.core.Action).WriteActJs(%request,"","MainHidden",..%ClassName(1),"ShowTab","&appPar="_i,ns)
 				set ret=ret_
 			     "<div class=""dropdown-divider""></div>"_
           		"<a href=""#"" class=""dropdown-item"" id='Menu"_$g(opt(i,"id"))_"' onclick="""_onclick_""">"_
@@ -154,7 +195,8 @@ ClassMethod DrawMenu(Par) As %String
             "</a>"
 
 		for { set i=$o(menu(m,i)) quit:i=""
-	   		set onclick=##class(apptools.core.Action).WriteActJs(%request,"","MainHidden",..%ClassName(1),"ShowTab","&appPar="_i)
+			set ns=$GET(opt(i,"Namespace"))
+	   		set onclick=##class(apptools.core.Action).WriteActJs(%request,"","MainHidden",..%ClassName(1),"ShowTab","&appPar="_i,ns)
 			set iconInem=$select($g(opt(i,"aw-icon"))'="":$g(opt(i,"aw-icon")),1:"fa-ellipsis-h")
 		 	set ret=ret_	
 			"<ul class=""nav nav-treeview"">"_
@@ -202,7 +244,7 @@ ClassMethod DrawStatus(Par) As %Status
 {
  set fio=##class(apptools.core.sys).GetFullName($username)
  set:fio="" fio=$$$aText("The user","")
- write "<span class='tip' title='"_fio_"-"_$j_"-"_$zu(5)_"'>"_$username_"</span>"
+ write "<span class='tip' title='"_fio_"-"_$j_"-"_$zu(5)_"'>"_$username_" - "_fio_"</span>"
  quit $$$OK
 }
 
@@ -291,16 +333,17 @@ ClassMethod ShowTabApps(Par, opt) As %Status
  		write " $('#tabList').append('<li id="_tabId_"></li>');"_$c(13,10)
  		write " $('#tabMenu').append('<li id="_tabIdMenu_"><a><font color=Lightsteelblue>"_$g(opt(Par,"TabName"))_"</font>"_$g(IconMenu)_"</a></li>');"_$c(13,10)
  		write " $('#t1,#ta1').hide();"_$c(13,10) //" $('#t1').prop('disabled',true);"
- 		if $g(opt(Par,"Disable")) {
+ 		set ns=$GET(opt(Par,"Namespace"))
+ 		if $GET(opt(Par,"Disable")) {
 	 		;write "$('#"_tabId_"').load('apptools.core.Action.cls','appClass="_..%ClassName(1)_"&appMethod=ShowTabAbout&appNsp="_$zu(5)_"&appPar="_Par_"');"
-	 		write ##class(apptools.core.Action).WriteActJs(%request,"",tabId,..%ClassName(1),"ShowTabAbout","&appPar="_Par_$g(opt(Par,"CGIvar")))
+	 		write ##class(apptools.core.Action).WriteActJs(%request,"",tabId,..%ClassName(1),"ShowTabAbout","&appPar="_Par_$g(opt(Par,"CGIvar")),ns)
  		}
  		elseif $g(opt(Par,"MethodUrl"))'="" {
 	 		write "$('#"_tabId_"').load('"_$g(opt(Par,"MethodUrl"))_"');"
  		}
  		else {
 	 		;write "$('#"_tabId_"').load('apptools.core.Action.cls','appClass="_$g(opt(Par,"ClassName"))_"&appMethod="_$g(opt(Par,"Method"))_"&appNsp="_$zu(5)_"&appPar="_Par_"');"
-	 		write ##class(apptools.core.Action).WriteActJs(%request,"",tabId,$g(opt(Par,"ClassName")),$g(opt(Par,"Method")),"&appPar="_Par_$g(opt(Par,"CGIvar")))
+	 		write ##class(apptools.core.Action).WriteActJs(%request,"",tabId,$g(opt(Par,"ClassName")),$g(opt(Par,"Method")),"&appPar="_Par_$g(opt(Par,"CGIvar")),ns)
  		}
  	 write "};"
  	 write " UIkit.tab('#tabMenu').show($('#"_tabIdMenu_"'));"
@@ -373,10 +416,11 @@ ClassMethod ShowInIFrame(key = "") As %Status
  set pref=$g(opt(key,"id"))
  set mhead=pref_"MainHeader"
  set mcont=pref_"MainContent"
+ ;  <iframe id="#(mcont)#" width="100%" height="100%" style='overflow: auto;' src='#($g(opt(key,"InFrameUrl")))#' ></iframe>
  &html<
 <form id="#(pref_"MainForm")#">
 <div class="uk-grid">
-    <iframe id="#(mcont)#" width="100%" height="100%" style='overflow: auto;' src='#($g(opt(key,"InFrameUrl")))#' ></iframe>
+    <iframe id="#(mcont)#" width="1500" height="1000" style='overflow: auto;' src='#($g(opt(key,"InFrameUrl")))#' ></iframe>
     </div>
 </div>
 </form>

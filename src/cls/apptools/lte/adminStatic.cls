@@ -1,30 +1,26 @@
 Include apptools.core
 
 /// https://adminlte.io
-Class apptools.lte.adminStatic [ Abstract ]
+Class apptools.lte.adminStatic Extends apptools.lte.adminTabs [ ClassType = "", DependsOn = apptools.core.msg, ProcedureBlock ]
 {
 
-/// http://localhost:52773/apptoolsrest/a/permiss-autoload=snapshot
+/// http://localhost:52773/apptoolsrest/a/permiss&autoload=snapshot
 /// http://localhost:52773/apptoolsrest/a/infochest
-/// http://localhost:52773/apptoolsrest/a/smarthome-autoload-snapshot
-ClassMethod GetMain(parameter) As %Status
+/// http://localhost:52773/apptoolsrest/a/smarthome&autoload=snapshot&namespace=USER
+ClassMethod GetMain(parameter, class = "") As %Status
 {
-	if 0,parameter="apptools.core.Action.cls" {
-		;set $$$AppL("MSW","req")=$$$AppObJs(%request)
-	 	;merge $$$AppL("MSW","%request.Data")=%request.Data
-		;set $$$AppL("MSW","%request.AppData")=%request.AppData
-		w  quit $$$OK ;$classmethod("apptools.core.Action","OnPage",.parameter)
-	}
 	set h=##class(apptools.core.rest).getStatic("apptools.lte.adminStatic:html")
-	set app=$p(parameter,"-")
-	set class="apptools.lte."_app
-	if '##class(apptools.core.sys).ClassExist(class) quit $$$ERROR($$$GeneralError,"class does not exist "_class)
-	;s appdinamic=%request.Application_"get-files/"
-	
-	set path="/apptools/adminlte/"
-	set h=$replace(h,"=path=",path)
-	
-	set st=$classmethod(class,"MainParameter",.h,path,$p(parameter,"-",2,*)) 
+	set app=$p(parameter,"&")
+	set:class="" class="apptools.lte."_app
+	set par("input-class=")=class
+	if '##class(apptools.core.sys).ClassExist(class) set class="apptools.lte.page404"
+	set cgivar="&"_$p(parameter,"&",2,*)
+	set ns=##class(apptools.core.Action).GetParam(,"namespace",cgivar)
+	if ns'="" set $namespace=ns
+	set par("input-cgivar")=cgivar
+    set par("=path=")="/apptools/"
+    set par("=Message-default=")=""
+    set st=$classmethod(class,"MainParameter",.h,.par) 
 
 	d ##class(apptools.core.rest).WriteStatic("html",,,,,h)
 	q $$$OK
@@ -43,11 +39,12 @@ XData html [ MimeType = application/yaml ]
   <!-- Google Font: Source Sans Pro -->
   <!--<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">-->
   <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="=path=plugins/fontawesome-free/css/all.min.css">
+  <link rel="stylesheet" href="=path=adminlte/plugins/fontawesome-free/css/all.min.css">
   <!-- overlayScrollbars -->
-  <link rel="stylesheet" href="=path=plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+  <link rel="stylesheet" href="=path=adminlte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
   <!-- Theme style -->
-  <link rel="stylesheet" href="=path=dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="=path=adminlte/dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="=path=jqueryui/jquery-ui.css">
   <!--=LinkIcon=-->
   <!--=Links=-->
 </head>
@@ -56,7 +53,7 @@ XData html [ MimeType = application/yaml ]
 
   <!-- Preloader -->
   <div class="preloader flex-column justify-content-center align-items-center">
-    <img class="animation__wobble" src="=path=dist/img/ApptoolsLogo.png" alt="ApptoolLogo" height="60" width="60">
+    <img class="animation__wobble" src="=path=adminlte/dist/img/ApptoolsLogo.png" alt="ApptoolLogo" height="60" width="60">
   </div>
 
   <!-- Navbar -->
@@ -67,9 +64,9 @@ XData html [ MimeType = application/yaml ]
       <li class="nav-item">
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
-      <li class="nav-item d-none d-sm-inline-block">
+      <!--<li class="nav-item d-none d-sm-inline-block">
         <a href="#" onclick="document.location.reload();" class="nav-link">Home</a>
-      </li>
+      </li>-->
     </ul>
 
     <!-- Right navbar links -->
@@ -109,7 +106,7 @@ XData html [ MimeType = application/yaml ]
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="#" onclick="document.location.reload();" class="brand-link">
-      <img src="=path=dist/img/=Logo-png=" alt="ApptoolsLogo" class="brand-image img-circle elevation-3" style="opacity: .8">
+      <img src="=Logo-image=" alt="ApptoolsLogo" class="brand-image img-circle elevation-3" style="opacity: .8">
       <span class="brand-text font-weight-light">=Brand-Text=</span>
     </a>
 
@@ -165,12 +162,12 @@ XData html [ MimeType = application/yaml ]
        <!-- Uikit Tab start -->
 	    <div class="uk-width-1-1 uk-margin-left uk-margin-right " style='overflow: auto;' id="mainApp" >
 			<ul id='tabMenu' class="uk-tab uk-tab-grid uk-tab-top" data-uk-tab="{connect:'#tabList', animation: 'fade'}">
-				<li id='t1' class="uk-active"><a href="#"><font color=Lightsteelblue>Welcom</font></a></li>
+				<li id='t1' class="uk-active"><a href="#"><font color=Lightsteelblue>=Tab=</font></a></li>
 			</ul>
 			<ul id="tabList" class="uk-switcher uk-margin uk-tab-content">
 				<li id='ta1' >
-			 	<div class="uk-alert-success" uk-alert>
-					<p> Sample of simple application</p>
+			 	<div class="uk-alert-warning" uk-alert>
+					<p>=Message-default=</p>
 			 	</div>
 				</li>
 			</ul>
@@ -205,23 +202,25 @@ XData html [ MimeType = application/yaml ]
 
 <!-- REQUIRED SCRIPTS -->
 <!-- jQuery -->
-<script src="=path=plugins/jquery/jquery.min.js"></script>
+<script src="=path=adminlte/plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap -->
-<script src="=path=plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="=path=adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- overlayScrollbars -->
-<script src="=path=plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+<script src="=path=adminlte/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
 <!-- AdminLTE App -->
-<script src="=path=dist/js/adminlte.js"></script>
+<script src="=path=adminlte/dist/js/adminlte.js"></script>
 
 <!-- PAGE PLUGINS -->
 <!-- jQuery Mapael -->
-<script src="=path=plugins/jquery-mousewheel/jquery.mousewheel.js"></script>
-<script src="=path=plugins/raphael/raphael.min.js"></script>
-<script src="=path=plugins/jquery-mapael/jquery.mapael.min.js"></script>
-<script src="=path=plugins/jquery-mapael/maps/usa_states.min.js"></script>
-<script src="=path=plugins/jquery/jquery.blockui.js"></script>
+<script src="=path=adminlte/plugins/jquery-mousewheel/jquery.mousewheel.js"></script>
+<script src="=path=adminlte/plugins/raphael/raphael.min.js"></script>
+<script src="=path=adminlte/plugins/jquery-mapael/jquery.mapael.min.js"></script>
+<script src="=path=adminlte/plugins/jquery-mapael/maps/usa_states.min.js"></script>
+<!-- jQuery UI -->
+<script src="=path=jqueryui/jquery-ui.js"></script>
+<script src="=path=jqueryui/jquery.blockui.js"></script>
 <!-- ChartJS -->
-<script src="=path=plugins/chart.js/Chart.min.js"></script>
+<script src="=path=adminlte/plugins/chart.js/Chart.min.js"></script>
 
 <!-- AdminLTE for demo purposes -->
 <!--<script src="dist/js/demo.js"></script>-->

@@ -13,46 +13,51 @@ Parameter GNStore = "^apptools.Permissions";
 Parameter AppRoles = "ui_Permissions";
 
 /// Replace parameters
-ClassMethod MainParameter(ByRef h, path, url = "") As %Status
+ClassMethod MainParameter(ByRef h, ByRef par) As %Status
 {
+ set path=par("=path=")
  set par("=Brand-Text=")="AppTools-admin"
- set par("=Logo-png=")="ApptoolsLogo.png"
+ set par("=Logo-image=")=path_"adminlte/dist/img/ApptoolsLogo.png"
  set par("=titleAppToolsadmin=")=..#HeaderText
- set par("<!--=LinkIcon=-->")=..GetAppIcon(path_"dist/img/ApptoolsLogo","png")
- quit ..RepaceParameter(.h, path, url,.par)
- quit $$$OK
+ set par("<!--=LinkIcon=-->")=..GetAppIcon(path_"adminlte/dist/img/ApptoolsLogo","png")
+ quit ..RepaceParameter(.h,.par)
 }
 
 /// what modes are available
 ClassMethod GetAllApps(opt) As %Status
 {
-	if ..IsPermiss("%All") {	
-	set LeftMenuName="Permission",
-		LeftMenuNumer=1,
-		open=1,        //3 =1 open menu
-		icon="fa-cog"  //4  icon
-	set menu=$lb(LeftMenuNumer,LeftMenuName,open,icon) 
-	set key="MenuMatrix"
-	set opt(key)=$$$aText("The matrix","") ;The name of the menu
-	set opt(key,"id")="Matrix"
-	set opt(key,"TabName")=$$$aText("The matrix","") ;the name of the tab
-	set opt(key,"ClassName")=..%ClassName(1)
-	set opt(key,"Method")="ShowTabSample"
-	set opt(key,"Disable")=0 ;developed
-	set opt(key,"TabMenu","Close")=1
-	set opt(key,"Menu")=menu
-	set opt(key,"Active")=1 ;active menu item
-	set opt(key,"aw-icon")="fa-list-alt" ;fa-table"
+	;side menu
+	set sideMenuName="Permission",
+		sideMenuNumer=1,
+		sideMenuOpen=1,        //3 =1 open menu
+		sideMenuIcon="fa-cog"  //4  icon   https://fontawesome.com/icons?d=gallery&p=2&m=free
+		set sideMenu=$lb(sideMenuNumer,sideMenuName,sideMenuOpen,sideMenuIcon) 
+			set key="MenuMatrix"
+			set opt(key,"Menu")=sideMenu
+			set opt(key)=$$$aText("The matrix","") ;The name of the menu
+			set opt(key,"id")="Matrix"
+			set opt(key,"TabName")=$$$aText("The matrix","") ;the name of the tab
+			set opt(key,"ClassName")=..%ClassName(1)
+			set opt(key,"Role")="%All"
+			set opt(key,"Namespace")="%SYS"
+			set opt(key,"Method")="ShowTabSample"
+			set opt(key,"Disable")=0 ;developed
+			set opt(key,"TabMenu","Close")=1
+			set opt(key,"Active")=1 ;active menu item
+			set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
 
-	set LeftMenuName="Account",LeftMenuNumer=99
+	;top menu
+	set topMenuName="Account",
+		topMenuNumer=99
 	set key="menu-top-account3"
-	set opt(key)="Exit"
-	set opt(key,"id")="AccountExit"
-	set opt(key,"TabName")="Logoit" 
-	set opt(key,"ClassName")=..%ClassName(1)
-	set opt(key,"Method")="Logout"
-	set opt(key,"MenuTop")=$lb(LeftMenuNumer,LeftMenuName) ; 99-account has nested items
-	}
+		set opt(key,"MenuTop")=$lb(topMenuNumer,topMenuName) ; 99-account has nested items
+		set opt(key)="Exit"
+		set opt(key,"id")="AccountExit"
+		set opt(key,"TabName")="Logoit" 
+		set opt(key,"ClassName")=..%ClassName(1)
+		set opt(key,"Method")="Logout"
+	
+	do ..CheckRoleMenu(.opt)
 	quit $$$OK
 }
 

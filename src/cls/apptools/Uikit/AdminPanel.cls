@@ -1,7 +1,7 @@
 Include apptools.core
 
 /// The template GUI of the application selector and tabs on the basis jQueryUi, Uikit
-Class apptools.Tabs.PanelUikitAdmin Extends %CSP.Page [ ClassType = "", DependsOn = apptools.core.msg, ProcedureBlock ]
+Class apptools.Uikit.AdminPanel Extends %CSP.Page [ ClassType = "", DependsOn = apptools.core.msg, ProcedureBlock ]
 {
 
 /// The application title

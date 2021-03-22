@@ -22,13 +22,17 @@ ClassMethod Init() As %Status
 }
 
 /// Replace parameters
-ClassMethod MainParameter(ByRef h, path, url = "") As %Status
+ClassMethod MainParameter(ByRef h, ByRef par) As %Status
 {
+ set path=par("=path=")
  set par("=Brand-Text=")="Admin Sample Panel"
- set par("=Logo-png=")="ApptoolsLogo.png"
+ set par("=path=")=path
+ set par("=Brand-Text=")="AppTools-admin"
+ set par("=Logo-image=")=path_"adminlte/dist/img/ApptoolsLogo.png"
  set par("=titleAppToolsadmin=")=..#HeaderText
- set par("<!--=LinkIcon=-->")=..GetAppIcon(path_"dist/img/ApptoolsLogo","png")
- quit ..RepaceParameter(.h, path, url,.par)
+ set par("<!--=LinkIcon=-->")=..GetAppIcon(path_"adminlte/dist/img/ApptoolsLogo","png")
+ 
+ quit ..RepaceParameter(.h, .par)
 }
 
 /// what are the available modes
@@ -209,7 +213,7 @@ ClassMethod FindResult(Par = "") As %Status
 		if Desc'="" s sql=sql_" and (fullName like '%"_Desc_"%') "
 		set msg="Query: "_sql
 
-		set exec="##class(apptools.core.LogInfo).MarkRed(%AppLogInfoVal,"""_Name_","_Desc_""")"
+		set exec="##class(apptools.core.LogInfo).MarkRed(%AppLogInfoVal,"""_$GET(Name)_","_$GET(Desc)_""")"
 		set st=##class(apptools.core.LogInfoPane).DrawSQL(sql,100000,$zu(5),msg,exec)
 		if 'st  w $$$appError($System.Status.GetErrorText(st))
 		quit $$$OK

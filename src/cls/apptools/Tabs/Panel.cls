@@ -230,7 +230,6 @@ ClassMethod FindResult(Par = "") As %Status
 	set divId=Par("divId")
 	set mode=Par("mode")
 	set Name=$g(Par("%request.Data",divId_"Name"))
-	set Desc="test2"
 	write ..ButtonAgain(divId,,key)
 	if mode=1 {
 		if Name="" w $$$appError($$$aText("Context is empty","")) q $$$OK
@@ -245,7 +244,7 @@ ClassMethod FindResult(Par = "") As %Status
 			if Name'="" s sql=sql_" and (title like '%"_Name_"%') "
 		}
 		set msg="Query: "_sql
-		set exec="##class(apptools.core.LogInfo).MarkRed(%AppLogInfoVal,"""_Name_","_Desc_""")"
+		set exec="##class(apptools.core.LogInfo).MarkRed(%AppLogInfoVal,"""_$GET(Name)_","_$GET(Desc)_""")"
 		set st=##class(apptools.core.LogInfoPane).DrawSQL(sql,100000,$zu(5),msg,exec)
 		quit $$$OK
 	} 
