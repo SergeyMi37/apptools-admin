@@ -15,6 +15,15 @@ ROUTINE apptools.core [Type=INC]
 #define escViolet(%t) $Select($$$escBg=0:%t,1:$c(27)_"[1;35;"_$$$escBg_"m"_%t_$$$escClear)
 #define escSeq(%e,%t) $Select($$$escBg=0:%t,1:$c(27)_"["_%e_"m"_%t_$$$escClear)
 
+#;%from - id form for serialize elements
+#;%to - id div output result
+#;%ns - namespase class
+#;%class - classname
+#;%method - method executed
+#;%arg - string cgi variables 
+#define onclick(%from,%to,%ns,%class,%method,%arg) ##class(apptools.core.Action).WriteActJs(%request,%from,%to,%class,%method,%arg,%ns) 
+#define SetHeightContent(%id,%d) $$$jsstart w $$$NL write "$('#"_%id_"MainContent').height($(window).height()-($('#"_%id_"MainHeader').height()+$('#t1').height()+"_%d_"));"_$$$NL $$$jsstop w $$$NL
+
 #;Include %msql $$$MaxStringLength
 #;		;2016.2<= set title={}.%FromJSON(json).title 
 #;		;2016.1 set title={}.$fromJSON(json).title

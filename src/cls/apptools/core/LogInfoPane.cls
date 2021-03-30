@@ -274,11 +274,13 @@ thead th:first-child {
 
 thead th {
   background: #E7EBF9;
+  color: blue;
 
 }
 
 tbody th {
   background: #E7EBF9;
+  color: blue;
 
 }
 

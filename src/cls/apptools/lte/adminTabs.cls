@@ -13,7 +13,7 @@ Parameter GNStore = "^%apptools.ui";
 /// For Redirect 
 Parameter PreLoad;
 
-Parameter ToAdmin = "You need to contact <a target=_new href='https://github.com/SergeyMi37'> technical support.";
+Parameter ToAdmin = "You need to contact <a target=_new href='https://github.com/SergeyMi37'> technical support.</a>";
 
 Parameter AppRoles;
 
@@ -139,6 +139,15 @@ ClassMethod GetStringJs(ns, cls, postload = 0, autoload = "") As %String
 /// what are the available modes
 ClassMethod GetAllApps(opt) As %Status
 {
+	;----- Setup the search in the top menu
+	s key="Search"
+	s opt(key)="Search"
+	s opt(key,"id")="Search-"
+	s opt(key,"TabName")="Search"_"-"
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabSearch"
+	s opt(key,"TabMenu","Close")=1
+	s opt(key,"TabMenu","Mode")=0 ;1 - for each new search bar to make new tab, 0-tab is always the same
 }
 
 /// the rendering top menu 
@@ -283,7 +292,9 @@ ClassMethod ShowTabSearch(key = "") As %Status
 /// Par - code menu item from the GetAllApps ..
 ClassMethod ShowTab(Par) As %Status
 {
+	zw Par
 	if $g(Par("appPar"))'="" set Par=Par("appPar")
+	zw Par
 	do ..GetAllApps(.opt) 
 	do ..ShowTabApps(.Par,.opt)
 }
@@ -293,14 +304,14 @@ ClassMethod ShowTab(Par) As %Status
 ClassMethod ShowTabApps(Par, opt) As %Status
 {
 	if Par="Search" {
-		set Searchstr=$g(Par("%request.Data","Searchstr"),Par("Searchstr"))
+		set Searchstr=$g(Par("%request.Data","Searchstr"),$GET(Par("Searchstr")))
 		if Searchstr="" q $$$OK
 		;s tr=$tr(##class(apptools.MSW.type).Transliteration(Searchstr)," №`()\/*;'"":%","_N---")
 		;s tr=$tr($zts,".,") 
 		set tr=$e($tr(Searchstr," №`()\/*;'"":%?$@&.,",""),1,10)_$i(@..#GNStore@("jobs",$j))
 		set key=tr ;Searchstr
 		MERGE opt(key)=opt(Par)
-		set opt(key)=opt(key)_tr ;Searchstr
+		set opt(key)=$GET(opt(key))_tr ;Searchstr
 		if $g(opt(Par,"TabMenu","Mode"))=1 { ;mode add a new tab 
 			set opt(key,"id")=opt(key,"id")_tr
 		} else { ;mode add a new replace the old 
@@ -386,10 +397,9 @@ ClassMethod Logout(Par) As %Status
 /// The output of the First button
 ClassMethod ButtonAgain(divId = "", key = "") As %Status
 {
-	set mhead=divId_"MainHeader"
-	set mcont=divId_"MainContent"
-	set onclick="$('#"_mcont_"').empty();"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",mhead,..%ClassName(1),divId_"FirstHead","&key="_key_"&divId="_divId)
-	;AppAct('"_divId_"MainForm','"_mhead_"','AppAct="_$zu(5)_":"_..%ClassName(1)_":"_divId_"FirstHead:&divId="_divId_"&key="_key_"');"
+	//set onclick="$('#"_divId_"MainContent"_"').empty();"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainHeader",..%ClassName(1),divId_"FirstHead","&key="_key_"&divId="_divId)
+	set onclick="$('#"_divId_"MainContent"_"').empty();"_
+		$$$onclick(divId_"MainForm",divId_"MainHeader",$namespace,..%ClassName(1),divId_"FirstHead","&key="_key_"&divId="_divId)
 	quit $$$appButton("appButtonExit","onclick="""_$g(onclick)_"""",$$$aText("Again",""))
 }
 
@@ -401,8 +411,12 @@ ClassMethod ShowTabAbout(key = "") As %Status
 	do ..GetAllApps(.opt) 
 	if $g(opt(key,"Disable")) write ..GetSupportInfo() quit $$$OK
 	set divId=$g(opt(key,"id"))
-	write "Hello world! Parameter: "_key
-	write ..ButtonAgain(divId,key)
+	write ..#ToAdmin
+	write "<br>Parameter key: "_key_"<br>Sample create custom tab"
+	write $$$appText(divId_"nametab","","tabname")_" "
+	set onclick=##class(apptools.core.Action).WriteActJs(%request,"","MainHidden",..%ClassName(1),"ShowTab","&appPar=Search&Searchstr='+$('#"_divId_"nametab"_"').val()")
+	set %ui=1
+	write $$$appButton(divId_"appButtonAbout","onclick="""_$tr(onclick,"*",1)_"""",""_$$$aText("Make tab",""))
 }
 
 /// rendering the Tab previously submitted
@@ -451,9 +465,12 @@ ClassMethod ShowTabSample(key = "") As %Status
  
  $$$jsstart
   	; to calculate the height of the container as a result of wijetunge victory container-Taba height of the container header
-    write ##class(apptools.core.Action).WriteActJs(%request,pref_"MainForm",mhead,..%ClassName(1),pref_"FirstHead","&divId="_pref_"&key="_key)
-  	write $$$blockui($$$aText("Loading...",""))
+    write ##class(apptools.core.Action).WriteActJs(%request,pref_"MainForm",mhead,..%ClassName(1),pref_"FirstHead","&divId="_pref_"&key="_key)_$$$NL
+  	write $$$blockui($$$aText("Loading...",""))_$$$NL
+  	;write "$('#"_mcont_"').height($(window).height()-($('#"_mhead_"').height()+$('#t1').height()+300)); //^^^height"_$$$NL
+  	;write "console.log('^^^height');"_$$$NL
  $$$jsstop
+ 
  quit $$$OK
 }
 

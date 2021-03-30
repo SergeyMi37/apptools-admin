@@ -9,8 +9,10 @@ Class apptools.lte.adminStatic Extends apptools.lte.adminTabs [ ClassType = "", 
 /// http://localhost:52773/apptoolsrest/a/smarthome&autoload=snapshot&namespace=USER
 ClassMethod GetMain(parameter, class = "") As %Status
 {
-	set h=##class(apptools.core.rest).getStatic("apptools.lte.adminStatic:html")
 	set app=$p(parameter,"&")
+	if (app["apptools.core.UploadCSP") quit ..GetAppCSP(app)
+	if (app["apptools.core.DownloadCSP") quit ..DownLoadFile(app)
+	
 	set:class="" class="apptools.lte."_app
 	set par("input-class=")=class
 	if '##class(apptools.core.sys).ClassExist(class) set class="apptools.lte.page404"
@@ -20,9 +22,23 @@ ClassMethod GetMain(parameter, class = "") As %Status
 	set par("input-cgivar")=cgivar
     set par("=path=")="/apptools/"
     set par("=Message-default=")=""
+	set h=##class(apptools.core.rest).getStatic("apptools.lte.adminStatic:html")
     set st=$classmethod(class,"MainParameter",.h,.par) 
 
 	d ##class(apptools.core.rest).WriteStatic("html",,,,,h)
+	q $$$OK
+}
+
+ClassMethod DownLoadFile(app) As %Status
+{
+	do $classmethod("apptools.core.DownloadCSP","OnPreHTTP",app)
+	do $classmethod("apptools.core.DownloadCSP","OnPage",app)
+	q $$$OK
+}
+
+ClassMethod GetAppCSP(app) As %Status
+{
+	d ##class(apptools.core.rest).WriteStatic("html",,,$p(app,".",1,*-1))
 	q $$$OK
 }
 
@@ -72,23 +88,23 @@ XData html [ MimeType = application/yaml ]
     <!-- Right navbar links -->
 	<ul class="navbar-nav ml-auto">
       <!-- =Navbar Search= -->
-      <!--<li class="nav-item">
+      <li class="nav-item">
         <div class="navbar-search-block">
-          <form class="form-inline">
+         
             <div class="input-group input-group-sm">
-              <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
+              <input class="form-control" placeholder="Search" id="MainSearch" aria-label="Search" >
               <div class="input-group-append">
-                <button class="btn btn-navbar" type="submit">
+                <button class="btn btn-navbar" type="button" id="MainSearchRun" onclick="AppRpc('','MainHidden','%SYS:apptools.lte.adminTabs:ShowTab:&appPar=Search&Searchstr='+$('#MainSearch').val(),'/apptoolsrest/post-json');" >
                   <i class="fas fa-search"></i>
                 </button>
-                <button class="btn btn-navbar" type="button" data-widget="navbar-search">
+                <button class="btn btn-navbar" type="button" data-widget="navbar-search" onclick="$('#MainSearch').val('');">
                   <i class="fas fa-times"></i>
                 </button>
               </div>
             </div>
-          </form>
+         
         </div>
-      </li>-->
+      </li>
 
       <!-- Notifications Dropdown Menu -->
 	  <!-- =Item Dropdown Menu= -->
@@ -231,6 +247,15 @@ XData html [ MimeType = application/yaml ]
 	<div id=dialogContent></div>
  </div>
 <!--=JS-Autoload=-->
+<script language='javascript'>
+$('#MainSearch').keydown(function (e) {
+  	if (e.keyCode == 13) {
+    // e.ctrlKey ...  Ctrl-Enter pressed
+   	$('#MainSearchRun').click();
+   }
+});
+</script>
+
 </body>
 </html>
 }

@@ -6,26 +6,28 @@ Class apptools.core.UploadCSP Extends %CSP.Page [ CompileAfter = apptools.core.m
 /// The path to the directory on the server for storing files
 Parameter pathfiles = {##class(%File).GetDirectory(##class(%File).TempFilename())};
 
-ClassMethod OnPage() As %Status
+ClassMethod OnPage(Par = "") As %Status
 {
-    s FieldName="loadFile"
+    set FieldName="loadFile"
     if $g(%loadFileSuccess)'="" {
 	    if $lv(%loadFileSuccess) {
 	        if $lg(%loadFileSuccess,1) {
 		        if $lg(%loadFileSuccess,5)'=1 d WriteError q 1
-	    		s orig=$lg(%loadFileSuccess,6)
-	    		s orig=$p(orig,$$$slash,*)
-	    		s orig=$tr(orig," №`()\/*;'"":","_N---")
-	    		w "<script>"
-	    		w "window.opener.document.getElementById('"_$g(%request.Data("FieldName",1))_"').value='"_$lg(%loadFileSuccess,2)_"*"_orig_"';"
-	    		w "window.close();"
-	    		w "</script>"
-	    		q 1
+	    		set orig=$lg(%loadFileSuccess,6)
+	    		set orig=$p(orig,$$$slash,*)
+	    		set orig=$tr(orig," №`()\/*;'"":","_N---")
+	    		write "<script>"
+	    		write "try{"
+	    		write "window.opener.document.getElementById('"_$g(%request.Data("FieldName",1))_"').value='"_$lg(%loadFileSuccess,2)_"*"_orig_"';"
+	    		write "}catch(e){}"
+	    		write "window.close();"
+	    		write "</script>"
+	    		quit $$$OK
 	        } else {
-	            d WriteError
-	            q 1
+	            do WriteError
+	            quit $$$OK
 	        }
-	        q $$$OK
+	        quit $$$OK
 	    }
     }
     &html<<!DOCTYPE HTML>
@@ -36,6 +38,12 @@ ClassMethod OnPage() As %Status
  write ##class(apptools.core.LogInfoPane).GetLink()
  set Upload=$$$aText("Upload","")
  set Cancel=$$$aText("Cancel","")
+ set pathcsp=""
+  if $d(%request) {
+	   ;zw %request TODO
+	   ;%request.AppData %request.Application
+	   if %request.Application["apptoolsrest" set pathcsp="/csp/spgz/"
+  }
  &html<
     <script>
         $(document).ready(function(){
@@ -47,7 +55,7 @@ ClassMethod OnPage() As %Status
     </script>  
 </head>
 <body bgcolor="#f0f8ff" >
-<form action="#(..%ClassName(1)_".cls")#" enctype="multipart/form-data" method="post">
+<form action="#(pathcsp_..%ClassName(1)_".cls")#" enctype="multipart/form-data" method="post">
     <br><center>
      #($$$aText("Select a file",""))#: <input class='ui-button ui-corner-all ui-widget' name='loadFile' id='loadFile' size=30 type='file' accept=".doc,.docx,.odt,.pdf,.xls,.xlsx" >
     <br><br>
@@ -66,7 +74,7 @@ WriteError w "<H3>"_$$$aText("An error has occurred","")_"</h3>"_$System.Status.
 }
 
 ///  [ ServerOnly = 1 ]
-ClassMethod OnPreHTTP() As %Boolean
+ClassMethod OnPreHTTP(Par = "") As %Boolean
 {
 	set ServerDirPath=$zconvert($g(%request.Data("ServerDirPath",1)),"I","URL")
 	if ServerDirPath="" set ServerDirPath=..#pathfiles

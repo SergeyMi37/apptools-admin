@@ -71,11 +71,10 @@ ClassMethod UiMatrixPermission(name = "", rolesmask = "", divId = "", key = "", 
 		if rolesmask="" write $$$appError($$$aText("Select the filter control","")) q 1
 		set msg=$$$aText("Matrix of access rights","")
 		set:blockui onclick=$$$blockui($$$aText("Loading...",""))
-		;set onclick=$g(onclick)_";ActionJs('"_divId_"FormContentSave','"_divId_"ContentSave','"_class_"','"_Method_"','key="_key_"~divId="_divId_"~mode=Save');"
 		
-		set onclick=$$$blockui("Load...")_";"_##class(apptools.core.Action).WriteActJs(%request,divId_"FormContentSave",divId_"ContentSave",class,Method,"&key="_key_"&divId="_divId_"&mode=Save")
-		;ActionJs('"_divId_"MainForm','"_divId_"MainContent','','"_divId_"Result','key="_key_"~divId="_divId_"~mode=*');"
-        ;set %ui=1
+		set onclick=$GET(onclick)_
+			$$$onclick(divId_"FormContentSave",divId_"ContentSave",$namespace,class,Method,"&key="_key_"&divId="_divId_"&mode=Save")
+
 		set butt=$$$appButton(divId_"appButtonSavePermiss","onclick="""_onclick_"""",$$$aText("Save access rights",""))
 		write butt_"<br><br>"
 		write "<form id='"_divId_"FormContentSave' >"
@@ -109,10 +108,7 @@ ClassMethod UiMatrixPermission(name = "", rolesmask = "", divId = "", key = "", 
 				set @gn@(row)=$g(@gn@(row))_$lb(ret)
 			}
 		}
-		;write "$('#"_pref_"MainContent').height($('#tabs-"_pref_"').height()-$('#"_pref_"MainHeader').height()-150);"
-		;write "<div id='TabViewCont' style='overflow: scroll;   max-width: 1200px;  max-height: 500px;'>"
 		set st=##class(apptools.core.LogInfoPane).DrawSQL("result "_gn,100000,$zu(5),$g(msg),$g(exec),,1)
-		;write "</div>"
 		;TODO do ##class(apptools.core.Form).DrawTable(.matrix) 
 		write "</form><div id='"_divId_"ContentSave'></div>"
 		quit $$$OK

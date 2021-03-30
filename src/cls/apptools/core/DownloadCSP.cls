@@ -12,7 +12,7 @@ Class apptools.core.DownloadCSP Extends %CSP.Page [ DependsOn = apptools.core.ms
 /// It is prefered that changes to %session.Preserve are also made in the OnPreHTTP() method
 /// as this is more efficient, although it is supported in any section of the page.
 /// Return <b>0</b> to prevent <method>OnPage</method> from being called.
-ClassMethod OnPreHTTP() As %Boolean [ ServerOnly = 1 ]
+ClassMethod OnPreHTTP(par = "") As %Boolean [ ServerOnly = 1 ]
 {
 	if %request.Get("fileName")'="" {
 		s file=%request.Get("fileName")
@@ -27,6 +27,7 @@ ClassMethod OnPreHTTP() As %Boolean [ ServerOnly = 1 ]
 	else {set fileName = $p(file,$$$slash,*)}
 	s %response.ContentType="application/force-download"
 	;s %response.CharSet="windows-1251"
+	s %response.CharSet=""
 	d %response.SetHeader("Expires", "0")
 	;d %response.SetHeader("Accept-Ranges","bytes")
 	set f=##class(%File).%New()
@@ -42,7 +43,7 @@ ClassMethod OnPreHTTP() As %Boolean [ ServerOnly = 1 ]
 /// Event handler for <b>PAGE</b> event: this is invoked in order to  
 /// generate the content of a csp page.
 /// w "<a title=""Save this file to disk"" href=""apptools.core.DownloadCSP.cls?fileId=221212"">"
-ClassMethod OnPage() As %Status [ ServerOnly = 1 ]
+ClassMethod OnPage(par = "") As %Status [ ServerOnly = 1 ]
 {
 	if %request.Get("fileName")'="" {
 		s file=%request.Get("fileName")
@@ -87,7 +88,7 @@ ClassMethod OnPage() As %Status [ ServerOnly = 1 ]
 /// To global link
 ClassMethod GetGN() As %String
 {
-	quit $na(^CacheTemp.apptools.tmpDownloadCSP(+$h)) ;global should be available from any region
+	quit $na(^CacheTemp.App.tmpDownloadCSP(+$h)) ;global should be available from any region
 }
 
 /// Remove the ID for download

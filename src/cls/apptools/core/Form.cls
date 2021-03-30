@@ -567,7 +567,7 @@ ClassMethod GetValueByIdField(class, id, NameField, ByRef Val, ExtProp = 0) As %
 
 /// Display a table from a matrix
 /// do ##class(apptools.core.Form).DrawTable(.matrix) 
-ClassMethod DrawTable(matrix) As %Status
+ClassMethod DrawTable(matrix, cols = "", rows = "") As %Status
 {
 	set r=$o(matrix(""))
 	quit:r="" $$$OK

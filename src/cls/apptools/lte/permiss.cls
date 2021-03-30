@@ -16,7 +16,7 @@ Parameter AppRoles = "ui_Permissions";
 ClassMethod MainParameter(ByRef h, ByRef par) As %Status
 {
  set path=par("=path=")
- set par("=Brand-Text=")="AppTools-admin"
+ set par("=Brand-Text=")="Admin v.1"
  set par("=Logo-image=")=path_"adminlte/dist/img/ApptoolsLogo.png"
  set par("=titleAppToolsadmin=")=..#HeaderText
  set par("<!--=LinkIcon=-->")=..GetAppIcon(path_"adminlte/dist/img/ApptoolsLogo","png")
@@ -41,7 +41,6 @@ ClassMethod GetAllApps(opt) As %Status
 			set opt(key,"Role")="%All"
 			set opt(key,"Namespace")="%SYS"
 			set opt(key,"Method")="ShowTabSample"
-			set opt(key,"Disable")=0 ;developed
 			set opt(key,"TabMenu","Close")=1
 			set opt(key,"Active")=1 ;active menu item
 			set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
@@ -68,22 +67,25 @@ ClassMethod MatrixFirstHead(Par = "") As %Status
 	set key=Par("key")
 	set divId=Par("divId")
 	set %ui=1
-	set onclick=$$$blockui("Load...")_";"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainContent",..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
+	//##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainContent",..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
+	set onclick=$$$blockui("Load...")_
+		$$$onclick(divId_"MainForm",divId_"MainContent",$namespace,..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
 	&html<
 		<table>
 		<tr>
 			<td>
- 	Login <br>#($$$appText(divId_"name","title='"_$$$aText("Names separated by a comma or by context","")_"'","s"))#
+ 			Login <br>#($$$appText(divId_"name","title='"_$$$aText("Names separated by a comma or by context","")_"'","ms"))#
 			</td>
 			<td>
-	Roles <br>#($$$appText(divId_"roles","title='"_$$$aText("Roles separated by a comma or by context","")_"'","d"))#
+			Roles <br>#($$$appText(divId_"roles","title='"_$$$aText("Roles separated by a comma or by context","")_"'","d"))#
 			</td>
 			<td> <br>
-	#($$$appButton(divId_"appButtonResult1","onclick="""_$tr(onclick,"*",1)_"""",""_$$$aText("User roles","")))#
+			#($$$appButton(divId_"appButtonResult1","onclick="""_$tr(onclick,"*",1)_"""",""_$$$aText("User roles","")))#
 			</td>
 		</tr>
 		</table>
 	>
+	$$$SetHeightContent(divId,250)
 	q $$$OK
 }
 
