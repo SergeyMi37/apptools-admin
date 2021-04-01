@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2020.3 (Build 302U)" ts="2021-03-22 20:05:52">
+<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2020.3 (Build 302U)" ts="2021-04-01 22:22:38">
 <Class name="apptools.Chart.Chart">
 <Super>apptools.core.AutoPage</Super>
 <TimeChanged>65428,53141.445298</TimeChanged>
@@ -3779,7 +3779,7 @@ Search result </Description>
 Security utilities</Description>
 <Abstract>1</Abstract>
 <IncludeCode>apptools.core</IncludeCode>
-<TimeChanged>65803,41967.05491</TimeChanged>
+<TimeChanged>65828,39827.891296</TimeChanged>
 <TimeCreated>64734,80043.870644</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -3859,11 +3859,10 @@ d ##class(apptools.Tabs.security).UiMatrixPermission("sm","sp","Ui","AnyKey","ap
 		if rolesmask="" write $$$appError($$$aText("Select the filter control","")) q 1
 		set msg=$$$aText("Matrix of access rights","")
 		set:blockui onclick=$$$blockui($$$aText("Loading...",""))
-		;set onclick=$g(onclick)_";ActionJs('"_divId_"FormContentSave','"_divId_"ContentSave','"_class_"','"_Method_"','key="_key_"~divId="_divId_"~mode=Save');"
 		
-		set onclick=$$$blockui("Load...")_";"_##class(apptools.core.Action).WriteActJs(%request,divId_"FormContentSave",divId_"ContentSave",class,Method,"&key="_key_"&divId="_divId_"&mode=Save")
-		;ActionJs('"_divId_"MainForm','"_divId_"MainContent','','"_divId_"Result','key="_key_"~divId="_divId_"~mode=*');"
-        ;set %ui=1
+		set onclick=$GET(onclick)_
+			$$$onclick(divId_"FormContentSave",divId_"ContentSave",$namespace,class,Method,"&key="_key_"&divId="_divId_"&mode=Save")
+
 		set butt=$$$appButton(divId_"appButtonSavePermiss","onclick="""_onclick_"""",$$$aText("Save access rights",""))
 		write butt_"<br><br>"
 		write "<form id='"_divId_"FormContentSave' >"
@@ -3897,10 +3896,7 @@ d ##class(apptools.Tabs.security).UiMatrixPermission("sm","sp","Ui","AnyKey","ap
 				set @gn@(row)=$g(@gn@(row))_$lb(ret)
 			}
 		}
-		;write "$('#"_pref_"MainContent').height($('#tabs-"_pref_"').height()-$('#"_pref_"MainHeader').height()-150);"
-		;write "<div id='TabViewCont' style='overflow: scroll;   max-width: 1200px;  max-height: 500px;'>"
 		set st=##class(apptools.core.LogInfoPane).DrawSQL("result "_gn,100000,$zu(5),$g(msg),$g(exec),,1)
-		;write "</div>"
 		;TODO do ##class(apptools.core.Form).DrawTable(.matrix) 
 		write "</form><div id='"_divId_"ContentSave'></div>"
 		quit $$$OK
@@ -6638,7 +6634,7 @@ Withdraw the necessary actions</Description>
 <IncludeCode>apptools.core</IncludeCode>
 <ProcedureBlock>1</ProcedureBlock>
 <Super>%CSP.Page</Super>
-<TimeChanged>65822,49532.337267</TimeChanged>
+<TimeChanged>65835,71814.929455</TimeChanged>
 <TimeCreated>65607,76497.951768</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -6849,7 +6845,7 @@ w ##class(apptools.core.Action).WriteWinOpenREST(%request)</Description>
 <FormalSpec>req</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
-  	if req.URL[(req.Application_"get-html")||(req.URL[(req.Application_"post-json"))||(req.URL[(req.Application_"a")) { //is static content
+  	if req.URL[(req.Application_"get-html")||(req.URL[(req.Application_"post-json")) { ;||(req.URL[(req.Application_"a")) { //is static content
   		q req.Application_"post-json"
   	} else {
   		q ""
@@ -7059,7 +7055,7 @@ Get the detail pane info object</Description>
 <Class name="apptools.core.DownloadCSP">
 <IncludeCode>apptools.core</IncludeCode>
 <Super>%CSP.Page</Super>
-<TimeChanged>65610,77273.857</TimeChanged>
+<TimeChanged>65829,48540.191746</TimeChanged>
 <TimeCreated>65607,76504.561797</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -7075,6 +7071,7 @@ It is prefered that changes to %session.Preserve are also made in the OnPreHTTP(
 as this is more efficient, although it is supported in any section of the page.
 Return <b>0</b> to prevent <method>OnPage</method> from being called.]]></Description>
 <ClassMethod>1</ClassMethod>
+<FormalSpec>par=""</FormalSpec>
 <ReturnType>%Boolean</ReturnType>
 <ServerOnly>1</ServerOnly>
 <Implementation><![CDATA[
@@ -7091,6 +7088,7 @@ Return <b>0</b> to prevent <method>OnPage</method> from being called.]]></Descri
 	else {set fileName = $p(file,$$$slash,*)}
 	s %response.ContentType="application/force-download"
 	;s %response.CharSet="windows-1251"
+	s %response.CharSet=""
 	d %response.SetHeader("Expires", "0")
 	;d %response.SetHeader("Accept-Ranges","bytes")
 	set f=##class(%File).%New()
@@ -7110,6 +7108,7 @@ Event handler for <b>PAGE</b> event: this is invoked in order to
 generate the content of a csp page.
 w "<a title=""Save this file to disk"" href=""apptools.core.DownloadCSP.cls?fileId=221212"">"]]></Description>
 <ClassMethod>1</ClassMethod>
+<FormalSpec>par=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <ServerOnly>1</ServerOnly>
 <Implementation><![CDATA[
@@ -7159,7 +7158,7 @@ w "<a title=""Save this file to disk"" href=""apptools.core.DownloadCSP.cls?file
 To global link</Description>
 <ClassMethod>1</ClassMethod>
 <ReturnType>%String</ReturnType>
-<Implementation><![CDATA[	quit $na(^CacheTemp.apptools.tmpDownloadCSP(+$h)) ;global should be available from any region
+<Implementation><![CDATA[	quit $na(^CacheTemp.App.tmpDownloadCSP(+$h)) ;global should be available from any region
 ]]></Implementation>
 </Method>
 
@@ -7233,7 +7232,7 @@ cgivar="fileName" to send a file via the full path (insecure)]]></Description>
 The representation of the stored classes for viewing and editing</Description>
 <Abstract>1</Abstract>
 <IncludeCode>apptools.core</IncludeCode>
-<TimeChanged>65646,50542.704931</TimeChanged>
+<TimeChanged>65828,34876.784824</TimeChanged>
 <TimeCreated>65607,76506.867349</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -7908,7 +7907,7 @@ if ##class(apptools.core.Form).GetValueByIdField("apptools.core.Parameter","15",
 Display a table from a matrix
 do ##class(apptools.core.Form).DrawTable(.matrix) </Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>matrix</FormalSpec>
+<FormalSpec>matrix,cols="",rows=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	set r=$o(matrix(""))
@@ -7950,7 +7949,7 @@ do ##class(apptools.core.Form).DrawTable(.matrix) </Description>
 </Class>
 
 
-<Routine name="apptools.core" type="INC" timestamp="65815,70355.223316"><![CDATA[
+<Routine name="apptools.core" type="INC" timestamp="65828,38434.240176"><![CDATA[
 #Include %occMessages
 #include %occReference
 
@@ -7966,6 +7965,15 @@ do ##class(apptools.core.Form).DrawTable(.matrix) </Description>
 #define escYellow(%t) $Select($$$escBg=0:%t,1:$c(27)_"[1;33;"_$$$escBg_"m"_%t_$$$escClear)
 #define escViolet(%t) $Select($$$escBg=0:%t,1:$c(27)_"[1;35;"_$$$escBg_"m"_%t_$$$escClear)
 #define escSeq(%e,%t) $Select($$$escBg=0:%t,1:$c(27)_"["_%e_"m"_%t_$$$escClear)
+
+#;%from - id form for serialize elements
+#;%to - id div output result
+#;%ns - namespase class
+#;%class - classname
+#;%method - method executed
+#;%arg - string cgi variables 
+#define onclick(%from,%to,%ns,%class,%method,%arg) ##class(apptools.core.Action).WriteActJs(%request,%from,%to,%class,%method,%arg,%ns) 
+#define SetHeightContent(%id,%d) $$$jsstart w $$$NL write "$('#"_%id_"MainContent').height($(window).height()-($('#"_%id_"MainHeader').height()+$('#t1').height()+"_%d_"));"_$$$NL $$$jsstop w $$$NL
 
 #;Include %msql $$$MaxStringLength
 #;		;2016.2<= set title={}.%FromJSON(json).title 
@@ -9362,7 +9370,7 @@ If exporting multiple items, separate them with commas, pass the items("item")="
 <Class name="apptools.core.LogInfoPane">
 <IncludeCode>apptools.core</IncludeCode>
 <Super>%CSP.Util.Pane</Super>
-<TimeChanged>65813,57866.855811</TimeChanged>
+<TimeChanged>65827,61227.879043</TimeChanged>
 <TimeCreated>65607,76510.552235</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -9656,11 +9664,13 @@ thead th:first-child {
 
 thead th {
   background: #E7EBF9;
+  color: blue;
 
 }
 
 tbody th {
   background: #E7EBF9;
+  color: blue;
 
 }
 
@@ -12068,7 +12078,7 @@ write ##class(apptools.core.Production).GetSettings("ProductionName","ItemName",
 <CompileAfter>apptools.core.msg</CompileAfter>
 <IncludeCode>apptools.core</IncludeCode>
 <Super>%CSP.Page</Super>
-<TimeChanged>65610,77273.857</TimeChanged>
+<TimeChanged>65827,58380.015026</TimeChanged>
 <TimeCreated>65607,76511.476206</TimeCreated>
 
 <Parameter name="pathfiles">
@@ -12079,26 +12089,29 @@ The path to the directory on the server for storing files</Description>
 
 <Method name="OnPage">
 <ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-    s FieldName="loadFile"
+    set FieldName="loadFile"
     if $g(%loadFileSuccess)'="" {
 	    if $lv(%loadFileSuccess) {
 	        if $lg(%loadFileSuccess,1) {
 		        if $lg(%loadFileSuccess,5)'=1 d WriteError q 1
-	    		s orig=$lg(%loadFileSuccess,6)
-	    		s orig=$p(orig,$$$slash,*)
-	    		s orig=$tr(orig," №`()\/*;'"":","_N---")
-	    		w "<script>"
-	    		w "window.opener.document.getElementById('"_$g(%request.Data("FieldName",1))_"').value='"_$lg(%loadFileSuccess,2)_"*"_orig_"';"
-	    		w "window.close();"
-	    		w "</script>"
-	    		q 1
+	    		set orig=$lg(%loadFileSuccess,6)
+	    		set orig=$p(orig,$$$slash,*)
+	    		set orig=$tr(orig," №`()\/*;'"":","_N---")
+	    		write "<script>"
+	    		write "try{"
+	    		write "window.opener.document.getElementById('"_$g(%request.Data("FieldName",1))_"').value='"_$lg(%loadFileSuccess,2)_"*"_orig_"';"
+	    		write "}catch(e){}"
+	    		write "window.close();"
+	    		write "</script>"
+	    		quit $$$OK
 	        } else {
-	            d WriteError
-	            q 1
+	            do WriteError
+	            quit $$$OK
 	        }
-	        q $$$OK
+	        quit $$$OK
 	    }
     }
     &html<<!DOCTYPE HTML>
@@ -12109,6 +12122,12 @@ The path to the directory on the server for storing files</Description>
  write ##class(apptools.core.LogInfoPane).GetLink()
  set Upload=$$$aText("Upload","")
  set Cancel=$$$aText("Cancel","")
+ set pathcsp=""
+  if $d(%request) {
+	   ;zw %request TODO
+	   ;%request.AppData %request.Application
+	   if %request.Application["apptoolsrest" set pathcsp="/csp/spgz/"
+  }
  &html<
     <script>
         $(document).ready(function(){
@@ -12120,7 +12139,7 @@ The path to the directory on the server for storing files</Description>
     </script>  
 </head>
 <body bgcolor="#f0f8ff" >
-<form action="#(..%ClassName(1)_".cls")#" enctype="multipart/form-data" method="post">
+<form action="#(pathcsp_..%ClassName(1)_".cls")#" enctype="multipart/form-data" method="post">
     <br><center>
      #($$$aText("Select a file",""))#: <input class='ui-button ui-corner-all ui-widget' name='loadFile' id='loadFile' size=30 type='file' accept=".doc,.docx,.odt,.pdf,.xls,.xlsx" >
     <br><br>
@@ -12143,6 +12162,7 @@ WriteError w "<H3>"_$$$aText("An error has occurred","")_"</h3>"_$System.Status.
 <Description>
  [ ServerOnly = 1 ]</Description>
 <ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
 <ReturnType>%Boolean</ReturnType>
 <Implementation><![CDATA[
 	set ServerDirPath=$zconvert($g(%request.Data("ServerDirPath",1)),"I","URL")
@@ -17864,7 +17884,7 @@ https://adminlte.io</Description>
 <IncludeCode>apptools.core</IncludeCode>
 <ProcedureBlock>1</ProcedureBlock>
 <Super>apptools.lte.adminTabs</Super>
-<TimeChanged>65822,44015.220027</TimeChanged>
+<TimeChanged>65829,56251.325808</TimeChanged>
 <TimeCreated>64127,58953.319558</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -17877,8 +17897,10 @@ http://localhost:52773/apptoolsrest/a/smarthome&autoload=snapshot&namespace=USER
 <FormalSpec>parameter,class=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set h=##class(apptools.core.rest).getStatic("apptools.lte.adminStatic:html")
 	set app=$p(parameter,"&")
+	if (app["apptools.core.UploadCSP") quit ..GetAppCSP(app)
+	if (app["apptools.core.DownloadCSP") quit ..DownLoadFile(app)
+	
 	set:class="" class="apptools.lte."_app
 	set par("input-class=")=class
 	if '##class(apptools.core.sys).ClassExist(class) set class="apptools.lte.page404"
@@ -17888,9 +17910,31 @@ http://localhost:52773/apptoolsrest/a/smarthome&autoload=snapshot&namespace=USER
 	set par("input-cgivar")=cgivar
     set par("=path=")="/apptools/"
     set par("=Message-default=")=""
+	set h=##class(apptools.core.rest).getStatic("apptools.lte.adminStatic:html")
     set st=$classmethod(class,"MainParameter",.h,.par) 
 
 	d ##class(apptools.core.rest).WriteStatic("html",,,,,h)
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="DownLoadFile">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>app</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	do $classmethod("apptools.core.DownloadCSP","OnPreHTTP",app)
+	do $classmethod("apptools.core.DownloadCSP","OnPage",app)
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetAppCSP">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>app</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	d ##class(apptools.core.rest).WriteStatic("html",,,$p(app,".",1,*-1))
 	q $$$OK
 ]]></Implementation>
 </Method>
@@ -17943,23 +17987,23 @@ s h=##class(apptools.core.rest).getStatic("apptools.Uikit.AdminLTE:html") w !,h,
     <!-- Right navbar links -->
 	<ul class="navbar-nav ml-auto">
       <!-- =Navbar Search= -->
-      <!--<li class="nav-item">
+      <li class="nav-item">
         <div class="navbar-search-block">
-          <form class="form-inline">
+         
             <div class="input-group input-group-sm">
-              <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
+              <input class="form-control" placeholder="Search" id="MainSearch" aria-label="Search" >
               <div class="input-group-append">
-                <button class="btn btn-navbar" type="submit">
+                <button class="btn btn-navbar" type="button" id="MainSearchRun" onclick="AppRpc('','MainHidden','%SYS:apptools.lte.adminTabs:ShowTab:&appPar=Search&Searchstr='+$('#MainSearch').val(),'/apptoolsrest/post-json');" >
                   <i class="fas fa-search"></i>
                 </button>
-                <button class="btn btn-navbar" type="button" data-widget="navbar-search">
+                <button class="btn btn-navbar" type="button" data-widget="navbar-search" onclick="$('#MainSearch').val('');">
                   <i class="fas fa-times"></i>
                 </button>
               </div>
             </div>
-          </form>
+         
         </div>
-      </li>-->
+      </li>
 
       <!-- Notifications Dropdown Menu -->
 	  <!-- =Item Dropdown Menu= -->
@@ -18102,6 +18146,15 @@ s h=##class(apptools.core.rest).getStatic("apptools.Uikit.AdminLTE:html") w !,h,
 	<div id=dialogContent></div>
  </div>
 <!--=JS-Autoload=-->
+<script language='javascript'>
+$('#MainSearch').keydown(function (e) {
+  	if (e.keyCode == 13) {
+    // e.ctrlKey ...  Ctrl-Enter pressed
+   	$('#MainSearchRun').click();
+   }
+});
+</script>
+
 </body>
 </html>
 ]]></Data>
@@ -18116,7 +18169,7 @@ The template GUI of the application selector and tabs on the basis jQueryUi, Uik
 <IncludeCode>apptools.core</IncludeCode>
 <ProcedureBlock>1</ProcedureBlock>
 <Super>%CSP.Page</Super>
-<TimeChanged>65822,52545.090811</TimeChanged>
+<TimeChanged>65829,56740.524088</TimeChanged>
 <TimeCreated>65065,36454.902831</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -18138,7 +18191,7 @@ For Redirect </Description>
 </Parameter>
 
 <Parameter name="ToAdmin">
-<Default><![CDATA[You need to contact <a target=_new href='https://github.com/SergeyMi37'> technical support.]]></Default>
+<Default><![CDATA[You need to contact <a target=_new href='https://github.com/SergeyMi37'> technical support.</a>]]></Default>
 </Parameter>
 
 <Parameter name="AppRoles">
@@ -18296,6 +18349,17 @@ what are the available modes</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>opt</FormalSpec>
 <ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	;----- Setup the search in the top menu
+	s key="Search"
+	s opt(key)="Search"
+	s opt(key,"id")="Search-"
+	s opt(key,"TabName")="Search"_"-"
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabSearch"
+	s opt(key,"TabMenu","Close")=1
+	s opt(key,"TabMenu","Mode")=0 ;1 - for each new search bar to make new tab, 0-tab is always the same
+]]></Implementation>
 </Method>
 
 <Method name="DrawMenuTop">
@@ -18478,7 +18542,9 @@ Par - code menu item from the GetAllApps ..</Description>
 <FormalSpec>Par</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
+	zw Par
 	if $g(Par("appPar"))'="" set Par=Par("appPar")
+	zw Par
 	do ..GetAllApps(.opt) 
 	do ..ShowTabApps(.Par,.opt)
 ]]></Implementation>
@@ -18493,14 +18559,14 @@ Par - code menu item from the GetAllApps ..</Description>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	if Par="Search" {
-		set Searchstr=$g(Par("%request.Data","Searchstr"),Par("Searchstr"))
+		set Searchstr=$g(Par("%request.Data","Searchstr"),$GET(Par("Searchstr")))
 		if Searchstr="" q $$$OK
 		;s tr=$tr(##class(apptools.MSW.type).Transliteration(Searchstr)," №`()\/*;'"":%","_N---")
 		;s tr=$tr($zts,".,") 
 		set tr=$e($tr(Searchstr," №`()\/*;'"":%?$@&.,",""),1,10)_$i(@..#GNStore@("jobs",$j))
 		set key=tr ;Searchstr
 		MERGE opt(key)=opt(Par)
-		set opt(key)=opt(key)_tr ;Searchstr
+		set opt(key)=$GET(opt(key))_tr ;Searchstr
 		if $g(opt(Par,"TabMenu","Mode"))=1 { ;mode add a new tab 
 			set opt(key,"id")=opt(key,"id")_tr
 		} else { ;mode add a new replace the old 
@@ -18596,10 +18662,9 @@ The output of the First button</Description>
 <FormalSpec>divId="",key=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
-	set mhead=divId_"MainHeader"
-	set mcont=divId_"MainContent"
-	set onclick="$('#"_mcont_"').empty();"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",mhead,..%ClassName(1),divId_"FirstHead","&key="_key_"&divId="_divId)
-	;AppAct('"_divId_"MainForm','"_mhead_"','AppAct="_$zu(5)_":"_..%ClassName(1)_":"_divId_"FirstHead:&divId="_divId_"&key="_key_"');"
+	//set onclick="$('#"_divId_"MainContent"_"').empty();"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainHeader",..%ClassName(1),divId_"FirstHead","&key="_key_"&divId="_divId)
+	set onclick="$('#"_divId_"MainContent"_"').empty();"_
+		$$$onclick(divId_"MainForm",divId_"MainHeader",$namespace,..%ClassName(1),divId_"FirstHead","&key="_key_"&divId="_divId)
 	quit $$$appButton("appButtonExit","onclick="""_$g(onclick)_"""",$$$aText("Again",""))
 ]]></Implementation>
 </Method>
@@ -18616,8 +18681,12 @@ Par - code menu item from the GetAllApps ..</Description>
 	do ..GetAllApps(.opt) 
 	if $g(opt(key,"Disable")) write ..GetSupportInfo() quit $$$OK
 	set divId=$g(opt(key,"id"))
-	write "Hello world! Parameter: "_key
-	write ..ButtonAgain(divId,key)
+	write ..#ToAdmin
+	write "<br>Parameter key: "_key_"<br>Sample create custom tab"
+	write $$$appText(divId_"nametab","","tabname")_" "
+	set onclick=##class(apptools.core.Action).WriteActJs(%request,"","MainHidden",..%ClassName(1),"ShowTab","&appPar=Search&Searchstr='+$('#"_divId_"nametab"_"').val()")
+	set %ui=1
+	write $$$appButton(divId_"appButtonAbout","onclick="""_$tr(onclick,"*",1)_"""",""_$$$aText("Make tab",""))
 ]]></Implementation>
 </Method>
 
@@ -18676,9 +18745,12 @@ Par - code menu item from the GetAllApps ..</Description>
  
  $$$jsstart
   	; to calculate the height of the container as a result of wijetunge victory container-Taba height of the container header
-    write ##class(apptools.core.Action).WriteActJs(%request,pref_"MainForm",mhead,..%ClassName(1),pref_"FirstHead","&divId="_pref_"&key="_key)
-  	write $$$blockui($$$aText("Loading...",""))
+    write ##class(apptools.core.Action).WriteActJs(%request,pref_"MainForm",mhead,..%ClassName(1),pref_"FirstHead","&divId="_pref_"&key="_key)_$$$NL
+  	write $$$blockui($$$aText("Loading...",""))_$$$NL
+  	;write "$('#"_mcont_"').height($(window).height()-($('#"_mhead_"').height()+$('#t1').height()+300)); //^^^height"_$$$NL
+  	;write "console.log('^^^height');"_$$$NL
  $$$jsstop
+ 
  quit $$$OK
 ]]></Implementation>
 </Method>
@@ -19927,7 +19999,7 @@ http://hp-msw:52773/apptoolsrest/a/permiss</Description>
 <IncludeCode>apptools.core</IncludeCode>
 <ProcedureBlock>1</ProcedureBlock>
 <Super>apptools.lte.adminTabs</Super>
-<TimeChanged>65822,52350.501021</TimeChanged>
+<TimeChanged>65828,40050.652913</TimeChanged>
 <TimeCreated>65065,36454.902831</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -19955,7 +20027,7 @@ Replace parameters</Description>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
  set path=par("=path=")
- set par("=Brand-Text=")="AppTools-admin"
+ set par("=Brand-Text=")="Admin v.1"
  set par("=Logo-image=")=path_"adminlte/dist/img/ApptoolsLogo.png"
  set par("=titleAppToolsadmin=")=..#HeaderText
  set par("<!--=LinkIcon=-->")=..GetAppIcon(path_"adminlte/dist/img/ApptoolsLogo","png")
@@ -19985,7 +20057,6 @@ what modes are available</Description>
 			set opt(key,"Role")="%All"
 			set opt(key,"Namespace")="%SYS"
 			set opt(key,"Method")="ShowTabSample"
-			set opt(key,"Disable")=0 ;developed
 			set opt(key,"TabMenu","Close")=1
 			set opt(key,"Active")=1 ;active menu item
 			set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
@@ -20017,22 +20088,25 @@ download form template search users and roles</Description>
 	set key=Par("key")
 	set divId=Par("divId")
 	set %ui=1
-	set onclick=$$$blockui("Load...")_";"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainContent",..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
+	//##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainContent",..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
+	set onclick=$$$blockui("Load...")_
+		$$$onclick(divId_"MainForm",divId_"MainContent",$namespace,..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
 	&html<
 		<table>
 		<tr>
 			<td>
- 	Login <br>#($$$appText(divId_"name","title='"_$$$aText("Names separated by a comma or by context","")_"'","s"))#
+ 			Login <br>#($$$appText(divId_"name","title='"_$$$aText("Names separated by a comma or by context","")_"'","ms"))#
 			</td>
 			<td>
-	Roles <br>#($$$appText(divId_"roles","title='"_$$$aText("Roles separated by a comma or by context","")_"'","d"))#
+			Roles <br>#($$$appText(divId_"roles","title='"_$$$aText("Roles separated by a comma or by context","")_"'","d"))#
 			</td>
 			<td> <br>
-	#($$$appButton(divId_"appButtonResult1","onclick="""_$tr(onclick,"*",1)_"""",""_$$$aText("User roles","")))#
+			#($$$appButton(divId_"appButtonResult1","onclick="""_$tr(onclick,"*",1)_"""",""_$$$aText("User roles","")))#
 			</td>
 		</tr>
 		</table>
 	>
+	$$$SetHeightContent(divId,250)
 	q $$$OK
 ]]></Implementation>
 </Method>
@@ -20054,6 +20128,541 @@ Search result </Description>
 	set roles=$g(Par("%request.Data",divId_"roles"))
 	write ..ButtonAgain(divId,key)
 	do ##class(apptools.Tabs.security).UiMatrixPermission(name,roles,divId,key,"apptools.Tabs.security","UiSavePermiss")
+	quit $$$OK
+]]></Implementation>
+</Method>
+</Class>
+
+
+<Class name="apptools.lte.permiss2">
+<Description>
+http://hp-msw:52773/apptoolsrest/a/permiss2</Description>
+<ClassType/>
+<IncludeCode>apptools.core</IncludeCode>
+<ProcedureBlock>1</ProcedureBlock>
+<Super>apptools.lte.adminTabs</Super>
+<TimeChanged>65832,83830.0446</TimeChanged>
+<TimeCreated>65065,36454.902831</TimeCreated>
+<DependsOn>apptools.core.msg</DependsOn>
+
+<Parameter name="HeaderText">
+<Description>
+Application title</Description>
+<Default>Permissions</Default>
+</Parameter>
+
+<Parameter name="GNStore">
+<Description>
+Global Name Store Referens files</Description>
+<Default>^apptools.Permissions</Default>
+</Parameter>
+
+<Parameter name="AppRoles">
+<Default>ui_Permissions</Default>
+</Parameter>
+
+<Method name="MainParameter">
+<Description>
+Replace parameters</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[&h,&par]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ set path=par("=path=")
+ set par("=Brand-Text=")="Admin v.2"
+ set par("=Logo-image=")=path_"adminlte/dist/img/ApptoolsLogo.png"
+ set par("=titleAppToolsadmin=")=..#HeaderText
+ set par("<!--=LinkIcon=-->")=..GetAppIcon(path_"adminlte/dist/img/ApptoolsLogo","png")
+ quit ..RepaceParameter(.h,.par)
+]]></Implementation>
+</Method>
+
+<Method name="GetAllApps">
+<Description>
+what modes are available</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>opt</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	;side menu
+	set sideMenuName="Permission",
+		sideMenuNumer=1,
+		sideMenuOpen=1,        //3 =1 open menu
+		sideMenuIcon="fa-cog"  //4  icon   https://fontawesome.com/icons?d=gallery&p=2&m=free
+		set sideMenu=$lb(sideMenuNumer,sideMenuName,sideMenuOpen,sideMenuIcon) 
+			set key="MenuMatrix"
+			set opt(key,"Menu")=sideMenu
+			set opt(key)=$$$aText("The matrix","") ;The name of the menu
+			set opt(key,"id")="Matrix"
+			set opt(key,"TabName")=$$$aText("The matrix","") ;the name of the tab
+			set opt(key,"ClassName")=..%ClassName(1)
+			set opt(key,"Role")="%All"
+			set opt(key,"Namespace")="%SYS"
+			set opt(key,"Method")="ShowTabSample"
+			set opt(key,"TabMenu","Close")=1
+			set opt(key,"Active")=1 ;active menu item
+			set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
+
+			set key="User-Copy"
+			set opt(key,"Menu")=sideMenu
+			set opt(key)=$$$aText("UserCopy","") ;The name of the menu
+			set opt(key,"id")="UserCopy"
+			set opt(key,"TabName")=$$$aText("UserCopy","") ;the name of the tab
+			set opt(key,"ClassName")=..%ClassName(1)
+			set opt(key,"Role")="%All"
+			set opt(key,"Namespace")="%SYS"
+			set opt(key,"Method")="ShowTabSample"
+			set opt(key,"TabMenu","Close")=1
+			set opt(key,"aw-icon")="fa-table"   ;https://fontawesome.com/icons?d=gallery&p=2&m=free
+
+	;top menu
+		s LeftMenuName="Support",LeftMenuNumer=1
+		s key="menu-top-support"
+		s opt(key)="support"
+		s opt(key,"id")="Support"
+		s opt(key,"TabName")="Support" 
+		s opt(key,"ClassName")=..%ClassName(1)
+		s opt(key,"Method")="ShowTabSupport"
+		s opt(key,"TabMenu","Close")=1
+		s opt(key,"MenuTop")=$lb(LeftMenuNumer,LeftMenuName)
+	
+	set topMenuName="Account",
+		topMenuNumer=99
+		set key="menu-top-accoun2"
+		set opt(key)="Account: "_$username
+		set opt(key,"id")="AccountProf"
+		set opt(key,"TabName")="Profile "_$username 
+		set opt(key,"ClassName")=..%ClassName(1)
+		set opt(key,"Method")="ShowInIFrame" 
+		set opt(key,"InFrameUrl")="http://"_$zu(110)_":52773/csp/sys/sec/%25CSP.UI.Portal.User.zen?PID="_$username
+		set opt(key,"TabMenu","Close")=1
+		set opt(key,"MenuTop")=$lb(topMenuNumer,topMenuName)
+	set key="menu-top-account3"
+		set opt(key,"MenuTop")=$lb(topMenuNumer,topMenuName) ; 99-account has nested items
+		set opt(key)="Exit"
+		set opt(key,"id")="AccountExit"
+		set opt(key,"TabName")="Logoit" 
+		set opt(key,"ClassName")=..%ClassName(1)
+		set opt(key,"Method")="Logout"
+	
+	do ..CheckRoleMenu(.opt)
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="ShowTabSupport">
+<Description>
+the render Tab On the program"
+Par - code menu item from the GetAllApps ..</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>key=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if $g(key("appPar"))'="" set key=key("appPar")
+	do ..GetAllApps(.opt) 
+	if $g(opt(key,"Disable")) write ..GetSupportInfo() quit $$$OK
+	set divId=$g(opt(key,"id"))
+	write ..#ToAdmin
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="MatrixFirstHead">
+<Description>
+download form template search users and roles</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set %ui=1
+	//##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainContent",..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
+	set onclick=$$$blockui("Load...")_
+		$$$onclick(divId_"MainForm",divId_"MainContent",$namespace,..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
+	&html<
+		<table>
+		<tr>
+			<td>
+ 			Login <br>#($$$appText(divId_"name","title='"_$$$aText("Names separated by a comma or by context","")_"'","ms"))#
+			</td>
+			<td>
+			Roles <br>#($$$appText(divId_"roles","title='"_$$$aText("Roles separated by a comma or by context","")_"'","d"))#
+			</td>
+			<td> <br>
+			#($$$appButton(divId_"appButtonResult1","onclick="""_$tr(onclick,"*",1)_"""",""_$$$aText("User roles","")))#
+			</td>
+		</tr>
+		</table>
+	>
+	$$$SetHeightContent(divId,250)
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="MatrixResult">
+<Description>
+Search result </Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set %ui=1
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set mode=Par("mode")
+	;Geting elements from form and prepare array Par
+	set name=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"name")	
+	set roles=$g(Par("%request.Data",divId_"roles"))
+	write ..ButtonAgain(divId,key)
+	do ##class(apptools.Tabs.security).UiMatrixPermission(name,roles,divId,key,"apptools.Tabs.security","UiSavePermiss")
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="UserCopyFirstHead">
+<Description>
+--------- User copy form</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set %ui=1
+	//##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainContent",..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
+	set onclick=$$$blockui("Load...")_
+		$$$onclick(divId_"MainForm",divId_"MainContent",$namespace,..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
+	&html<
+		<table>
+		<tr>
+			<td>
+ 			Login <br><br>#($$$appText(divId_"name","title='"_$$$aText("Names separated by a comma or by context","")_"'","s"))#
+			</td>
+			<td>
+			Unclude Fullname, Comment or Roles <br>#($$$appText(divId_"desc","title='"_$$$aText("Description","")_"'","s"))#
+			</td>
+			<td> <br>
+			#($$$appButton(divId_"appButtonFind","onclick="""_$replace(onclick,"*","find")_"""",""_$$$aText("Find Users","")))#
+			</td>
+
+			<td>
+ 			Copy from <br>#($$$appText(divId_"copyfrom","title='"_$$$aText("Username copy from","")_"'",""))#
+			</td>
+			<td>
+			Copy to <br>#($$$appText(divId_"copyto","title='"_$$$aText("Username copy to","")_"'",""))#
+			</td>
+			<td> <br>
+			#($$$appButton(divId_"appButtonCopy","onclick="""_$replace(onclick,"*","copy")_"""",""_$$$aText("Copy Users","")))#
+			</td>
+		</tr>
+		</table>
+	>
+	$$$SetHeightContent(divId,250)
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="UserCopyResult">
+<Description>
+Search result </Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set %ui=1
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set mode=Par("mode")
+	if mode="find" {
+		;Geting elements from form and prepare array Par
+		set name=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"name")	
+		set desc=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"desc")	
+		write ..ButtonAgain(divId,key)
+		set where="name['"_name_"'"
+		if name="" set where="1=1"
+		set wheredesc="1=1"
+		if desc'="" set wheredesc="( Comment['"_desc_"' or FullName [ '"_desc_"' or Roles [ '"_desc_"' )"
+		set sql="select name, comment, FullName, Superuser,Enabled, Roles, ExpirationDate,CreateDateTime,CreateUsername,LastModifiedDateTime,LastModifiedInfo,LastModifiedUsername, EmailAddress from Security.Users where "_where_" and "_wheredesc
+		set st=##class(apptools.core.LogInfoPane).DrawSQL(sql,100000,$namespace,$g(msg),$g(exec),,1)
+	}
+	if mode="copy" {
+		;Geting elements from form and prepare array Par
+		set copyfrom=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"copyfrom")	
+		set copyto=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"copyto")	
+		if copyfrom=""||(copyto="") write $$$appError("Username is empty") quit $$$OK
+		set st=##class(Security.Users).Copy(copyfrom,copyto)
+		if 'st write $$$appError($System.Status.GetErrorText(st)) quit $$$OK
+		write $$$appMsg("Copied successfully") quit $$$OK
+	}
+	quit $$$OK
+]]></Implementation>
+</Method>
+</Class>
+
+
+<Class name="apptools.lte.permiss3">
+<Description>
+http://hp-msw:52773/apptoolsrest/a/permiss2</Description>
+<ClassType/>
+<IncludeCode>apptools.core</IncludeCode>
+<ProcedureBlock>1</ProcedureBlock>
+<Super>apptools.lte.adminTabs</Super>
+<TimeChanged>65829,53928.585444</TimeChanged>
+<TimeCreated>65065,36454.902831</TimeCreated>
+<DependsOn>apptools.core.msg</DependsOn>
+
+<Parameter name="HeaderText">
+<Description>
+Application title</Description>
+<Default>Permissions</Default>
+</Parameter>
+
+<Parameter name="GNStore">
+<Description>
+Global Name Store Referens files</Description>
+<Default>^apptools.Permissions</Default>
+</Parameter>
+
+<Parameter name="AppRoles">
+<Default>ui_Permissions</Default>
+</Parameter>
+
+<Method name="MainParameter">
+<Description>
+Replace parameters</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[&h,&par]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ set path=par("=path=")
+ set par("=Brand-Text=")="Admin v.3"
+ set par("=Logo-image=")=path_"adminlte/dist/img/ApptoolsLogo.png"
+ set par("=titleAppToolsadmin=")=..#HeaderText
+ set par("<!--=LinkIcon=-->")=..GetAppIcon(path_"adminlte/dist/img/ApptoolsLogo","png")
+ quit ..RepaceParameter(.h,.par)
+]]></Implementation>
+</Method>
+
+<Method name="GetAllApps">
+<Description>
+what modes are available</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>opt</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	;side menu
+	set sideMenuName="Permission",
+		sideMenuNumer=1,
+		sideMenuOpen=1,        //3 =1 open menu
+		sideMenuIcon="fa-cog"  //4  icon   https://fontawesome.com/icons?d=gallery&p=2&m=free
+		set sideMenu=$lb(sideMenuNumer,sideMenuName,sideMenuOpen,sideMenuIcon) 
+			set key="MenuMatrix"
+			set opt(key,"Menu")=sideMenu
+			set opt(key)=$$$aText("The matrix","") ;The name of the menu
+			set opt(key,"id")="Matrix"
+			set opt(key,"TabName")=$$$aText("The matrix","") ;the name of the tab
+			set opt(key,"ClassName")=..%ClassName(1)
+			set opt(key,"Role")="%All"
+			set opt(key,"Namespace")="%SYS"
+			set opt(key,"Method")="ShowTabSample"
+			set opt(key,"TabMenu","Close")=1
+			set opt(key,"Active")=1 ;active menu item
+			set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
+
+			set key="User-Copy"
+			set opt(key,"Menu")=sideMenu
+			set opt(key)=$$$aText("UserCopy","") ;The name of the menu
+			set opt(key,"id")="UserCopy"
+			set opt(key,"TabName")=$$$aText("UserCopy","") ;the name of the tab
+			set opt(key,"ClassName")=..%ClassName(1)
+			set opt(key,"Role")="%All"
+			set opt(key,"Namespace")="%SYS"
+			set opt(key,"Method")="ShowTabSample"
+			set opt(key,"TabMenu","Close")=1
+			set opt(key,"aw-icon")="fa-table"   ;https://fontawesome.com/icons?d=gallery&p=2&m=free
+
+	;top menu
+		s LeftMenuName="Support",LeftMenuNumer=1
+		s key="menu-top-support"
+		s opt(key)="support"
+		s opt(key,"id")="Support"
+		s opt(key,"TabName")="Support" 
+		s opt(key,"ClassName")=..%ClassName(1)
+		s opt(key,"Method")="ShowTabAbout"
+		s opt(key,"TabMenu","Close")=1
+		s opt(key,"MenuTop")=$lb(LeftMenuNumer,LeftMenuName)
+	
+	set topMenuName="Account",
+		topMenuNumer=99
+		set key="menu-top-accoun2"
+		set opt(key)="Account: "_$username
+		set opt(key,"id")="AccountProf"
+		set opt(key,"TabName")="Profile "_$username 
+		set opt(key,"ClassName")=..%ClassName(1)
+		set opt(key,"Method")="ShowInIFrame" 
+		set opt(key,"InFrameUrl")="http://"_$zu(110)_":52773/csp/sys/sec/%25CSP.UI.Portal.User.zen?PID="_$username
+		set opt(key,"TabMenu","Close")=1
+		set opt(key,"MenuTop")=$lb(topMenuNumer,topMenuName)
+	set key="menu-top-account3"
+		set opt(key,"MenuTop")=$lb(topMenuNumer,topMenuName) ; 99-account has nested items
+		set opt(key)="Exit"
+		set opt(key,"id")="AccountExit"
+		set opt(key,"TabName")="Logoit" 
+		set opt(key,"ClassName")=..%ClassName(1)
+		set opt(key,"Method")="Logout"
+	
+	;----- Setup the search in the top menu
+	s key="Search"
+	s opt(key)="Search"
+	s opt(key,"id")="Search-"
+	s opt(key,"TabName")="Search"_"-"
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabSearch"
+	s opt(key,"TabMenu","Close")=1
+	s opt(key,"TabMenu","Mode")=0 ;1 - for each new search bar to make new tab, 0-tab is always the same
+	
+	do ..CheckRoleMenu(.opt)
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="MatrixFirstHead">
+<Description>
+download form template search users and roles</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set %ui=1
+	//##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainContent",..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
+	set onclick=$$$blockui("Load...")_
+		$$$onclick(divId_"MainForm",divId_"MainContent",$namespace,..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
+	&html<
+		<table>
+		<tr>
+			<td>
+ 			Login <br>#($$$appText(divId_"name","title='"_$$$aText("Names separated by a comma or by context","")_"'","ms"))#
+			</td>
+			<td>
+			Roles <br>#($$$appText(divId_"roles","title='"_$$$aText("Roles separated by a comma or by context","")_"'","d"))#
+			</td>
+			<td> <br>
+			#($$$appButton(divId_"appButtonResult1","onclick="""_$tr(onclick,"*",1)_"""",""_$$$aText("User roles","")))#
+			</td>
+		</tr>
+		</table>
+	>
+	$$$SetHeightContent(divId,250)
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="MatrixResult">
+<Description>
+Search result </Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set %ui=1
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set mode=Par("mode")
+	;Geting elements from form and prepare array Par
+	set name=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"name")	
+	set roles=$g(Par("%request.Data",divId_"roles"))
+	write ..ButtonAgain(divId,key)
+	do ##class(apptools.Tabs.security).UiMatrixPermission(name,roles,divId,key,"apptools.Tabs.security","UiSavePermiss")
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="UserCopyFirstHead">
+<Description>
+--------- User copy form</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set %ui=1
+	//##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainContent",..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
+	set onclick=$$$blockui("Load...")_
+		$$$onclick(divId_"MainForm",divId_"MainContent",$namespace,..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
+	&html<
+		<table>
+		<tr>
+			<td>
+ 			Login <br>#($$$appText(divId_"name","title='"_$$$aText("Names separated by a comma or by context","")_"'","s"))#
+			</td>
+			<td>
+			Unclude Fullname, Comment or Roles <br>#($$$appText(divId_"desc","title='"_$$$aText("Description","")_"'","s"))#
+			</td>
+			<td> <br>
+			#($$$appButton(divId_"appButtonFind","onclick="""_$replace(onclick,"*","find")_"""",""_$$$aText("Find Users","")))#
+			</td>
+
+			<td>
+ 			Copy from <br>#($$$appText(divId_"copyfrom","title='"_$$$aText("Username copy from","")_"'",""))#
+			</td>
+			<td>
+			Copy to <br>#($$$appText(divId_"copyto","title='"_$$$aText("Username copy to","")_"'",""))#
+			</td>
+			<td> <br>
+			#($$$appButton(divId_"appButtonCopy","onclick="""_$replace(onclick,"*","copy")_"""",""_$$$aText("Copy Users","")))#
+			</td>
+		</tr>
+		</table>
+	>
+	$$$SetHeightContent(divId,250)
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="UserCopyResult">
+<Description>
+Search result </Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Par=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set %ui=1
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set mode=Par("mode")
+	if mode="find" {
+		;Geting elements from form and prepare array Par
+		set name=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"name")	
+		set desc=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"desc")	
+		write ..ButtonAgain(divId,key)
+		set where="name['"_name_"'"
+		if name="" set where="1=1"
+		set wheredesc="1=1"
+		if desc'="" set wheredesc="( Comment['"_desc_"' or FullName [ '"_desc_"' or Roles [ '"_desc_"' )"
+		set sql="select name, comment, FullName, Superuser,Enabled, Roles, ExpirationDate,CreateDateTime,CreateUsername,LastModifiedDateTime,LastModifiedInfo,LastModifiedUsername, EmailAddress from Security.Users where "_where_" and "_wheredesc
+		set st=##class(apptools.core.LogInfoPane).DrawSQL(sql,100000,$namespace,$g(msg),$g(exec),,1)
+	}
+	if mode="copy" {
+		;Geting elements from form and prepare array Par
+		set copyfrom=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"copyfrom")	
+		set copyto=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"copyto")	
+		if copyfrom=""||(copyto="") write $$$appError("Username is empty") quit $$$OK
+		set st=##class(Security.Users).Copy(copyfrom,copyto)
+		if 'st write $$$appError($System.Status.GetErrorText(st)) quit $$$OK
+		write $$$appMsg("Copied successfully") quit $$$OK
+	}
 	quit $$$OK
 ]]></Implementation>
 </Method>
@@ -21305,6 +21914,532 @@ Outputs XML to be fed into %SYS.ZENReportExcelExporter Excel-compliant stream fr
  <sheet excelSheetName="Report">
 ]]></Data>
 </XData>
+</Class>
+
+
+<Class name="apptools.util.database">
+<Description>
+Utility for creating and deleting databases with one command 
+Create DataBase and Namespace with CSP, REST application 
+Forked from https://openexchange.intersystems.com/package/isc-generate-db
+
+Added resource and role creation for the database. (Many modules ZPM require MatchRoles=":{$dbrole}")
+Added deletion of DataBases, role resources and Namespace.
+Adding rest application is optional.
+
+example:
+write $System.Status.GetErrorText(##class(apptools.util.database).CreateDBNS("TESTDB2"))
+write $System.Status.GetErrorText(##class(apptools.util.database).DeleteDBNS("TESTDB2"))
+create db and namespace without resource and role
+write $System.Status.GetErrorText(##class(%ZPM.PackageManager.Developer.UnitTest.Utils).CreateNamespace("testdb14"))
+write $System.Status.GetErrorText(##class(%ZPM.PackageManager.Developer.UnitTest.Utils).DeleteNamespace("testdb14"))</Description>
+<Abstract>1</Abstract>
+<TimeChanged>65835,69829.516</TimeChanged>
+<TimeCreated>65687,72123.672838</TimeCreated>
+
+<Parameter name="LIBRARY">
+<Expression>$Select($Select($ZVersion["IRIS":1,1:0):"IRISLIB",1:"CACHELIB")</Expression>
+</Parameter>
+
+<Parameter name="SYSGLOBALS">
+<Expression>$Select($Select($ZVersion["IRIS":1,1:0):"IRISSYS",1:"CACHESYS")</Expression>
+</Parameter>
+
+<Parameter name="TEMPGLOBALS">
+<Expression>$Select($Select($ZVersion["IRIS":1,1:0):"IRISTEMP",1:"CACHETEMP")</Expression>
+</Parameter>
+
+<Parameter name="DATABASENAME">
+<Expression>$Select($Select($ZVersion["IRIS":1,1:0):"IRIS.DAT",1:"CACHE.DAT")</Expression>
+</Parameter>
+
+<Method name="Init">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	write !,"Creating and deleting db, namespace, resource and role with one command"
+	write !,"example:"
+	write !,"write $System.Status.GetErrorText(##class(appmsw.util.database).CreateDBNS(""TESTDB2""))"
+	write !,"write $System.Status.GetErrorText(##class(appmsw.util.database).DeleteDBNS(""TESTDB2""))",!
+	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="CreateDBNS">
+<Description>
+write ##class(apptools.util.database).CreateDBNS("NEWNS")</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pNamespace:%String,pCodeData:%Boolean=0,pPathDataset:%String="",pInterOperability:%Boolean=1,pREST:%String=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set pNamespace=$ZCONVERT(pNamespace,"L")
+	quit ..Install(pNamespace, pCodeData, pPathDataset, pInterOperability, pREST)
+]]></Implementation>
+</Method>
+
+<Method name="Install">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pNamespace:%String,pCodeData:%Boolean=1,pPathDataset:%String="",pInterOperability:%Boolean=0,pREST:%String=""</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    Set sc = $$$OK
+    Try {
+        Set sc = $$$ADDSC(sc,..CreateDatabase(pNamespace, pCodeData, pPathDataset)) quit:$$$ISERR(sc)
+        Set sc = $$$ADDSC(sc,..CreateNamespace(pNamespace, pCodeData, pInterOperability, pREST)) quit:$$$ISERR(sc)
+    }
+    Catch (err) {
+        Set sc = $$$ADDSC(sc,err.AsStatus())
+    }
+    Return sc
+]]></Implementation>
+</Method>
+
+<Method name="CreateDatabase">
+<Description>
+Create new database directory</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pNamespace:%String,pCodeData:%Boolean,pPathDataset:%String=""</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	set CurrNS=$Namespace
+    New $Namespace
+    Set $Namespace = "%SYS"
+    Set sc = $$$OK
+    Try {
+        Set dbList = $Listbuild("")
+        Set:(pCodeData = $$$YES) dbList= $Listbuild("-CODE","-DATA") 
+
+        For i = 1:1:$Listlength(dbList) {
+            Set dbSuffix = $Listget(dbList,i)
+            If (pPathDataset '= "") {
+                Set directory = pPathDataset_$Case($$$isWINDOWS,1:"\",:"/")_pNamespace_dbSuffix
+            }
+            Else {
+                Set directory = ..GetDatabaseDirectory(pNamespace_dbSuffix)
+            }
+
+            #; create a new directory if does not exist
+            If '..CheckDatabaseDirExists(directory) {
+                Set directory = $ZStrip(directory,"<>W")
+                Set sc = $$$ADDSC(sc,##class(%File).CreateDirectoryChain(directory))
+                If $$$ISERR(sc) {
+                    Set msg = directory_": Could not create this directory. Please check the directory and try again."
+                    Set sc = $$$ADDSC(sc,$$$ERROR($$$GeneralError,msg))				
+                }
+            }
+            Else {
+                #; abort if database is already created
+                If ..CheckDatabaseExists(directory) {
+                    Set msg = directory_": Database already existent in this directory. Please check the directory and try again."
+                    Set sc = $$$ADDSC(sc,$$$ERROR($$$GeneralError,msg))
+                }
+            }
+            Quit:$$$ISERR(sc)
+
+            #; create new Resource
+            Set dbName = pNamespace_dbSuffix
+            set $Namespace=CurrNS
+            Set sc = $$$ADDSC(sc,..CreateRole($ZCONVERT(dbName,"U")))
+            Quit:$$$ISERR(sc)
+            Set $Namespace = "%SYS"
+            
+            #; create new database
+            Write "Creating Database "_dbName_"... "
+            Set size = 1
+            Set blockSize = 8192
+            Set properties("Directory") = directory
+            Set journalState = 1
+            Set sc = $$$ADDSC(sc,##class(SYS.Database).CreateDatabase(directory,size,blockSize,0,"%DB_"_dbName,journalState,"",""))
+            Quit:$$$ISERR(sc)
+
+            #; Handle if we have dismounted then deleted the database at the O/S level,
+            #; but the CPF entry still exists with the same directory, then recreate the DB only
+            If ##class(Config.Databases).Exists(dbName,.obj) {
+                If obj.Directory '= ##class(%File).ComputeFullDBDir(directory) {
+                    Set sc = $$$ADDSC(sc,##Class(Config.Databases).Create(dbName,.properties))
+                    Quit:$$$ISERR(sc)
+                }
+            }
+            Else {
+                Set sc = $$$ADDSC(sc,##Class(Config.Databases).Create(dbName,.properties))
+                Quit:$$$ISERR(sc)
+            }
+            Write "done!",!
+        }
+    }
+    Catch (err) {
+        Set sc = $$$ADDSC(sc,err.AsStatus())
+    }
+    Return sc
+]]></Implementation>
+</Method>
+
+<Method name="CreateRole">
+<Description>
+Create new Role
+w $system.Status.GetErrorText(##class(apptools.util.database).CreateRole("SWAGGERUI-CODE"))</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>dbName:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+   ;create new role
+   New $Namespace
+   Set $Namespace = "%SYS"
+   Set sc = $$$OK
+   s nameR="%DB_"_dbName,desc="Role for "_nameR 
+	s pResources=nameR_":RW" 
+	if '##class(Security.Resources).Exists(nameR) {
+		Set sc = $$$ADDSC(sc,##class(Security.Resources).Create(nameR,"Resources for "_nameR,"RW"))
+		Quit:$$$ISERR(sc) sc
+	}
+	s pRolesGranted=""
+	if '##class(Security.Roles).Exists(nameR) {
+		Set sc = $$$ADDSC(sc,##class(Security.Roles).Create(nameR,desc,pResources,pRolesGranted))
+		Quit:$$$ISERR(sc) sc
+		w !,"Create new role "_nameR
+	}
+	Return sc
+]]></Implementation>
+</Method>
+
+<Method name="CreateResource">
+<Description>
+Create new Resource
+w $system.Status.GetErrorText(##class(apptools.util.database).CreateResource("DSW-DATA"))</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>dbName:%String,Permiss:%String="RW"</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+   ;create new resource
+   New $Namespace
+   Set $Namespace = "%SYS"
+    Set sc = $$$OK
+   s nameR="%DB_"_dbName,desc="Resource for "_nameR 
+	if '##class(Security.Resources).Exists(nameR) {
+		Set sc = $$$ADDSC(sc,##class(Security.Resources).Create(nameR,desc,Permiss))
+		Quit:$$$ISERR(sc) sc
+		w !,"Create new Resource "_nameR
+	}
+	Return sc
+]]></Implementation>
+</Method>
+
+<Method name="DeleteResource">
+<Description>
+Delete Resource
+w $system.Status.GetErrorText(##class(apptools.util.database).DeleteResource("DSWDATA"))</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>dbName:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ New $Namespace
+ Set $Namespace = "%SYS"
+ Set sc = $$$OK
+   s nameR="%DB_"_dbName
+	if ##class(Security.Resources).Exists(nameR) {
+		Set sc = $$$ADDSC(sc,##class(Security.Resources).Delete(nameR))
+		Quit:$$$ISERR(sc) sc
+		w !,"Delete Resource "_nameR
+	}
+	Return sc
+]]></Implementation>
+</Method>
+
+<Method name="DeleteRole">
+<Description>
+Delete Role
+w $system.Status.GetErrorText(##class(apptools.util.database).DeleteRole("DSWDATA"))</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>dbName:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ New $Namespace
+ Set $Namespace = "%SYS"
+ Set sc = $$$OK
+   s nameR="%DB_"_dbName
+	if ##class(Security.Roles).Exists(nameR) {
+		Set sc = $$$ADDSC(sc,##class(Security.Roles).Delete(nameR))
+		Quit:$$$ISERR(sc) sc
+		w !,"Delete role "_nameR
+	}
+	Return sc
+]]></Implementation>
+</Method>
+
+<Method name="CreateNamespace">
+<Description>
+Create new namespace</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pNamespace:%String,pCodeData:%Boolean,pInterOperability:%Boolean,pREST:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+
+    New $Namespace
+    Set $Namespace = "%SYS"
+
+    If (pCodeData = $$$YES) {
+        Set strGlobals = pNamespace_"-DATA"
+        Set strRoutine = pNamespace_"-CODE"
+    }
+    Else {
+        Set (strGlobals, strRoutine) = pNamespace
+    }
+
+    Set sc = $$$OK
+    Try {
+
+        Write "Creating Namespace "_pNamespace_"... "
+
+        Set nsProperties("Globals") = strGlobals
+        Set nsProperties("Library") = ..#LIBRARY
+        Set nsProperties("Routines") = strRoutine
+        Set nsProperties("SysGlobals") = ..#SYSGLOBALS
+        Set nsProperties("SysRoutines") = ..#SYSGLOBALS
+        Set nsProperties("TempGlobals") = ..#TEMPGLOBALS
+        Set sc = $$$ADDSC(sc,##Class(Config.Namespaces).Create(pNamespace,.nsProperties))
+
+        Write "done!",!
+
+        #; enable Interoperability
+        If (pInterOperability = $$$YES) {
+            Write "Creating Interoperability mappings ... "
+            #; create InterOperability mappings
+            Set:'$Data(^%SYS("Ensemble","InstalledNamespace",pNamespace)) ^%SYS("Ensemble","InstalledNamespace",pNamespace)=""
+            Set sc = $$$ADDSC(sc,##class(%EnsembleMgr).createMappings(pNamespace))
+            Write "done!",!
+
+            Write "Adding Interoperability SQL privileges ... "
+            #; add InterOperability SQL privileges
+            Set sc = $$$ADDSC(sc,##class(%EnsembleMgr).addEnsembleSQLPrivileges(pNamespace))	
+            Write "done!",!
+        }
+        Set sc = $$$ADDSC(sc,..CreateCSPApplication(pNamespace))
+        If (pREST '= "") {
+            Set sc = $$$ADDSC(sc,..createRESTApp(pNamespace,pREST))
+        }
+    }
+    Catch (err) {
+        Set sc = $$$ADDSC(sc,err.AsStatus())
+    }
+    Return sc
+]]></Implementation>
+</Method>
+
+<Method name="CreateCSPApplication">
+<Description>
+Create CSP application</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pNamespace:%String</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    Set sc = $$$OK
+    New $Namespace
+    Set $Namespace="%SYS"
+    Try {
+        Write "Creating CSP Application ... "
+        Set lower = $ZConvert(pNamespace,"L")
+        Set del = $Case($$$isWINDOWS,1:"\",:"/")
+        Set cspName = "/csp/"_lower
+
+        Set properties("Name") = cspName
+        Set properties("CookiePath") = "/csp/"_lower
+        Set properties("AutheEnabled") = $$$AutheUnauthenticated
+        Set properties("NameSpace") = pNamespace
+        Set properties("Path") = $System.Util.InstallDirectory()_"csp"_del_lower
+        Set properties("GroupById") = $$$IscMgtPortalId
+        Set properties("AutoCompile") = 1
+
+        // If the application exists, quit
+        If '##class(Security.Applications).Exists(cspName,.existingApp,.sc2) {
+            // Create the csp application properties	
+            Set sc = $$$ADDSC(sc,##class(Security.Applications).Create(cspName,.properties))
+        }
+        Else {
+            Set sc = $$$ADDSC(sc,sc2)
+        }
+        Write "done!",!
+    }
+    Catch (err) {
+        Set sc = $$$ADDSC(sc,err.AsStatus())
+    }
+    Return sc
+]]></Implementation>
+</Method>
+
+<Method name="createRESTApp">
+<Description>
+Create REST Application</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pNamespace:%String,DispatchClass="REST.Dispatch"</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    #dim sc As %Status = $$$OK
+
+    New $Namespace
+    Set $Namespace = "%SYS"
+
+    Write "Creating CSP Application ... "
+
+    Set lower = $ZConvert(pNamespace,"L")
+    Set restName = "/rest/"_lower
+
+    If '##class(Security.Applications).Exists(restName) {
+        Set props("AutheEnabled") = $$$AutheUnauthenticated
+        Set props("NameSpace") = pNamespace
+        Set props("IsNameSpaceDefault") = $$$NO
+        Set props("DispatchClass") = DispatchClass
+        Set props("MatchRoles")=":%All"
+        Set sc = ##class(Security.Applications).Create(restName, .props)
+        Write "done!",!
+
+
+        Write "Creating "_DispatchClass_".cls ... "
+        Do ..CreateDispatchClass(pNamespace,DispatchClass)
+        Write "done!",!
+    }
+
+    Quit sc
+]]></Implementation>
+</Method>
+
+<Method name="CreateDispatchClass">
+<Description>
+Create a dummy REST service to populate messages</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pNamespace:%String,classname="REST.Dispatch"</FormalSpec>
+<Private>1</Private>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+    New $Namespace
+    Set $Namespace = pNamespace
+    Set sc = $$$OK
+    Try {
+        ;Set classname = "REST.Dispatch"
+        Set class = ##class(%Dictionary.ClassDefinition).%New(classname)
+        Set class.GeneratedBy = $ClassName()
+        Set class.Super = "%CSP.REST"
+
+        Set xdata = ##class(%Dictionary.XDataDefinition).%New()
+        Set xdata.Name = "UrlMap"
+        Set xdata.XMLNamespace = "http://www.intersystems.com/urlmap"
+        Do xdata.Data.WriteLine("<Routes>")
+        Do xdata.Data.WriteLine("<Route Url=""/"" Method=""GET"" Call=""Test"" Cors=""true""/>")
+        Do xdata.Data.WriteLine("</Routes>")
+        Do class.XDatas.Insert(xdata)
+        Set sc = $$$ADDSC(sc,class.%Save())
+
+        Set method = ##class(%Dictionary.MethodDefinition).%New(classname)
+        Set method.Name = "Test"
+        Set method.ClassMethod = 1
+        Set method.ReturnType = "%Status"
+        Set stream = ##class(%Stream.TmpCharacter).%New()
+        Do stream.WriteLine("	Set %response.ContentType = ""application/json"" ")
+        Do stream.WriteLine("	Set retObj = {}")
+        Do stream.WriteLine("	Set retMessage = ""Hello World!"" ")
+        Do stream.WriteLine("	Set retObj.Message = retMessage")
+        Do stream.WriteLine("	Write retObj.%ToJSON()")
+        Do stream.WriteLine("	Quit $$$OK")
+        Set method.Implementation = stream
+        Set sc = $$$ADDSC(sc,method.%Save())
+
+        Set sc = $$$ADDSC(sc,$System.OBJ.Compile(classname,"fck-dv"))
+    }
+    Catch (err) {
+        Set sc = $$$ADDSC(sc,err.AsStatus())
+    }
+    Return sc
+]]></Implementation>
+</Method>
+
+<Method name="GetDatabaseDirectory">
+<Description>
+Get database directory</Description>
+<ClassMethod>1</ClassMethod>
+<CodeMode>expression</CodeMode>
+<FormalSpec>pNamespace:%String</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[##class(%File).SubDirectoryName($System.Util.ManagerDirectory(),pNamespace)
+]]></Implementation>
+</Method>
+
+<Method name="CheckDatabaseDirExists">
+<Description>
+Checks if database directory exist</Description>
+<ClassMethod>1</ClassMethod>
+<CodeMode>expression</CodeMode>
+<FormalSpec>directory:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[##class(%File).DirectoryExists(directory)
+]]></Implementation>
+</Method>
+
+<Method name="CheckDatabaseExists">
+<Description>
+Checks if database directory exist</Description>
+<ClassMethod>1</ClassMethod>
+<CodeMode>expression</CodeMode>
+<FormalSpec>directory:%String</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[##class(%File).Exists(directory_$Case($$$isWINDOWS,1:"\",:"/")_..#DATABASENAME)
+]]></Implementation>
+</Method>
+
+<Method name="DeleteDBNS">
+<Description>
+w $system.Status.GetErrorText(##class(apptools.util.database).DeleteDBNS("SWAGGERUI", 0))</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>pNamespace</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	if $namespace=$ZCONVERT(pNamespace,"U") set $namespace="%SYS"
+	Set sc = ##class(%ZPM.PackageManager.Developer.UnitTest.Utils).DeleteNamespace($ZCONVERT(pNamespace,"L"))
+	Quit:$$$ISERR(sc) sc
+	Set sc = ..DeleteResource($ZCONVERT(pNamespace,"U"))
+	;Quit:$$$ISERR(sc) sc
+	Set sc = ..DeleteRole($ZCONVERT(pNamespace,"U"))
+	;Quit:$$$ISERR(sc) sc
+	q sc
+]]></Implementation>
+</Method>
+
+<Method name="DismountListDB">
+<Description>
+zn "app" w $System.Status.GetErrorText(##class(apptools.util.database).DismountListDB("DOJO"))</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Database</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	s st=..DismountDB(Database)
+	if st {
+		s st1=..DismountDB(Database_"ENSTEMP")
+		if 'st1 q st1
+		s st2=..DismountDB(Database_"SECONDARY")
+		if st2 q st2
+	} else { q st }
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="DismountDB">
+<Description>
+write $System.Status.GetErrorText(##class(apptools.util.database).DismountDB("PROD"))</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Database</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	new $namespace
+	zn "%sys"
+	s st=$$$OK
+	If ##Class(Config.Databases).Get(Database,.Properties) {
+		Set Directory = $G(Properties("Directory"))
+  		Set st = ##class(SYS.Database).DismountDatabase(Directory)
+	}
+	q st
+]]></Implementation>
+</Method>
 </Class>
 
 

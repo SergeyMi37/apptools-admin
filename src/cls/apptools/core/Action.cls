@@ -172,7 +172,7 @@ ClassMethod ParseJson(jsonStr, appClass, appMethod, appPar) As %Status
 /// w ##class(apptools.core.Action).WriteWinOpenREST(%request)
 ClassMethod WriteWinOpenREST(req) As %String
 {
-  	if req.URL[(req.Application_"get-html")||(req.URL[(req.Application_"post-json"))||(req.URL[(req.Application_"a")) { //is static content
+  	if req.URL[(req.Application_"get-html")||(req.URL[(req.Application_"post-json")) { ;||(req.URL[(req.Application_"a")) { //is static content
   		q req.Application_"post-json"
   	} else {
   		q ""
