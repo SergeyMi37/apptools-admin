@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2020.3 (Build 302U)" ts="2021-04-01 22:22:38">
+<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2020.3 (Build 302U)" ts="2021-04-10 08:05:05">
 <Class name="apptools.Chart.Chart">
 <Super>apptools.core.AutoPage</Super>
 <TimeChanged>65428,53141.445298</TimeChanged>
@@ -6634,7 +6634,7 @@ Withdraw the necessary actions</Description>
 <IncludeCode>apptools.core</IncludeCode>
 <ProcedureBlock>1</ProcedureBlock>
 <Super>%CSP.Page</Super>
-<TimeChanged>65835,71814.929455</TimeChanged>
+<TimeChanged>65839,45316.018632</TimeChanged>
 <TimeCreated>65607,76497.951768</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -6883,6 +6883,9 @@ w ##class(apptools.core.Action).WriteActJs(%request,pref_"MainForm",mhead,..%Cla
 <Implementation><![CDATA[
   	;s $$$AppL("MML","%request-WriteActJs-")=$$$AppObJs(req)
   	set:CGIVar'["'" CGIVar=CGIVar_"'"
+  	
+  	quit:req.URL[".cls" "ActionJs('"_fornId_"','"_resultDivId_"','"_classname_"','"_method_"','"_CGIVar_");"
+  	
   	if req.URL[(req.Application_"get-html")||
   		(req.URL[(req.Application_"post-json"))||
   		(req.URL[(req.Application_"a")) { //is static content
@@ -17884,7 +17887,7 @@ https://adminlte.io</Description>
 <IncludeCode>apptools.core</IncludeCode>
 <ProcedureBlock>1</ProcedureBlock>
 <Super>apptools.lte.adminTabs</Super>
-<TimeChanged>65829,56251.325808</TimeChanged>
+<TimeChanged>65832,46272.553828</TimeChanged>
 <TimeCreated>64127,58953.319558</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -17903,7 +17906,7 @@ http://localhost:52773/apptoolsrest/a/smarthome&autoload=snapshot&namespace=USER
 	
 	set:class="" class="apptools.lte."_app
 	set par("input-class=")=class
-	if '##class(apptools.core.sys).ClassExist(class) set class="apptools.lte.page404"
+	;if '##class(apptools.core.sys).ClassExist(class) set class="apptools.lte.page404"
 	set cgivar="&"_$p(parameter,"&",2,*)
 	set ns=##class(apptools.core.Action).GetParam(,"namespace",cgivar)
 	if ns'="" set $namespace=ns
@@ -18169,7 +18172,7 @@ The template GUI of the application selector and tabs on the basis jQueryUi, Uik
 <IncludeCode>apptools.core</IncludeCode>
 <ProcedureBlock>1</ProcedureBlock>
 <Super>%CSP.Page</Super>
-<TimeChanged>65829,56740.524088</TimeChanged>
+<TimeChanged>65843,56036.902361</TimeChanged>
 <TimeCreated>65065,36454.902831</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -18201,7 +18204,7 @@ For Redirect </Description>
 <Description>
 is there a right to work with this form</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>role</FormalSpec>
+<FormalSpec>role=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	if $roles["%All" quit $$$OK
@@ -18241,9 +18244,18 @@ is there a right to work with this form</Description>
 <FormalSpec><![CDATA[&opt]]></FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
+	quit:$roles["%All" $$$OK
 	set i="" for { set i=$Order(opt(i)) quit:i=""
-		if $GET(opt(i,"Roles"))'="" 
+		kill found
+		if $GET(opt(i,"Roles"))'="" {
+			set roles=$GET(opt(i,"Roles"))
+			for r=1:1:$l(roles,",") { continue:$p(roles,",",r)=""
+				if (","_$roles_",")[(","_$p(roles,",",r)_",") set found=1 quit
+			}
+		}
+		if '$GET(found) KILL opt(i)
 	}
+	quit $$$OK
 ]]></Implementation>
 </Method>
 
@@ -18861,6 +18873,155 @@ Draw Tables UiKit</Description>
     	>
 	} else {
 	}
+]]></Implementation>
+</Method>
+
+<Method name="GetElemProp">
+<Description>
+Get property element object
+do ##class(apptools.lte.adminTabs).GetElemProp("","test",.gn,"pref",,.tag)</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[obj="",propName,&gn,PrefixIdDIV="",Mode="",&tags=""]]></FormalSpec>
+<Implementation><![CDATA[
+	set sysType=$g(gn("Properties",propName,"Type"))
+	
+	if sysType["%Stream." quit $$$OK ;TODO exception
+	set Name=$g(gn("Properties",propName,"Name"))
+
+	if Name="" quit $$$ERROR($$$GeneralError,"No Exsist Property "_propName) 
+	
+	set Required=$g(gn("Properties",propName,"Required"))
+	set ReadOnly=$g(gn("Properties",propName,"ReadOnly"))
+	set Parameters=$g(gn("Properties",propName,"Parameters"))
+	
+	set Value=""
+	if $iso(obj) set Value=$property(obj,Name)
+	
+	set redstar="" if Required s redstar="<font color=red title='"_$$$aText("Required field","")_"'>*</font>"
+	
+	do ##class(apptools.core.Form).GetJsonProp(obj, propName, .gn, .pr)
+	if 'ReadOnly set ReadOnly=$g(pr("readOnly"))
+	if 'Mode set ReadOnly=1
+	
+	set label=pr("description")_redstar
+	if Mode["ShowFieldName" set label=label_"<br>("_propName_")"
+	if $g(pr("inputpattern"))="hidden" set label=""
+	set tags=tags_"<td style='text-align: right;' title='"_$g(pr("title"))_"' ><label>"_label_"</label></td>"
+	set tags=tags_"<td style='text-align: left;' title='"_$g(pr("title"))_"' >"
+	s pr("attr")=$g(pr("attr"))_" "_$s(Required:"Required",1:"")_" "_$s(ReadOnly:"disabled",1:"")
+	
+	s %id=$g(PrefixIdDIV)_Name
+	s %val=$g(Value)
+	s pr("WebComp-size")=" size=50 " if pr("attr")["size" set pr("WebComp-size")=""
+	
+	if sysType="%Boolean",pr("inputtype")'="checkbox" {
+		d ..SelectFieldYesNo(%id,%val,.tag)
+		set tags=tags_tag
+	}
+	elseif sysType="%Date" {
+	 	set tags=tags_$$$appText(%id," size=10 "_pr("attr"),%val)
+	}
+	else {  //%String
+		if $g(pr("inputpattern"))="textarea" {
+			if pr("attr")'["cols" s pr("attr")=pr("attr")_" cols=77 "
+			if pr("attr")'["rows" s pr("attr")=pr("attr")_" rows=3 "
+			set tags=tags_$$$appTextarea(%id,pr("attr"),%val)
+		}
+		elseif $g(pr("inputpattern"))="hidden" {
+			set tags=tags_"<input type='hidden' id='"_%id_"' name='"_%id_"' "_$g(pr("attr"))_" value='"_%val_"'>"
+		}
+		elseif $g(pr("inputpattern"))="autocomplete" {
+			set met=$g(pr("autocompleteMethod"))
+			if met'=""  xecute "do "_met
+			set tags=tags_$$$appAutocomplete(%id," "_pr("attr"),%val)
+		}
+		elseif $g(pr("inputpattern"))="files" {
+			set tags=tags_##class(apptools.core.Form).WebCompShowFiles(obj,.pr,Mode,%id,%val)
+		}
+		elseif $g(pr("inputpattern"))="select" {
+			set met=$g(pr("selectMethod"))
+			if met'="" {
+				;;w met
+				if (met["{") { //a list of json
+					;TODO
+				}
+				else { //a list of functions
+					xecute "do "_met
+				}
+			}
+			;w $$$appInputHidden(.%id," "_attr,%val)
+		}
+		elseif $g(pr("inputpattern"))="selectize" {
+			s met=$g(pr("selectMethod"))
+			set tags=tags_"<input type='text' id='"_%id_"' name='"_%id_"' class='input-tags demo-default ui-corner-all ui-widget ui-widget-content' value='"_%val_"'>"
+			if met'="" {
+				xecute "do "_met
+			}
+		}
+		elseif pr("inputtype")="checkbox" {
+			set tags=tags_##class(apptools.core.Form).WebCompShowCheckbox(,.pr,Mode,%id,%val)
+		}
+		elseif pr("inputtype")'="" {
+			set tags=tags_$$$appInput(%id," type='"_pr("inputtype")_"' "_pr("WebComp-size")_pr("attr"),%val)
+		}
+		elseif Parameters["{" {
+			if {}.$$$jsonFromJSON(Parameters).VALUELIST'="" {
+			  set vl={}.$$$jsonFromJSON(Parameters).VALUELIST
+			  set dl={}.$$$jsonFromJSON(Parameters).DISPLAYLIST
+			  ;	s ^tmpMSW(1,$i(^tmpMSW),"Parameters")=$lb(propName,vl,dl)
+			  set:dl="" dl=vl
+			  do ..SelectField($lfs(vl),,$lfs(dl),.gn2,,%id,%val,600,.tag)
+			  set tags=tags_tag
+			} else {
+				set tags=tags_$$$appText(%id,pr("WebComp-size")_pr("attr"),%val)
+			}
+		}
+		else { set tags=tags_$$$appText(%id,pr("WebComp-size")_pr("attr"),%val)
+		}
+	}
+	set tags=tags_"</td>"
+	Quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="SelectFieldYesNo">
+<Description>
+The output type field select Yes or no 
+do ##class(apptools.lte.adminTabs).SelectFieldYesNo("test","0",.tag)</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[idSelect="selectmenu",dfltKey="",&tags]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	do ..SelectField($lb(0,1),,$lb($$$aText("No",""),$$$aText("Yes","")),.gn,,idSelect,dfltKey,100,.tags)
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="SelectField">
+<Description>
+The output fields of type select
+do ##class(apptools.lte.adminTabs).SelectField($lb("",0,1),"alert(1);",$lb("","No","Yes"),.gn,,"test","0",50,.tag) </Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[KeyList="",ONCHANGE="",ValueList="",gnRet,order=1,idSelect="selectmenu",dfltKey="",width=500,&tags]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	kill gnRet
+	set selectNS="<SELECT id='"_idSelect_"' name='"_idSelect_"' "_$s(NoWrite:"ONCHANGE='"_ONCHANGE_"'",1:"")_">",
+		tags=""
+	set gnRet($i(gnRet))=selectNS
+	for i=1:1:$ll(KeyList) { 
+		set selected=""
+		if dfltKey'="",dfltKey=$lg(KeyList,i) s selected="selected"
+		set select=" <OPTION "_$g(selected)_" VALUE="""_$lg(KeyList,i)_""">"_$lg(ValueList,i)_"</OPTION>"
+  		set gnRet($i(gnRet))=select
+	}
+	set gnRet($i(gnRet))="</SELECT>"
+	for i=1:1 {q:'$DATA(gnRet(i))  set tags=tags_gnRet(i)}
+	set tags=tags_"<script language='javascript'>"
+		set tags=tags_"$( '#"_idSelect_"' ).selectmenu({ change: function( event, data ) { "_ONCHANGE_" }, width:"_width_" }).selectmenu('menuWidget');" ;;.selectmenu('refresh') .addClass('overflow');"
+		set tags=tags_"$( '#"_idSelect_"-menu' ).css( 'max-height','500px');"
+	set tags=tags_"<script language='javascript'>"
+	q $$$OK
 ]]></Implementation>
 </Method>
 </Class>
@@ -20141,7 +20302,7 @@ http://hp-msw:52773/apptoolsrest/a/permiss2</Description>
 <IncludeCode>apptools.core</IncludeCode>
 <ProcedureBlock>1</ProcedureBlock>
 <Super>apptools.lte.adminTabs</Super>
-<TimeChanged>65832,83830.0446</TimeChanged>
+<TimeChanged>65829,49829.191202</TimeChanged>
 <TimeCreated>65065,36454.902831</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -20340,7 +20501,7 @@ Search result </Description>
 		<table>
 		<tr>
 			<td>
- 			Login <br><br>#($$$appText(divId_"name","title='"_$$$aText("Names separated by a comma or by context","")_"'","s"))#
+ 			Login <br>#($$$appText(divId_"name","title='"_$$$aText("Names separated by a comma or by context","")_"'","s"))#
 			</td>
 			<td>
 			Unclude Fullname, Comment or Roles <br>#($$$appText(divId_"desc","title='"_$$$aText("Description","")_"'","s"))#
@@ -21729,7 +21890,7 @@ nk71qAAAAABJRU5ErkJggg==
 <Description>
 Report generation in a given directory upon request with a given field format</Description>
 <IncludeCode>apptools.core,%occODBC</IncludeCode>
-<TimeChanged>65661,34563.048643</TimeChanged>
+<TimeChanged>65839,58764.427203</TimeChanged>
 <TimeCreated>64273,2606.599454</TimeCreated>
 
 <Method name="Report2xlsx">
@@ -21752,7 +21913,7 @@ set sc = ##class(apptools.util.XLSX).Report2xlsx("/backup/temp/reports","select 
 			set env = "EXCELMEMSIZE"
 			set sc = ##class(isc.SetEnv).Setup()
 			quit:$$$ISERR(sc) 
-			set sc = ##class(isc.SetEnv).SetEnvVar(env, "6048m")
+			set sc = ##class(isc.SetEnv).SetEnvVar(env, "7048m")
 			quit:$$$ISERR(sc) 
 			set val = $system.Util.GetEnviron(env)
 		}

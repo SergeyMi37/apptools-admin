@@ -162,7 +162,7 @@ ClassMethod UserCopyFirstHead(Par = "") As %Status
 		<table>
 		<tr>
 			<td>
- 			Login <br><br>#($$$appText(divId_"name","title='"_$$$aText("Names separated by a comma or by context","")_"'","s"))#
+ 			Login <br>#($$$appText(divId_"name","title='"_$$$aText("Names separated by a comma or by context","")_"'","s"))#
 			</td>
 			<td>
 			Unclude Fullname, Comment or Roles <br>#($$$appText(divId_"desc","title='"_$$$aText("Description","")_"'","s"))#

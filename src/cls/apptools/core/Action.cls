@@ -200,6 +200,9 @@ ClassMethod WriteActJs(req, fornId, resultDivId, classname, method, CGIVar = "",
 {
   	;s $$$AppL("MML","%request-WriteActJs-")=$$$AppObJs(req)
   	set:CGIVar'["'" CGIVar=CGIVar_"'"
+  	
+  	quit:req.URL[".cls" "ActionJs('"_fornId_"','"_resultDivId_"','"_classname_"','"_method_"','"_CGIVar_");"
+  	
   	if req.URL[(req.Application_"get-html")||
   		(req.URL[(req.Application_"post-json"))||
   		(req.URL[(req.Application_"a")) { //is static content

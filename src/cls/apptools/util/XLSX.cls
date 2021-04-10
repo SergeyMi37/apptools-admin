@@ -20,7 +20,7 @@ ClassMethod Report2xlsx(directory As %String, sql = "", filename = "", format = 
 			set env = "EXCELMEMSIZE"
 			set sc = ##class(isc.SetEnv).Setup()
 			quit:$$$ISERR(sc) 
-			set sc = ##class(isc.SetEnv).SetEnvVar(env, "6048m")
+			set sc = ##class(isc.SetEnv).SetEnvVar(env, "7048m")
 			quit:$$$ISERR(sc) 
 			set val = $system.Util.GetEnviron(env)
 		}

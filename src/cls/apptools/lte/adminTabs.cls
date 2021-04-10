@@ -18,7 +18,7 @@ Parameter ToAdmin = "You need to contact <a target=_new href='https://github.com
 Parameter AppRoles;
 
 /// is there a right to work with this form
-ClassMethod IsPermiss(role) As %Status
+ClassMethod IsPermiss(role = "") As %Status
 {
 	if $roles["%All" quit $$$OK
 	set st=""
@@ -49,9 +49,18 @@ ClassMethod CheckPermiss(ByRef par) As %Status
 
 ClassMethod CheckRoleMenu(ByRef opt) As %Status
 {
+	quit:$roles["%All" $$$OK
 	set i="" for { set i=$Order(opt(i)) quit:i=""
-		if $GET(opt(i,"Roles"))'="" 
+		kill found
+		if $GET(opt(i,"Roles"))'="" {
+			set roles=$GET(opt(i,"Roles"))
+			for r=1:1:$l(roles,",") { continue:$p(roles,",",r)=""
+				if (","_$roles_",")[(","_$p(roles,",",r)_",") set found=1 quit
+			}
+		}
+		if '$GET(found) KILL opt(i)
 	}
+	quit $$$OK
 }
 
 /// Icon from png
@@ -561,6 +570,141 @@ ClassMethod DrawTableUi(mode = "beg", divId = "tab2", attr = "", ByRef Enum) As 
     	>
 	} else {
 	}
+}
+
+/// Get property element object
+/// do ##class(apptools.lte.adminTabs).GetElemProp("","test",.gn,"pref",,.tag)
+ClassMethod GetElemProp(obj = "", propName, ByRef gn, PrefixIdDIV = "", Mode = "", ByRef tags = "")
+{
+	set sysType=$g(gn("Properties",propName,"Type"))
+	
+	if sysType["%Stream." quit $$$OK ;TODO exception
+	set Name=$g(gn("Properties",propName,"Name"))
+
+	if Name="" quit $$$ERROR($$$GeneralError,"No Exsist Property "_propName) 
+	
+	set Required=$g(gn("Properties",propName,"Required"))
+	set ReadOnly=$g(gn("Properties",propName,"ReadOnly"))
+	set Parameters=$g(gn("Properties",propName,"Parameters"))
+	
+	set Value=""
+	if $iso(obj) set Value=$property(obj,Name)
+	
+	set redstar="" if Required s redstar="<font color=red title='"_$$$aText("Required field","")_"'>*</font>"
+	
+	do ##class(apptools.core.Form).GetJsonProp(obj, propName, .gn, .pr)
+	if 'ReadOnly set ReadOnly=$g(pr("readOnly"))
+	if 'Mode set ReadOnly=1
+	
+	set label=pr("description")_redstar
+	if Mode["ShowFieldName" set label=label_"<br>("_propName_")"
+	if $g(pr("inputpattern"))="hidden" set label=""
+	set tags=tags_"<td style='text-align: right;' title='"_$g(pr("title"))_"' ><label>"_label_"</label></td>"
+	set tags=tags_"<td style='text-align: left;' title='"_$g(pr("title"))_"' >"
+	s pr("attr")=$g(pr("attr"))_" "_$s(Required:"Required",1:"")_" "_$s(ReadOnly:"disabled",1:"")
+	
+	s %id=$g(PrefixIdDIV)_Name
+	s %val=$g(Value)
+	s pr("WebComp-size")=" size=50 " if pr("attr")["size" set pr("WebComp-size")=""
+	
+	if sysType="%Boolean",pr("inputtype")'="checkbox" {
+		d ..SelectFieldYesNo(%id,%val,.tag)
+		set tags=tags_tag
+	}
+	elseif sysType="%Date" {
+	 	set tags=tags_$$$appText(%id," size=10 "_pr("attr"),%val)
+	}
+	else {  //%String
+		if $g(pr("inputpattern"))="textarea" {
+			if pr("attr")'["cols" s pr("attr")=pr("attr")_" cols=77 "
+			if pr("attr")'["rows" s pr("attr")=pr("attr")_" rows=3 "
+			set tags=tags_$$$appTextarea(%id,pr("attr"),%val)
+		}
+		elseif $g(pr("inputpattern"))="hidden" {
+			set tags=tags_"<input type='hidden' id='"_%id_"' name='"_%id_"' "_$g(pr("attr"))_" value='"_%val_"'>"
+		}
+		elseif $g(pr("inputpattern"))="autocomplete" {
+			set met=$g(pr("autocompleteMethod"))
+			if met'=""  xecute "do "_met
+			set tags=tags_$$$appAutocomplete(%id," "_pr("attr"),%val)
+		}
+		elseif $g(pr("inputpattern"))="files" {
+			set tags=tags_##class(apptools.core.Form).WebCompShowFiles(obj,.pr,Mode,%id,%val)
+		}
+		elseif $g(pr("inputpattern"))="select" {
+			set met=$g(pr("selectMethod"))
+			if met'="" {
+				;;w met
+				if (met["{") { //a list of json
+					;TODO
+				}
+				else { //a list of functions
+					xecute "do "_met
+				}
+			}
+			;w $$$appInputHidden(.%id," "_attr,%val)
+		}
+		elseif $g(pr("inputpattern"))="selectize" {
+			s met=$g(pr("selectMethod"))
+			set tags=tags_"<input type='text' id='"_%id_"' name='"_%id_"' class='input-tags demo-default ui-corner-all ui-widget ui-widget-content' value='"_%val_"'>"
+			if met'="" {
+				xecute "do "_met
+			}
+		}
+		elseif pr("inputtype")="checkbox" {
+			set tags=tags_##class(apptools.core.Form).WebCompShowCheckbox(,.pr,Mode,%id,%val)
+		}
+		elseif pr("inputtype")'="" {
+			set tags=tags_$$$appInput(%id," type='"_pr("inputtype")_"' "_pr("WebComp-size")_pr("attr"),%val)
+		}
+		elseif Parameters["{" {
+			if {}.$$$jsonFromJSON(Parameters).VALUELIST'="" {
+			  set vl={}.$$$jsonFromJSON(Parameters).VALUELIST
+			  set dl={}.$$$jsonFromJSON(Parameters).DISPLAYLIST
+			  ;	s ^tmpMSW(1,$i(^tmpMSW),"Parameters")=$lb(propName,vl,dl)
+			  set:dl="" dl=vl
+			  do ..SelectField($lfs(vl),,$lfs(dl),.gn2,,%id,%val,600,.tag)
+			  set tags=tags_tag
+			} else {
+				set tags=tags_$$$appText(%id,pr("WebComp-size")_pr("attr"),%val)
+			}
+		}
+		else { set tags=tags_$$$appText(%id,pr("WebComp-size")_pr("attr"),%val)
+		}
+	}
+	set tags=tags_"</td>"
+	Quit $$$OK
+}
+
+/// The output type field select Yes or no 
+/// do ##class(apptools.lte.adminTabs).SelectFieldYesNo("test","0",.tag)
+ClassMethod SelectFieldYesNo(idSelect = "selectmenu", dfltKey = "", ByRef tags) As %Status
+{
+	do ..SelectField($lb(0,1),,$lb($$$aText("No",""),$$$aText("Yes","")),.gn,,idSelect,dfltKey,100,.tags)
+	q $$$OK
+}
+
+/// The output fields of type select
+/// do ##class(apptools.lte.adminTabs).SelectField($lb("",0,1),"alert(1);",$lb("","No","Yes"),.gn,,"test","0",50,.tag) 
+ClassMethod SelectField(KeyList = "", ONCHANGE = "", ValueList = "", gnRet, order = 1, idSelect = "selectmenu", dfltKey = "", width = 500, ByRef tags) As %Status
+{
+	kill gnRet
+	set selectNS="<SELECT id='"_idSelect_"' name='"_idSelect_"' "_$s(NoWrite:"ONCHANGE='"_ONCHANGE_"'",1:"")_">",
+		tags=""
+	set gnRet($i(gnRet))=selectNS
+	for i=1:1:$ll(KeyList) { 
+		set selected=""
+		if dfltKey'="",dfltKey=$lg(KeyList,i) s selected="selected"
+		set select=" <OPTION "_$g(selected)_" VALUE="""_$lg(KeyList,i)_""">"_$lg(ValueList,i)_"</OPTION>"
+  		set gnRet($i(gnRet))=select
+	}
+	set gnRet($i(gnRet))="</SELECT>"
+	for i=1:1 {q:'$DATA(gnRet(i))  set tags=tags_gnRet(i)}
+	set tags=tags_"<script language='javascript'>"
+		set tags=tags_"$( '#"_idSelect_"' ).selectmenu({ change: function( event, data ) { "_ONCHANGE_" }, width:"_width_" }).selectmenu('menuWidget');" ;;.selectmenu('refresh') .addClass('overflow');"
+		set tags=tags_"$( '#"_idSelect_"-menu' ).css( 'max-height','500px');"
+	set tags=tags_"<script language='javascript'>"
+	q $$$OK
 }
 
 }

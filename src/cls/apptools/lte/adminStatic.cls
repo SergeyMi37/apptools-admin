@@ -15,7 +15,7 @@ ClassMethod GetMain(parameter, class = "") As %Status
 	
 	set:class="" class="apptools.lte."_app
 	set par("input-class=")=class
-	if '##class(apptools.core.sys).ClassExist(class) set class="apptools.lte.page404"
+	;if '##class(apptools.core.sys).ClassExist(class) set class="apptools.lte.page404"
 	set cgivar="&"_$p(parameter,"&",2,*)
 	set ns=##class(apptools.core.Action).GetParam(,"namespace",cgivar)
 	if ns'="" set $namespace=ns
