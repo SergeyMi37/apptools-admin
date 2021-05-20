@@ -15,6 +15,7 @@ USER ${ISC_PACKAGE_MGRUSER}
 
 #COPY  Installer.cls .
 COPY  src src
+COPY  web web
 COPY module.xml module.xml
 COPY iris.script /tmp/iris.script
 
