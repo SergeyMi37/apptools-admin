@@ -48,10 +48,10 @@ ClassMethod StopAll() As %Status
 
 /// Check and restore autorun products in Namespaces, run all products that were launched
 /// d ##class(apptools.core.Production).StartAll()
-ClassMethod StartAll() As %Status
+ClassMethod StartAll(nsOnly = "") As %Status
 {
  	d ..EnsAction("auto1")
- 	d ..EnsAction("start")
+ 	d ..EnsAction("start",nsOnly)
  	w !!,"ok"
  	q
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2020.3 (Build 302U)" ts="2021-04-10 08:05:05">
+<Export generator="IRIS" version="26" zv="IRIS for UNIX (Red Hat Enterprise Linux for x86-64) 2020.3 (Build 304U)" ts="2021-08-12 21:34:32">
 <Class name="apptools.Chart.Chart">
 <Super>apptools.core.AutoPage</Super>
 <TimeChanged>65428,53141.445298</TimeChanged>
@@ -32,7 +32,7 @@ Get the detail pane info object</Description>
 <Class name="apptools.Chart.ChartPanel">
 <IncludeCode>apptools.core</IncludeCode>
 <Super>apptools.core.LogInfoPane</Super>
-<TimeChanged>65671,35471.418897</TimeChanged>
+<TimeChanged>65940,38755.591642</TimeChanged>
 <TimeCreated>64985,34799.861897</TimeCreated>
 
 <Parameter name="XMLTYPE">
@@ -57,7 +57,7 @@ Drawing graphs</Description>
 	set arg("type")="bar" ;line
 	set arg("datasets")="{   label: """_$$$aText("Error display on the graph","")_""", borderColor: 'rgb(255, 199, 132)',  data: [30],  }"
 
-	set days=1000
+	set days=365 ;1000
 	if %request.Get("days") S days=%request.Get("days")
 	
 	if %request.Get("panel")'="" {
@@ -7952,7 +7952,7 @@ do ##class(apptools.core.Form).DrawTable(.matrix) </Description>
 </Class>
 
 
-<Routine name="apptools.core" type="INC" timestamp="65828,38434.240176"><![CDATA[
+<Routine name="apptools.core" type="INC" timestamp="65895,29775.061119"><![CDATA[
 #Include %occMessages
 #include %occReference
 
@@ -8126,6 +8126,7 @@ do ##class(apptools.core.Form).DrawTable(.matrix) </Description>
 #; To add an active link to the panel
 #define addAppLog(%text,%title,%input,%target) "<a title='"_%title_"' "_$g(%target)_" href=""apptools.core.LogInfo.cls?NSP="_$zu(5)_"&WHAT="_$zconvert(%input,"O","URL")_""">"_%text_"</a>"
 #define addAppL(%text) "<a target="""_$ZCRC(%text,7)_""" href=""apptools.core.LogInfo.cls?NSP="_$zu(5)_"&WHAT="_$zconvert(%text,"O","URL")_""">"_%text_"</a>"
+#define addLoadLogInfo(%text,%title,%input,%http) "<a title='"_%title_"' target=LogInfo"_$tr($zts,",.")_" href="""_%http_"apptools.core.LogInfo.cls?NSP="_$zu(5)_"&WHAT="_$zconvert(%input,"O","URL")_""">"_%text_"</a>"
 
 #; To obtain the date and time YYYY-MM-DD HH:MM:SS
 #define AppDT(%h) $zd(+%h,3)_" "_##class(apptools.core.type).GetValidZT(%h)
@@ -8175,10 +8176,16 @@ do ##class(apptools.core.Form).DrawTable(.matrix) </Description>
 
 #define appTab3(%n1,%n2,%n3) "<table cellpadding=2 cellspacing=0 border=1 class=""DetailTable"" width=""90%""><tbody><tr><th align=""left"" width=""5px"">"_%n1_"</th><th align=""left"" width=""50px"">"_%n2_"</th><th align=""left"" width=""50px"">"_%n3_"</th></tr>"
 
-#define jsstart w "<script language='javascript'>"
-#define jsstop w "</script>"
+#define jsbegin "<script language='javascript'>"_$$$NL
+#define jsend "</script>"_$$$NL
+#define jsstart write $$$jsbegin
+#define jsstop write $$$jsend
 #define styleurl "text-decoration:underline; color:blue; cursor:hand;"
 #define blockui(%msg)  "$.blockUI( { message: '"_%msg_"' , css: { border: 'none', padding: '15px', backgroundColor: '#000', '-webkit-border-radius': '10px','-moz-border-radius': '10px', opacity: .5, color: '#fff' }} );"
+
+#define Msg(%c,%t) "<span class='brand-text font-weight-light' style='color:"_%c_"'>"_%t_"</span><br>"
+#define Message(%t) "<span class='brand-text font-weight-light'>"_%t_"</span><br>"
+#define MessErr(%t) "<span class='brand-text font-weight-light' style='color:hotpink'>"_%t_"</span><br>"
 
 #;	Localization
 #define GNLangDOMAIN "AppTools"
@@ -9373,7 +9380,7 @@ If exporting multiple items, separate them with commas, pass the items("item")="
 <Class name="apptools.core.LogInfoPane">
 <IncludeCode>apptools.core</IncludeCode>
 <Super>%CSP.Util.Pane</Super>
-<TimeChanged>65827,61227.879043</TimeChanged>
+<TimeChanged>65940,36670.483972</TimeChanged>
 <TimeCreated>65607,76510.552235</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -9848,7 +9855,7 @@ Drawing the form to enter information</Description>
 				 | <a target='Tabs' name='Tabs' href='#("apptools.Tabs.PanelSample.cls")#' id='Param'>#($$$aText("Sample Tabs Application",""))#</a>
 				 
 				 | <a target='Chart' name='Chart'  id='Chart' href='#("apptools.Chart.Chart.cls?panel=class(apptools.Chart.ChartPanel).ChartDbSize&NSP="_$Namespace)#'>#($$$aText("Database growth Chart",""))#</a>
-				 | <a target='ChartAlert' name='ChartAlert'  id='ChartAlert' href='#("apptools.Chart.Chart.cls?panel=class(apptools.Chart.ChartPanel).ChartAlert&NSP="_$Namespace)#'>#($$$aText("Event Chart",""))#</a>
+				 | <a target='ChartAlert' name='ChartAlert'  id='ChartAlert' href='#("apptools.Chart.Chart.cls?panel=class(apptools.Chart.ChartPanel).ChartAlert&days=365&NSP="_$Namespace)#'>#($$$aText("Event Chart",""))#</a>
  			 | 
  			</td>
 		</tr>
@@ -10059,9 +10066,10 @@ d ##class(apptools.core.LogInfoPane).AddC1310("")</Description>
 
 <Method name="DrawGN">
 <Description>
-do ##class(apptools.core.LogInfoPane).DrawGN(a)</Description>
+do ##class(apptools.core.LogInfoPane).DrawGN(a)
+do ##class(apptools.core.LogInfoPane).DrawGN($lb("^tmp**",1000,$namespace,1),0,.res) zwrite @res ;get list global directory with allocations blocks</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>a</FormalSpec>
+<FormalSpec><![CDATA[a,print=1,&result]]></FormalSpec>
 <Implementation><![CDATA[
 	set $lb(gn, MaxNode, NSpace, Next, Message ,exp, Filtr, ExecuteDraw, exportXLS, exportXLSfile, exportXLSfileEmail)=a
 		if gn["*" {
@@ -10091,19 +10099,31 @@ do ##class(apptools.core.LogInfoPane).DrawGN(a)</Description>
 						if $d(dir(dir,r.%Get("Name"))) { 
 							set row=dir(dir,r.%Get("Name"))
 							set alloc=r.%Get("Allocated MB")
-							set @GN@(sql,0,row,14)=$select(alloc<1:alloc,1:"<font color=red><b>"_alloc_"</b></font>")
+							set @GN@(sql,0,row,14)=$select('print:alloc,alloc<1:alloc,1:"<font color=red><b>"_alloc_"</b></font>")
 							if gn["***" { set used=r.%Get("Used MB")
-								set @GN@(sql,0,row,15)=$select(used<1:used,1:"<font color=red><b>"_used_"</b></font>")
+								set @GN@(sql,0,row,15)=$select('print:used,used<1:used,1:"<font color=red><b>"_used_"</b></font>")
 							}
 							
 						}
 					}
 			 	}
 		 	}
-		 	set st=..DrawSQL("result "_$na(@GN@(sql,0)),MaxNode,NSpace,$g(Message),$g(ExecuteDraw),$lb(exportXLS,exportXLSfile,exportXLSfileEmail))
+		 	if print {
+		 		set st=..DrawSQL("result "_$na(@GN@(sql,0)),MaxNode,NSpace,$g(Message),$g(ExecuteDraw),$lb(exportXLS,exportXLSfile,exportXLSfileEmail))
+		 	}
+		 	else {
+			 	set result=$na(@GN@(sql))
+			 	set st=$$$OK
+		 	}
 		}
 		else {
-			set st=..DrawArray(gn,MaxNode,NSpace,Next,$g(Message),$g(exp),Filtr,$g(ExecuteDraw),$lb(exportXLS,exportXLSfile,exportXLSfileEmail))
+		 	if print {			
+				set st=..DrawArray(gn,MaxNode,NSpace,Next,$g(Message),$g(exp),Filtr,$g(ExecuteDraw),$lb(exportXLS,exportXLSfile,exportXLSfileEmail))
+		 	}
+		 	else {
+			 	set result=gn
+			 	set st=$$$OK
+		 	}
 		}
 		q $$$OK
 ]]></Implementation>
@@ -10670,7 +10690,7 @@ Close file XLS</Description>
 	// Send file to e-mail
 	i exportXLSfileEmail'="" {
 		s sc=##class(apptools.core.LogInfo).SendEmail(exportXLSfileEmail, $$$aText("Send file","")_" "_exportXLSfile, $g(msg)_"<br> "_$$$aText("Namespace","")_" :"_$Namespace_"<br> "_$$$aText("Query","")_": "_SQL, exportXLSfile)
-		;i 'sc ;s $$$AppL("APP","CloseXLSfile-SendEmail")=$System.Status.GetErrorText(sc) 
+		i 'sc write $System.Status.GetErrorText(sc) ;s $$$AppL("APP","CloseXLSfile-SendEmail")=$System.Status.GetErrorText(sc) 
 		}
 	write !,"<br><h5>"_$$$aText("Query result","")_" ("_(+count)_" "_$$$aText("lines) uploaded to file","")_" "_exportXLSfile_"</h5>"
 	quit
@@ -10683,11 +10703,15 @@ Query table output
 fileXLS - list of parameters for uploading to Excel and sending by mail
  $lg(fileXLS,1) =1 flag 
 	s exportXLSfileEmail=$lg(fileXLS,3) - parcel addresses separated by commas, to which to send the file
-	s exportXLSfile=$lg(fileXLS,2) - full path to the file where to write the table</Description>
+	s exportXLSfile=$lg(fileXLS,2) - full path to the file where to write the table
+ mode=1 - not included number colomn
+
+d ##class(App.LogInfoPane).DrawSQL("query %SYS.GlobalQuery:NameSpaceList %SYS %S*",10000,$namespace," ")</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>SQL:%String="",MaxNode=$$$MAXSHOW,NSpace="",msg="",Execute="",fileXLS="",Mode="",FiltrRow=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
+	set hoverClass="hc"_$tr($zts,",.")
 	if ($zconvert($e(SQL,1),"L")="q") {
 		try { set st=1
 			if $e($p(SQL," ",2,99),1,2)="##" {
@@ -10739,7 +10763,7 @@ fileXLS - list of parameters for uploading to Excel and sending by mail
 	<h7>#($s(msg'="":msg,1:"Query: "_SQL))#</h7>
 	<table style="border-radius: 10px; border: 1px solid #72a7cf" cellpadding="2" cellspacing="0" class="DetailTable" bgcolor="#c4d6d6" width="90%">
 	<thead>
-		<tr class=trs >
+		<tr class='trs #(hoverClass)#' >
 		>
 	if 'Mode write "<th width=""1%"">#</th>"
 	
@@ -10800,7 +10824,7 @@ fileXLS - list of parameters for uploading to Excel and sending by mail
 	;Set the hover for table rows
 	i '$d(%DrawSQL) {
 	$$$jsstart
-		w "$('.trs').hover(function(){ " // set the function when you hover the cursor over the element and during its lead	ui-state-hover
+		w "$('."_hoverClass_"').hover(function(){ " // set the function when you hover the cursor over the element and during its lead	ui-state-hover
 		w "  $(this).toggleClass( 'ui-widget-content' )" 
 		w " });"
 	$$$jsstop
@@ -10810,7 +10834,7 @@ fileXLS - list of parameters for uploading to Excel and sending by mail
  // Handling one query string
 qNext(GetData,cou="")
 		set count=count+1
-		write "<tr class=trs >"
+		write "<tr class='trs "_hoverClass_"' >"
 		if 'Mode write "<th>"_$s(cou="":count,1:cou)_"</th>"
 		if count>MaxNode w "<th style='color:red'>... "_$$$aText("More entries","")_" "_MaxNode_"</th></tr>" s stopWrite=1 QUIT
 		for ii=1:1:ColCount {	
@@ -11322,7 +11346,7 @@ d ##class(apptools.core.Production).SaveAndStop()
 d ##class(apptools.core.Production).StartAll()</Description>
 <Abstract>1</Abstract>
 <IncludeCode>apptools.core</IncludeCode>
-<TimeChanged>65719,61872.79234</TimeChanged>
+<TimeChanged>65952,29748.884405</TimeChanged>
 <TimeCreated>65607,76510.942315</TimeCreated>
 
 <Parameter name="TIMEOUTSTOP">
@@ -11388,10 +11412,11 @@ d ##class(apptools.core.Production).StopAll()</Description>
 Check and restore autorun products in Namespaces, run all products that were launched
 d ##class(apptools.core.Production).StartAll()</Description>
 <ClassMethod>1</ClassMethod>
+<FormalSpec>nsOnly=""</FormalSpec>
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
  	d ..EnsAction("auto1")
- 	d ..EnsAction("start")
+ 	d ..EnsAction("start",nsOnly)
  	w !!,"ok"
  	q
 ]]></Implementation>
@@ -12081,7 +12106,7 @@ write ##class(apptools.core.Production).GetSettings("ProductionName","ItemName",
 <CompileAfter>apptools.core.msg</CompileAfter>
 <IncludeCode>apptools.core</IncludeCode>
 <Super>%CSP.Page</Super>
-<TimeChanged>65827,58380.015026</TimeChanged>
+<TimeChanged>65899,55016.121983</TimeChanged>
 <TimeCreated>65607,76511.476206</TimeCreated>
 
 <Parameter name="pathfiles">
@@ -12130,6 +12155,7 @@ The path to the directory on the server for storing files</Description>
 	   ;zw %request TODO
 	   ;%request.AppData %request.Application
 	   if %request.Application["apptoolsrest" set pathcsp="/csp/spgz/"
+	   if %request.Application["/arest/" set pathcsp="/csp/spgz/"
   }
  &html<
     <script>
@@ -12638,7 +12664,7 @@ presumable codename</Description>
 Utilities working with files</Description>
 <Abstract>1</Abstract>
 <IncludeCode>apptools.core</IncludeCode>
-<TimeChanged>65811,66976.216585</TimeChanged>
+<TimeChanged>65943,29001.620792</TimeChanged>
 <TimeCreated>65607,76505.230442</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -12920,9 +12946,21 @@ Search of time of the extension of the database</Description>
 <FormalSpec>Line,yyyy,mm,dd</FormalSpec>
 <Implementation><![CDATA[
 	Set mm=$p(Line,"/",1)
-	;Set dd=$p(Line,"/",2)
+	Set dd=$p(Line,"/",2)
 	Set yyyy="20"_$p($p(Line,"/",3),"-")
 	q mm'=""&&(yyyy'="")
+]]></Implementation>
+</Method>
+
+<Method name="GetContextForAlert">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[	quit $lb("Close a transaction that failed to roll back","Shutdown complete","CPUusage Alert: CPUusage","Paging Alert: Physical Memory is","Lock table full","DiskPercentFull","Multiple sensors critically above normal")
+]]></Implementation>
+</Method>
+
+<Method name="GetContextForAlertExclude">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[	quit $lb("ResourceCleanup: Dead job cleanup","JobType=Background","JobType=CSP","SSL/TLS Certificate(s) expiring within")
 ]]></Implementation>
 </Method>
 
@@ -12930,26 +12968,27 @@ Search of time of the extension of the database</Description>
 <Description>
 Search important events</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec><![CDATA[Line,&bd]]></FormalSpec>
+<FormalSpec><![CDATA[Line,&bd,hdt]]></FormalSpec>
 <Implementation><![CDATA[
 	q:'..getDate(Line,.yyyy,.mm) $$$OK
-	if Line["Shutdown complete"	{
-		i $i(bd("Reboot",yyyy,mm))
+	set context=..GetContextForAlert()
+	for i=1:1:$ll(context) {
+		if Line[$lg(context,i)	{
+			if $i(bd($lg(context,i),yyyy,mm)) set stop=1 quit
+		}
 	}
-	elseif 0,Line["DELETE:",Line["journals"	{
-		i $i(bd("DELETE journals",yyyy,mm))
-	}
-	elseif 0,Line["Automatic journal file roll"	{
-		i $i(bd("Automatic journal file roll",yyyy,mm))
-	}
-	elseif Line["Paging Alert: Physical Memory is"	{
-		i $i(bd("Paging Alert: Physical Memory is used",yyyy,mm))
-	}
-	elseif Line["Error reading from SNMP port"	{
-		i $i(bd("Error reading from SNMP port",yyyy,mm))
-	}
-	elseif Line["Lock table full"	{
-		i $i(bd("Lock table full",yyyy,mm))
+	quit:$Get(stop) $$$OK
+	set Exclude=..GetContextForAlertExclude()
+	if $p(Line," ",3)>2 {
+		for i=1:1:$ll(Exclude) {
+			if Line[$lg(Exclude,i)	{
+				set stop=1 quit
+			}
+		}
+		quit:$Get(stop) $$$OK
+		
+		set context=$p(Line," ",5,7)
+		if $i(bd(context,yyyy,mm))
 	}
 	q $$$OK
 ]]></Implementation>
@@ -12959,7 +12998,7 @@ Search important events</Description>
 <Description>
 Search of time of the extension of the database</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec><![CDATA[Line,&bd]]></FormalSpec>
+<FormalSpec><![CDATA[Line,&bd,hdt]]></FormalSpec>
 <Implementation><![CDATA[
 	s context = "Expansion completed"
 	if Line[context	{
@@ -13026,13 +13065,14 @@ To execute the method on each line of Protocol</Description>
 <Implementation><![CDATA[
 	Set gn=$$$GNmessages
 	KILL res
-	d ##class(apptools.core.files).getPathcconsole(.dir,.logname) ;w !,dir
-	d ##class(apptools.core.files).GetList(dir,logname_"*",.List) ;zw List
-	s i="" f { s i=$o(List(i)) q:i="" 
+	do ##class(apptools.core.files).getPathcconsole(.dir,.logname) ;w !,dir
+	do ##class(apptools.core.files).GetList(dir,logname_"*",.List) ;zw List
+	set i="" for { set i=$o(List(i)) q:i="" 
 		do ParseFile(gn,i)
 	}
-	
-	s bd=##class(apptools.core.files).getPeriod(days,.FromDateTime,.ToDateTime,.df,.dt) ;df_" "_dt
+	;w !,days
+	s period=##class(apptools.core.files).getPeriod(days,.FromDateTime,.ToDateTime,.df,.dt) 
+	;w !,df_" "_dt
 	
 	if FromDateTime="" Set HFromDateTime="1.1"
 	else  Set HFromDateTime=$$DataTimeCConsole2H(FromDateTime)
@@ -13040,55 +13080,69 @@ To execute the method on each line of Protocol</Description>
 	else  Set HToDateTime=$$DataTimeCConsole2H(ToDateTime)
 	
 	;w !,HFromDateTime_" "_HToDateTime
-	
-	s hdt=HFromDateTime
-	s class=$p($p(method,"(",2),")"),method=$p($p(method,")",2),".",2)
-	f { s hdt=$o(@gn@(hdt),1,Line) q:hdt=""  q:hdt>HToDateTime
+	;w !,FromDateTime_" "_ToDateTime
+	;set hdt=HFromDateTime
+	set from=$p(df,".",3)_$p(df,".",2)_$p(df,".",1)_"000000"
+	set to=$p(dt,".",3)_$p(dt,".",2)_$p(dt,".",1)_"235959"
+	;w !,from," ",to
+	set class=$p($p(method,"(",2),")"),method=$p($p(method,")",2),".",2)
+	for i=1:1 {
+		 set from=$o(@gn@(from),1,Line) 
+		 quit:from=""  
+		 quit:from>to
+		;w !,$zr,!,Line
+		;w !,$na(@gn@(from)),!,@gn@(from)
 		// Search context 
-		d $classmethod(class,method,Line,.bd)
+		d $classmethod(class,method,Line,.bd,from)
 	}
+	set bd=period
 	quit $$$OK
 
 
 /// Function parse Protocol of the file on the date required depth
 /// To skanirovat cconsole.log the result to put 
 ParseFile(gnTemp,InFile)
-	if $g(@gnTemp)[InFile,InFile'["cconsole.log" q 1 ;already archive dismantled
+	if $g(@gnTemp)[InFile,InFile'["messages.log" q 1 ;already archive dismantled
 	;w !,InFile
 	Set File2 = ##class(%File).%New(InFile)
 	Do File2.Open("RSK\UTF8\")
 	Do {
 		Set Line = File2.ReadLine()
-		s H=$$DataTimeCConsole2H($p(Line,":",1,3))
-		i H="",$g(zts)'="" {
-			i $l($g(@gnTemp@(zts)))>32000 continue
-			;i $i(@gnTemp@(0))
-			s @gnTemp@(zts)=$g(@gnTemp@(zts))_" "_Line ;glue from the previous
+		set H=$$DataTimeCConsole2H($p(Line,":",1,3),.GGGGMMDD)
+		
+		if H="",$g(zts)'="" {
+			if $l($g(@gnTemp@(zts)))>32000 continue
+			if @gnTemp@(zts)[Line continue
+			set @gnTemp@(zts)=$g(@gnTemp@(zts))_" "_Line ;glue from the previous
 			continue
 		}
-		s zts=H_","_$p($p(Line,":",4)," ")
-		i $g(@gnTemp@(zts))'="",$g(@gnTemp@(zts))'=Line {
-			 i $l($g(@gnTemp@(zts)))>32000 continue
-			 ;i $i(@gnTemp@(0))
-			 s @gnTemp@(zts)=$g(@gnTemp@(zts))_" "_Line  
+		;s zts=H_","_$p($p(Line,":",4)," ")
+		set zts=GGGGMMDD_"."_$p($p(Line,":",4)," ")
+		set zts=+zts
+		if $g(@gnTemp@(zts))'="",$g(@gnTemp@(zts))'=Line {
+			 if $l($g(@gnTemp@(zts)))>32000 continue
+			 if @gnTemp@(zts)[Line continue
+			 set @gnTemp@(zts)=$g(@gnTemp@(zts))_" "_Line  
 			 continue
 		}
 		;i $i(@gnTemp@(0)) ;i '(@gnTemp@(0)#1000) w "."
 		s @gnTemp@(zts)=Line
-		} While 'File2.AtEnd
+	} While 'File2.AtEnd
 	Do File2.Close()
-	s:$g(@gnTemp)'[InFile @gnTemp=$g(@gnTemp)_"*"_InFile ;add the name of zagolovok for exceptions in the following analysis
+	set:$g(@gnTemp)'[InFile @gnTemp=$g(@gnTemp)_"*"_InFile ;add the name of zagolovok for exceptions in the following analysis
  quit $g(@gnTemp)
 
 /// Transform the date 09/01/17-10:31:15 in $Horolog.
-DataTimeCConsole2H(DT) 
-		s dc=""
+DataTimeCConsole2H(DT,GGGGMMDD)
+		set dc=""
 		Set Date1=$p(DT,"-")
 		Set Time1=$p(DT,"-",2)
 		try {
-			Set dh=$zdh($p(Date1,"/",1,2)_"/20"_$p(Date1,"/",3),1)
+			set da=$p(Date1,"/",1,2)_"/20"_$p(Date1,"/",3)
+			Set dh=$zdh(da,1)
 			Set th=$zth(Time1,1)
 			Set dc=dh_"."_th
+			set GGGGMMDD=$p(da,"/",3)_$p(da,"/",1)_$p(da,"/",2)_$tr(Time1,":")
 		} catch {}
  quit $g(dc)
 
@@ -13453,6 +13507,52 @@ ParamField - field name ;"OfficeFile"</Description>
  		;set @gn@(id,"origname")=origname
  		;set URL=..%ClassName(1)_".cls?"_cgivar_"="_id
  	quit id
+]]></Implementation>
+</Method>
+
+<Method name="Test">
+<Description>
+do ##class(apptools.core.files).Test(30,.res)</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>days,res</FormalSpec>
+<Implementation><![CDATA[
+ 	;set method="class(apptools.core.files).Alert" 
+	set method="class(apptools.core.files).AlertDays" 
+	do ##class(apptools.core.files).FindContextInLog(days,method,.res)
+]]></Implementation>
+</Method>
+
+<Method name="AlertDays">
+<Description>
+Search important events</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[Line,&bd,dt]]></FormalSpec>
+<Implementation><![CDATA[
+	q:'..getDate(Line,.yyyy,.mm,.dd) $$$OK
+	set context=..GetContextForAlert()
+	;w !,dt," ",Line
+	
+	for i=1:1:$ll(context) {
+		if Line[$lg(context,i)	{
+			set bd($i(bd))=Line
+			set stop=1 quit
+		}
+	}
+	quit:$Get(stop) $$$OK
+	
+	set Exclude=..GetContextForAlertExclude()
+	if $p(Line," ",3)>1 {
+		for i=1:1:$ll(Exclude) {
+			if Line[$lg(Exclude,i)	{
+				set stop=1 quit
+			}
+		}
+	
+		quit:$Get(stop) $$$OK
+		;set context=$p(Line," ",3)_" "_$p(Line," ",5,7)
+		set bd($i(bd))=Line
+	}
+	q $$$OK
 ]]></Implementation>
 </Method>
 </Class>
@@ -15481,7 +15581,7 @@ do ##class(apptools.core.msg).EscColor()</Description>
 Network Utility %Net.HttpRequest, %Net.SMTP, %Net.FTP</Description>
 <Abstract>1</Abstract>
 <IncludeCode>apptools.core</IncludeCode>
-<TimeChanged>65810,50157.467575</TimeChanged>
+<TimeChanged>65904,47131.774221</TimeChanged>
 <TimeCreated>65607,76510.74453</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -15518,7 +15618,8 @@ To send email
 subscrible - a comma separated list whom to send the letter
 subj - subject
 text - the text of the letter
-attach - an array of files the link</Description>
+attach - an array of files the link
+samples write ##class(apptools.core.net).SendMail(server, port, ssl, UseSTARTTLS, timezone, username, psw, from, subscrible, subj, text, attach)</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>server,port,ssl,UseSTARTTLS,timezone,username,psw,from,subscrible,subj,text,attach</FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -16007,7 +16108,7 @@ w ##class(apptools.core.net).loadzpm()</Description>
 // The REST interface: class that routes HTTP requests</Description>
 <IncludeCode>apptools.core</IncludeCode>
 <Super>%CSP.REST</Super>
-<TimeChanged>65822,32231.430979</TimeChanged>
+<TimeChanged>65962,35137.979494</TimeChanged>
 <TimeCreated>65607,76511.09225</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -16048,6 +16149,7 @@ w ##class(apptools.core.net).loadzpm()</Description>
 
 <Route Url="/products/:mode" Method="GET" Call="getProductions"/>
 <Route Url="/productslist/:ns" Method="GET" Call="getListErrProducts"/>
+<Route Url="/alerts/:count" Method="GET" Call="GetAlerts"/>
 
 <Route Url="/proj/:proj/:metrics/:mode" Method="GET" Call="apptools.MVK.Metrics:getProj"/>
 </Routes>
@@ -16097,7 +16199,7 @@ post http://server:57772/rest/jsonrpc
 			d %request.Content.Rewind() 
 			set json=%request.Content.Read($$$MaxStringLength) 
 			set json = $ZCVT(json,"I","UTF8") 
-			s $$$AppL("MML","jsonrpc-json")=json
+			;s $$$AppL("MML","jsonrpc-json")=json
 	 		if ($g(json)["{") {
 	 			set method={}.$$$jsonFromJSON(json).method
 	 			set params={}.$$$jsonFromJSON(json).params
@@ -16105,7 +16207,8 @@ post http://server:57772/rest/jsonrpc
 	 			set id={}.$$$jsonFromJSON(json).id
 	 			if jsonrpc'="2.0" w ..jsonrpcError(2,"Version not supported "_jsonrpc) q
 	 			s appPar=""
-	 			if method[":" { if $p(method,":",1)'="" s ns=$p(method,":",1)
+	 			if method[":" { 
+	 				if $p(method,":",1)'="" s ns=$p(method,":",1)
 					if $p(method,":",2)'="" s class=$p(method,":",2)
 					if $p(method,":",3)'="" s meth=$p(method,":",3)
 					if $p(method,":",4)'="" s appPar=$p(method,":",4,*)
@@ -16123,9 +16226,25 @@ post http://server:57772/rest/jsonrpc
 				   ;set %response.CharSet = "utf-8"
     			;	set %response.ContentType = "text/html"
     				;s appPar("params")=params
-    				if $isobject(params) d ##class(apptools.core.Action).GetElemParseForm(params.form,.appPar,"z",0)
-      				do $classmethod(class,meth,.appPar) 
+    				if $isobject(params) {
+	    				d ##class(apptools.core.Action).GetElemParseForm(params.form,.appPar,"z",0)
+	    				s appPar("params")=params.%ToJSON()
+    				}
+    				do $classmethod(class,meth,.appPar) 
 					quit
+					/*
+					if $isobject(params.form) {
+	    				d ##class(apptools.core.Action).GetElemParseForm(params.form,.appPar,"z",0)
+	    				do $classmethod(class,meth,.appPar) 
+    				}
+    				elseif $isobject(params) {
+	    				do $classmethod(class,meth,.params) 
+    				}
+	    			else {
+		    			;d ##class(apptools.core.Action).GetElemParseForm(params.form,.appPar,"z",0)
+      					do $classmethod(class,meth,.appPar) 
+	    			}
+					quit */
 				}
 				;w "{""text"":""Hello world"",""inn"":"""_params.inn_"""}" q
 				;w $ZCVT(str,"O","UTF8") 
@@ -16399,7 +16518,7 @@ Write the contents of xData tag</Description>
 <Method name="getDirSize">
 <Description>
 To sorted sizes subdirs for Linux
-w ##class(apptools.core.rest).getDirSize("/opt/isc/ensemble/mgr/")</Description>
+kill res set res="" write ##class(apptools.core.rest).getDirSize("/opt2/isc/iris/mgr/",.res,0)</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec><![CDATA[path="",&res,minsize=10]]></FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -16415,6 +16534,7 @@ w ##class(apptools.core.rest).getDirSize("/opt/isc/ensemble/mgr/")</Description>
 	set tempfile=$SYSTEM.Util.InstallDirectory()_"mgr/Temp/dirsize.log"
 	kill @gn set nl = $c(10)
 	try {
+		;du -sm /opt2/isc/iris/mgr/*| sort -nr
 		set cmd="du -sm "_path_"*| sort -nr >"_tempfile
 		set result = $zf(-1, cmd)
 		if (result '= 0) { 
@@ -16434,6 +16554,7 @@ w ##class(apptools.core.rest).getDirSize("/opt/isc/ensemble/mgr/")</Description>
 		set st = ex.AsStatus()
 		;$$$TRACE($system.Status.GetErrorText(st))
 	}
+	do ##class(%File).Delete(tempfile)
 	zn curNs
 	quit st
 ]]></Implementation>
@@ -16442,7 +16563,7 @@ w ##class(apptools.core.rest).getDirSize("/opt/isc/ensemble/mgr/")</Description>
 <Method name="getDBsize">
 <Description>
 The size of the database in Gigabytes
-d ##class(apptools.core.rest).getDBsize("dbsize",.list)</Description>
+do ##class(apptools.core.rest).getDBsize("dbsize",.list) write list</Description>
 <ClassMethod>1</ClassMethod>
 <FormalSpec>prefix=..#ISCPREFIX_"_dbsize",dbname,int=1,all=0</FormalSpec>
 <ReturnType>%Status</ReturnType>
@@ -16458,12 +16579,24 @@ d ##class(apptools.core.rest).getDBsize("dbsize",.list)</Description>
 	for i=1:1 { q:'$d(@r@(i))   ;pass the loop through the entire report
 		continue:$g(@r@(i,1))=""
 		;by default, we give all sizes to Gigabytes
-		set free=$g(@r@(i,8))
+
 		set dir=$g(@r@(i,2))
 		set name=$g(@r@(i,1))
 		if 'all,(","_listDb_",")'[(","_name_",") continue
 		if 'all,(dir)[("secondary/")||((dir)[("temp/")) continue
-		set size=$g(@r@(i,4))
+		
+		set size=$$ToGB($g(@r@(i,4)))
+		set free=$$ToGB($g(@r@(i,8)))
+		set dbname(dir)=size
+		set dbname(dir,"name")=name
+		set dbname(dir,"free")=free
+		write:'int prefix_"_"_name_" "_size_nl
+		write:'int prefix_"_"_name_"_DiskFreeSpace "_(+free)_nl
+	}
+	set dbname=free
+	write nl
+	quit $$$OK
+ToGB(size) 
 		if size["MB" {s size=$j(size/(1024),"",3) ;if in MB, then divide
 		}
 		elseif size["TB" {s size=size*1024  ;if TB then multiply
@@ -16471,14 +16604,7 @@ d ##class(apptools.core.rest).getDBsize("dbsize",.list)</Description>
 		else {
 			set size=+size  ;if GB then translate into the number
 		}
-		set dbname(dir)=size
-		set dbname(dir,"name")=name
-		set dbname(dir,"free")=+free
-		write:'int prefix_"_"_name_" "_size_nl
-		write:'int prefix_"_"_name_"_DiskFreeSpace "_(+free)_nl
-	}
-	write nl
-	quit $$$OK
+	quit size
 ]]></Implementation>
 </Method>
 
@@ -16518,6 +16644,63 @@ http://localhost:57772/apptoolsrest/products/0</Description>
 	;	w $s(co:"/",1:"\")_"server_"_$zu(110)_"_"_ns_" Errors: "_co_$$$NL
 	;}
 	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetAlertsSys">
+<Description>
+do ##class(%SYS.System).WriteToConsoleLog("InterSystems Interoperability Test",,3)
+do ##class(apptools.core.rest).GetAlertsSys(,.json)</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[count=10,&sys]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	do ##class(%SYSTEM.Monitor).GetAlerts(,.str,.last)
+	set sys = {}
+	set sys.host = $ZU(110)
+	set sys.instance = $P($ZU(86),"*",2)
+	set sys.version = $zv
+	set sys.alerts = []
+	
+	set i=""
+	for ii=1:1 { set i=$Order(str(i),-1,val) quit:i=""
+		if ii>count quit
+		set alert={}
+		set alert.type=$P(val," ",3)
+		set alert.text=val
+		do sys.alerts.%Push(alert)
+	}
+	do sys.%ToJSON()
+ quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="GetAlerts">
+<Description>
+do ##class(apptools.core.rest).GetAlerts(,.json)</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[days=1,&sys]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+ 	;set method="class(apptools.core.files).Alert" 
+	set method="class(apptools.core.files).AlertDays" 
+	do ##class(apptools.core.files).FindContextInLog(days,method,.str)
+	set sys = {}
+	set sys.host = $ZU(110)
+	set sys.instance = $P($ZU(86),"*",2)
+	set sys.version = $zv
+	set sys.period = $G(str)
+	set sys.alerts = []
+	set i=""
+	for ii=1:1 { set i=$Order(str(i),-1,val) quit:i=""
+		;if ii>count quit
+		set alert={}
+		set alert.type=$P(val," ",3)
+		set alert.text=val
+		do sys.alerts.%Push(alert)
+	}
+	do sys.%ToJSON()
+	 quit $$$OK
 ]]></Implementation>
 </Method>
 
@@ -16663,7 +16846,7 @@ ORDER BY c.contractNumber
 <Class name="apptools.core.sys">
 <Abstract>1</Abstract>
 <IncludeCode>apptools.core</IncludeCode>
-<TimeChanged>65804,57910.272158</TimeChanged>
+<TimeChanged>65965,59621.589885</TimeChanged>
 <TimeCreated>65607,76511.284467</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -16816,7 +16999,7 @@ Flag = "NotTemp" - exclude tempory</Description>
 <Method name="ListNS">
 <Description>
 Get a list of domain namespaces separated by commas
-w ##class(apptools.core.sys).ListNS(.info,"NotPre,Ens")
+write ##class(apptools.core.sys).ListNS(.info,"NotPre,Ens")
 Flag = "Ens" - only where the ensemble is installed
 Flag = "NotPre" - exclude prepared</Description>
 <ClassMethod>1</ClassMethod>
@@ -17279,17 +17462,17 @@ Sample  w ##class(apptools.core.sys).GetRoles(mask,.roles)</Description>
 <Method name="GetUsers">
 <Description>
 Get system users
-kill users w ##class(App.sys).GetUsers("super",.users,.sql) w !,sql,! zw users 
-kill users w ##class(App.sys).GetUsers("sup%,adm%",.users,.sql) w !,sql,! zw users 
-kill users w ##class(App.sys).GetUsers("sup%,admin",.users,.sql) w !,sql,! zw users </Description>
+kill users set ext(1)=" or FullName like '%Manager%'" w ##class(apptools.core.sys).GetUsers("super",.users,.sql,.ext) w !,sql,! zw users 
+kill users w ##class(apptools.core.sys).GetUsers("sup%,adm%",.users,.sql) w !,sql,! zw users 
+kill users w ##class(apptools.core.sys).GetUsers("sup%,admin",.users,.sql) w !,sql,! zw users </Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec><![CDATA[mask="",&list,&sql]]></FormalSpec>
+<FormalSpec><![CDATA[mask="",&list,&sql,&ext]]></FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
   NEW $NAMESPACE
   SET $NAMESPACE = "%SYS"
   set mask=$zconvert(mask,"L")
-  set sql="select NameLowerCase,FullName,Comment,Roles,EmailAddress FROM Security.Users where (1=1)"
+  set sql="select NameLowerCase,FullName,Comment,Roles,EmailAddress,Enabled FROM Security.Users where (1=1)"
   if mask[",",mask'["%" { set mask=$replace($ZStrip(mask,"<>W"),",","','")
   	set sql=sql_" and NameLowerCase in ('"_mask_"')"
   } 
@@ -17306,6 +17489,12 @@ kill users w ##class(App.sys).GetUsers("sup%,admin",.users,.sql) w !,sql,! zw us
   elseif mask'="" {
 	  set sql=sql_" and NameLowerCase like '%"_mask_"%'"
   }
+  if $DATA(ext) {
+	  set i=""
+	  for { set i=$order(ext(i),1,data) quit:i=""
+	  	set sql=sql_" "_data
+	  }
+  }
 	set result=##CLASS(%ResultSet).%New("%DynamicQuery:SQL")
 	set tSC=result.Prepare(sql)
 	set:tSC tSC=result.Execute()
@@ -17314,7 +17503,7 @@ kill users w ##class(App.sys).GetUsers("sup%,admin",.users,.sql) w !,sql,! zw us
 	}
 	else {
 		while result.Next() {
-			set list(result.Data("NameLowerCase"))=$lb(result.Data("FullName"),result.Data("Comment"),result.Data("Roles"),result.Data("EmailAddress"))
+			set list(result.Data("NameLowerCase"))=$lb(result.Data("FullName"),result.Data("Comment"),result.Data("Roles"),result.Data("EmailAddress"),result.Data("Enabled"))
 		}
 	}
 	quit $$$OK
@@ -17564,7 +17753,7 @@ write $System.Status.GetErrorText(##class(apptools.core.sys).Integrity("APPTOOLS
 Utility types</Description>
 <Abstract>1</Abstract>
 <IncludeCode>apptools.core</IncludeCode>
-<TimeChanged>65610,77273.857</TimeChanged>
+<TimeChanged>65871,33598.386736</TimeChanged>
 <TimeCreated>65607,76511.38127</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -17682,9 +17871,9 @@ w ##class(apptools.core.type).GetYear($h)</Description>
 To get a date in the format 2018-04-03T16:40:30
 w ##class(apptools.core.type).GetDateTime($h)</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec>h</FormalSpec>
+<FormalSpec>h,delim="T"</FormalSpec>
 <ReturnType>%String</ReturnType>
-<Implementation><![CDATA[	q $zd(h,3)_"T"_##class(apptools.core.type).GetValidZT(h)
+<Implementation><![CDATA[	q $zd(h,3)_delim_##class(apptools.core.type).GetValidZT(h)
 ]]></Implementation>
 </Method>
 
@@ -17887,7 +18076,7 @@ https://adminlte.io</Description>
 <IncludeCode>apptools.core</IncludeCode>
 <ProcedureBlock>1</ProcedureBlock>
 <Super>apptools.lte.adminTabs</Super>
-<TimeChanged>65832,46272.553828</TimeChanged>
+<TimeChanged>65855,32810.102631</TimeChanged>
 <TimeCreated>64127,58953.319558</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -17941,6 +18130,240 @@ http://localhost:52773/apptoolsrest/a/smarthome&autoload=snapshot&namespace=USER
 	q $$$OK
 ]]></Implementation>
 </Method>
+
+<XData name="AddStyle">
+<Description>
+s h=##class(apptools.core.rest).getStatic("apptools.lte.adminStatic:AddStyle") w !,h,!</Description>
+<MimeType>application/yaml</MimeType>
+<Data><![CDATA[
+<style type="text/css">
+ 
+ 	/* https://habr.com/ru/post/453744/
+table {
+  overflow: hidden;
+}
+
+tr:hover {
+  background-color: #ffa;
+}
+
+td, th {
+  position: relative;
+}
+td:hover::after,
+th:hover::after {
+  content: "";
+  position: absolute;
+  background-color: #ffa;
+  left: 0;
+  top: -5000px;
+  height: 10000px;
+  width: 100%;
+  z-index: -1;
+}
+*/
+
+ 
+ /*
+	div {
+  max-width: 400px;
+  max-height: 150px;
+  overflow: scroll;
+}
+*/
+
+/* Use position: sticky to have it stick to the edge
+ * and top, right, or left to choose which edge to stick to: */
+
+thead th {
+  position: -webkit-sticky; /* for Safari */
+  position: sticky;
+  top: 0;
+}
+
+tbody th {
+  position: -webkit-sticky; /* for Safari */
+  position: sticky;
+  left: 0;
+}
+
+/* To have the header in the first column stick to the left: */
+
+thead th:first-child {
+  left: 0;
+  z-index: 1;
+}
+
+
+/* Just to display it nicely: */
+
+thead th {
+  background: #E7EBF9;
+  color: blue;
+
+}
+
+tbody th {
+  background: #E7EBF9;
+  color: blue;
+
+}
+
+table {
+  border-radius: 10px; 
+  border: 1px solid #72a7cf
+}
+
+td,
+th {
+  padding: 0.5em;
+}
+
+.bigbox { 
+height: 20px; width: 20px 
+}
+ 
+</style>
+]]></Data>
+</XData>
+
+<XData name="AddJS">
+<Description>
+s h=##class(apptools.core.rest).getStatic("apptools.lte.adminStatic:AddJS") w !,h,!</Description>
+<MimeType>application/yaml</MimeType>
+<Data><![CDATA[
+<script language='javascript'>
+$('#tWHAT').keydown(function (e) {
+  	if (e.ctrlKey && e.keyCode == 13) {
+    // Ctrl-Enter pressed
+    document.getElementById('WHAT').value=document.getElementById('tWHAT').value;
+    document.forms['loginfo'].submit();
+   }
+});
+// 
+function ActionJs(FormId,ResultId,appClass,appMethod,appPar,appNsp){
+	var $data =[];
+	//;var appNspace ='#(ns)#';
+	//;if (!appNsp) {appNsp =appNspace;}
+	//var classname ='#(class)#';
+	//if (!appClass) var appClass =classname;
+	if (FormId) {
+		$data = $('#'+FormId).serializeArray(); 
+		//alert(FormId);
+	}
+	//Add to array
+	$data.push({name:"appClass",value:appClass});
+	$data.push({name:"appMethod",value:appMethod});
+	$data.push({name:"appNsp",value:appNsp});
+	$data.push({name:"appPar",value:appPar});
+	$.ajax({
+	  url: 'apptools.core.Action.cls',
+	  type: 'post',
+	  data: $data,
+	  crossDomain: true,
+	  success: function(result) {
+	  if (ResultId) {$('#'+ResultId).html(result);}
+	  }
+	});
+}
+// Collect data from the form, serialize, send to the server, execute and paste the result into the container
+// FormId - source form identifier <form id='FormInpur'>...</form>
+// ResultId -  identifier of the target container <div id='ResultDiv'>...</div>
+// appAct -  parameters for executing code on the server
+//     namespace:classname:methodname:par1=val1&par2=val2...&parX-valX
+function AppAct(FormId,ResultId,appAct){
+	var $data =[]; //json array initialization
+	$data.push({name:"params",value:{}});
+	if (FormId) { //if the form id is specified, then we collect all input elements from it
+		// elements must have an id attribute matching the name.
+		// For example <input type='text' id='elem2' name='elem2'>
+		$data = $('#'+FormId).serializeArray();
+	}
+	$data.push({name:"appAct",value:appAct}); //add execution parameters that will be parsed in apptools.core.Action.cls
+	//if (jsonExt) {
+	//  if there is additional json, then add it
+	//	$data.push({"jsonExt":jsonExt});
+	//	}
+	//var url1='apptools.core.Action.cls';	if (url2) { url1=url2;}
+	//execute an asynchronous request to the apptools.core.Action.cls
+	$.ajax({  
+	  url: 'apptools.core.Action.cls',
+	  type: 'post',
+	  data: $data,
+	  success: function(result) {  // if successful
+	  	// if the resulting container is specified, put everything sent from the server into it
+	  	if (ResultId) {$('#'+ResultId).html(result);}
+	  }
+	});
+}
+// Collect data from the form, serialize, send to the server, execute and paste the result into the container
+// FormId - source form identifier <form id='FormInpur'>...</form>
+// ResultId -  identifier of the target container <div id='ResultDiv'>...</div>
+// appAct -  parameters for executing code on the server
+//     namespace:classname:methodname:par1=val1&par2=val2...&parX-valX
+//     namespace:routine:label:par1=val1&par2=val2...&parX-valX
+function AppRpc(FormId,ResultId,appAct,url,json){
+	var data ={"jsonrpc":"2.0",params:{}};
+	
+	if (FormId) {
+		data.params.formId=FormId;
+		data.params.form=JSON.stringify($('#'+FormId).serializeArray());
+	}
+	if (json) {
+		data.params.json = json;
+	}
+
+	data.method=appAct;
+	$.ajax({
+	  url: url,
+	  type: 'post',
+	  contentType:'application/json; charset=UTF-8',
+	  dataType:'html', 
+	  crossDomain: true,
+	  data: JSON.stringify(data),
+	  success: function(result) {
+	  if (ResultId) {
+		  $('#'+ResultId).html(result);
+	  }
+	  else {
+		  return result;
+	  	}
+	  }
+	});
+}
+
+// The function of opening the dialog box
+function WinOpen(ns,classname,met,el,title,rest) {
+	
+	var titlename="Method "+met+" parameter "+decodeURIComponent(el);
+	if (title) {titlename=title;}
+
+	//$("#dialogContent").load("apptools.core.Action.cls","appClass="+classname+"&appMethod="+met+"&appNsp="+ns+"&appPar="+el);
+	
+	if (rest) {AppRpc('anyForm','dialogContent',ns+':'+classname+':'+met+':'+decodeURIComponent(el),rest);}
+	else { ActionJs('anyForm',"dialogContent",classname,met,el,ns);}
+	$( "#dialog" ).dialog({
+		modal: true, 
+        title: titlename, 
+        autoOpen: true, 
+        width:window.innerWidth-200, 
+        height:window.innerHeight-300,
+		position: { my: 'top', at: 'top+150' },
+		buttons: [
+		{
+			text: "Cancel",
+			click: function() {
+				$( this ).dialog( "close" );
+			}
+		}
+		]
+		});
+	try { event.preventDefault();
+	} catch (e){};
+}
+</script>
+]]></Data>
+</XData>
 
 <XData name="html">
 <Description>
@@ -18172,7 +18595,7 @@ The template GUI of the application selector and tabs on the basis jQueryUi, Uik
 <IncludeCode>apptools.core</IncludeCode>
 <ProcedureBlock>1</ProcedureBlock>
 <Super>%CSP.Page</Super>
-<TimeChanged>65843,56036.902361</TimeChanged>
+<TimeChanged>65967,34789.044928</TimeChanged>
 <TimeCreated>65065,36454.902831</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -18249,13 +18672,25 @@ is there a right to work with this form</Description>
 		kill found
 		if $GET(opt(i,"Roles"))'="" {
 			set roles=$GET(opt(i,"Roles"))
-			for r=1:1:$l(roles,",") { continue:$p(roles,",",r)=""
-				if (","_$roles_",")[(","_$p(roles,",",r)_",") set found=1 quit
-			}
+			set found=..CheckRole(roles)
+		}
+		else { set found=1
 		}
 		if '$GET(found) KILL opt(i)
 	}
 	quit $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="CheckRole">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>roles</FormalSpec>
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	for r=1:1:$l(roles,",") { continue:$p(roles,",",r)=""
+		if (","_$roles_",")[(","_$p(roles,",",r)_",") set found=1 quit
+	}
+	quit +$GET(found)
 ]]></Implementation>
 </Method>
 
@@ -18319,38 +18754,28 @@ Replace parameters</Description>
 <FormalSpec>ns,cls,postload=0,autoload=""</FormalSpec>
 <ReturnType>%String</ReturnType>
 <Implementation><![CDATA[
- set io=$i
- OPEN 2:$j USE 2
+ set js=""
  if postload {
-	 write $$$NL
- $$$jsstart write $$$NL
- 	write ##class(apptools.core.Action).WriteActJs(%request,"","account_status",..%ClassName(1),"DrawStatus","")_$$$NL
+  set js=js_$$$NL_"<script language='javascript'>"_$$$NL
+  set js=js_$$$NL_##class(apptools.core.Action).WriteActJs(%request,"","account_status",..%ClassName(1),"DrawStatus","")_$$$NL
  	set enter=##class(apptools.core.Action).WriteActJs(%request,"","MainHidden",..%ClassName(1),"ShowTab","&appPar=Search&Searchstr='+document.getElementById('searchstr').value")_$$$NL
- 	write "$('#searchstr').keydown(function (e) { if (e.keyCode == 13) { "_enter_" }});"_$$$NL
+ 	set js=js_$$$NL_"$('#searchstr').keydown(function (e) { if (e.keyCode == 13) { "_enter_" }});"_$$$NL
   	if autoload="" {
 	 	do ..GetAllApps(.opt) 
 	 	set i="" 
 	 	for { set i=$o(opt(i)) q:i=""
-	 		if $GET(opt(i,"Active")) write "$('#Menu"_opt(i,"id")_"').trigger('click');"_$$$NL
+	 		if $GET(opt(i,"Active")) set js=js_$$$NL_"$('#Menu"_opt(i,"id")_"').trigger('click');"_$$$NL
 	 	}
  	} else {
-	 	write "$('#Menu"_autoload_"').trigger('click');"_$$$NL
+	 	set js=js_$$$NL_"$('#Menu"_autoload_"').trigger('click');"_$$$NL
  	}
- 	write $$$NL
- $$$jsstop write $$$NL
+ 	set js=js_$$$NL
+  set js=js_$$$NL_"</script>"_$$$NL
  }
  else {
- 	do ##class(apptools.core.LogInfoPane).AddJS(ns,cls)
- 	do ##class(apptools.core.LogInfoPane).AddStyle()
+ 	set js=js_$$$NL_##class(apptools.core.rest).getStatic("apptools.lte.adminStatic:AddJS")_$$$NL
+ 	set js=js_$$$NL_##class(apptools.core.rest).getStatic("apptools.lte.adminStatic:AddStyle")_$$$NL
  }
- set i=""
- 	,js=""
- for { set i=$o(^SPOOL($j,i),1,s) q:i=""
-		set js=js_s_$$$NL
- 	}
- 	KILL ^SPOOL($j)
-
- use io
  quit js
 ]]></Implementation>
 </Method>
@@ -18443,7 +18868,7 @@ render side menu </Description>
 		 	set ret=ret_	
 			"<ul class=""nav nav-treeview"">"_
               "<li class=""nav-item"">"_
-                "<a id='Menu"_$g(opt(i,"id"))_"' href=""#"" onclick="""_onclick_""" class=""nav-link"">"_
+                "<a id='Menu"_$g(opt(i,"id"))_"' href=""#"" onclick="""_onclick_""" class=""nav-link""  title="""_$g(opt(i))_""">"_
                 "<i class=""nav-icon fas "_iconInem_"""></i>"_
                 			
                   "<p>"_$g(opt(i))_"</p>"_
@@ -18596,7 +19021,7 @@ Par - code menu item from the GetAllApps ..</Description>
 	}
 	set tabId="tab-"_opt(Par,"id")
 	set tabIdMenu="tabMenu-"_opt(Par,"id")
-	if $g(opt(Par,"TabMenu","Close"))'="" s IconMenu="<span class=""uk-margin-small-left uk-icon uk-close"" uk-icon=""close"" onclick=""$(\'#"_tabIdMenu_",#"_tabId_"\').remove();""></span>"
+	if $g(opt(Par,"TabMenu","Close"))'="0" s IconMenu="<span class=""uk-margin-small-left uk-icon uk-close"" uk-icon=""close"" onclick=""$(\'#"_tabIdMenu_",#"_tabId_"\').remove();""></span>"
  	if $DATA(opt(Par,"TabMenu","Close"))>9 { //there are more points
  		;TODO
  	}
@@ -18881,7 +19306,7 @@ Draw Tables UiKit</Description>
 Get property element object
 do ##class(apptools.lte.adminTabs).GetElemProp("","test",.gn,"pref",,.tag)</Description>
 <ClassMethod>1</ClassMethod>
-<FormalSpec><![CDATA[obj="",propName,&gn,PrefixIdDIV="",Mode="",&tags=""]]></FormalSpec>
+<FormalSpec><![CDATA[obj="",propName,&gn,PrefixIdDIV="",Mode="",&tags="",&Par=""]]></FormalSpec>
 <Implementation><![CDATA[
 	set sysType=$g(gn("Properties",propName,"Type"))
 	
@@ -18894,12 +19319,13 @@ do ##class(apptools.lte.adminTabs).GetElemProp("","test",.gn,"pref",,.tag)</Desc
 	set ReadOnly=$g(gn("Properties",propName,"ReadOnly"))
 	set Parameters=$g(gn("Properties",propName,"Parameters"))
 	
-	set Value=""
+	set Value=$G(Par("ValueElement"))
 	if $iso(obj) set Value=$property(obj,Name)
 	
 	set redstar="" if Required s redstar="<font color=red title='"_$$$aText("Required field","")_"'>*</font>"
 	
 	do ##class(apptools.core.Form).GetJsonProp(obj, propName, .gn, .pr)
+	if $GET(Par("attr"))'="" set pr("attr")=Par("attr") 
 	if 'ReadOnly set ReadOnly=$g(pr("readOnly"))
 	if 'Mode set ReadOnly=1
 	
@@ -19006,7 +19432,7 @@ do ##class(apptools.lte.adminTabs).SelectField($lb("",0,1),"alert(1);",$lb("","N
 <ReturnType>%Status</ReturnType>
 <Implementation><![CDATA[
 	kill gnRet
-	set selectNS="<SELECT id='"_idSelect_"' name='"_idSelect_"' "_$s(NoWrite:"ONCHANGE='"_ONCHANGE_"'",1:"")_">",
+	set selectNS="<SELECT id='"_idSelect_"' name='"_idSelect_"' "_$s(ONCHANGE'="":"ONCHANGE='"_ONCHANGE_"'",1:"")_">",
 		tags=""
 	set gnRet($i(gnRet))=selectNS
 	for i=1:1:$ll(KeyList) { 
@@ -19034,7 +19460,7 @@ http://hp-msw:52773/apptoolsrest/a/adminsample</Description>
 <IncludeCode>apptools.core</IncludeCode>
 <ProcedureBlock>1</ProcedureBlock>
 <Super>apptools.lte.adminTabs</Super>
-<TimeChanged>65822,31575.858008</TimeChanged>
+<TimeChanged>65868,34946.104385</TimeChanged>
 <TimeCreated>65065,36454.902831</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -19102,7 +19528,7 @@ what are the available modes</Description>
 	set opt(key,"ClassName")=..%ClassName(1)
 	set opt(key,"Method")="ShowTabSample"
 	set opt(key,"Disable")=0 ;developed
-	set opt(key,"TabMenu","Close")=1
+	set opt(key,"TabMenu","Close")=0 ;the tab cannot be deleted
 	set opt(key,"Menu")=$lb(1,"Mode",1,"fa-cog") ;$lg(,3)=1 - open menu level 1
 	set opt(key,"Active")=1 ;active menu item
 	set opt(key,"aw-icon")="fa-list-alt" ;fa-table"
@@ -19114,7 +19540,6 @@ what are the available modes</Description>
 	set opt(key,"ClassName")=..%ClassName(1)
 	set opt(key,"Method")="ShowTabSample"
 	set opt(key,"Disable")=0 ;developed
-	set opt(key,"TabMenu","Close")=1
 	set opt(key,"Menu")=$lb(1,"Mode",1) ;$lg(,3)=1 - open menu level 1
 	
 	set key="menu-second"
@@ -20160,7 +20585,7 @@ http://hp-msw:52773/apptoolsrest/a/permiss</Description>
 <IncludeCode>apptools.core</IncludeCode>
 <ProcedureBlock>1</ProcedureBlock>
 <Super>apptools.lte.adminTabs</Super>
-<TimeChanged>65828,40050.652913</TimeChanged>
+<TimeChanged>65868,34963.084065</TimeChanged>
 <TimeCreated>65065,36454.902831</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -20218,7 +20643,7 @@ what modes are available</Description>
 			set opt(key,"Role")="%All"
 			set opt(key,"Namespace")="%SYS"
 			set opt(key,"Method")="ShowTabSample"
-			set opt(key,"TabMenu","Close")=1
+			set opt(key,"TabMenu","Close")=0 ;the tab cannot be deleted
 			set opt(key,"Active")=1 ;active menu item
 			set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
 
@@ -20302,7 +20727,7 @@ http://hp-msw:52773/apptoolsrest/a/permiss2</Description>
 <IncludeCode>apptools.core</IncludeCode>
 <ProcedureBlock>1</ProcedureBlock>
 <Super>apptools.lte.adminTabs</Super>
-<TimeChanged>65829,49829.191202</TimeChanged>
+<TimeChanged>65868,34974.237726</TimeChanged>
 <TimeCreated>65065,36454.902831</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -20360,7 +20785,7 @@ what modes are available</Description>
 			set opt(key,"Role")="%All"
 			set opt(key,"Namespace")="%SYS"
 			set opt(key,"Method")="ShowTabSample"
-			set opt(key,"TabMenu","Close")=1
+			set opt(key,"TabMenu","Close")=0 ;the tab cannot be deleted
 			set opt(key,"Active")=1 ;active menu item
 			set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
 
@@ -20573,7 +20998,7 @@ http://hp-msw:52773/apptoolsrest/a/permiss2</Description>
 <IncludeCode>apptools.core</IncludeCode>
 <ProcedureBlock>1</ProcedureBlock>
 <Super>apptools.lte.adminTabs</Super>
-<TimeChanged>65829,53928.585444</TimeChanged>
+<TimeChanged>65868,35009.393923</TimeChanged>
 <TimeCreated>65065,36454.902831</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -20631,7 +21056,7 @@ what modes are available</Description>
 			set opt(key,"Role")="%All"
 			set opt(key,"Namespace")="%SYS"
 			set opt(key,"Method")="ShowTabSample"
-			set opt(key,"TabMenu","Close")=1
+			set opt(key,"TabMenu","Close")=0 ;the tab cannot be deleted
 			set opt(key,"Active")=1 ;active menu item
 			set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
 
@@ -20644,7 +21069,6 @@ what modes are available</Description>
 			set opt(key,"Role")="%All"
 			set opt(key,"Namespace")="%SYS"
 			set opt(key,"Method")="ShowTabSample"
-			set opt(key,"TabMenu","Close")=1
 			set opt(key,"aw-icon")="fa-table"   ;https://fontawesome.com/icons?d=gallery&p=2&m=free
 
 	;top menu
@@ -20667,7 +21091,6 @@ what modes are available</Description>
 		set opt(key,"ClassName")=..%ClassName(1)
 		set opt(key,"Method")="ShowInIFrame" 
 		set opt(key,"InFrameUrl")="http://"_$zu(110)_":52773/csp/sys/sec/%25CSP.UI.Portal.User.zen?PID="_$username
-		set opt(key,"TabMenu","Close")=1
 		set opt(key,"MenuTop")=$lb(topMenuNumer,topMenuName)
 	set key="menu-top-account3"
 		set opt(key,"MenuTop")=$lb(topMenuNumer,topMenuName) ; 99-account has nested items
@@ -20684,7 +21107,6 @@ what modes are available</Description>
 	s opt(key,"TabName")="Search"_"-"
 	s opt(key,"ClassName")=..%ClassName(1)
 	s opt(key,"Method")="ShowTabSearch"
-	s opt(key,"TabMenu","Close")=1
 	s opt(key,"TabMenu","Mode")=0 ;1 - for each new search bar to make new tab, 0-tab is always the same
 	
 	do ..CheckRoleMenu(.opt)
@@ -20837,7 +21259,7 @@ http://hp-msw:52773/apptoolsrest/a/smarthome</Description>
 <IncludeCode>apptools.core</IncludeCode>
 <ProcedureBlock>1</ProcedureBlock>
 <Super>apptools.lte.adminTabs</Super>
-<TimeChanged>65822,33982.039477</TimeChanged>
+<TimeChanged>65868,35030.799266</TimeChanged>
 <TimeCreated>65065,36454.902831</TimeCreated>
 <DependsOn>apptools.core.msg</DependsOn>
 
@@ -20906,7 +21328,6 @@ what modes are available</Description>
 	s opt(key,"ClassName")=..%ClassName(1)
 	s opt(key,"Method")="ShowTabSample"
 	s opt(key,"Disable")=0 ;developed
-	s opt(key,"TabMenu","Close")=1
 	s opt(key,"Menu")=Level1
 	s opt(key,"Active")=1 ;active menu item
 
@@ -20917,7 +21338,6 @@ what modes are available</Description>
 	s opt(key,"ClassName")=..%ClassName(1)
 	s opt(key,"Method")="ShowTabSample"
 	s opt(key,"Disable")=0 ;developed
-	s opt(key,"TabMenu","Close")=1
 	s opt(key,"Menu")=Level1
 
 	;----------
@@ -20929,7 +21349,6 @@ what modes are available</Description>
 	s opt(key,"ClassName")=..%ClassName(1)
 	s opt(key,"MethodUrl")="http://ShowTabAbout.cls"
 	s opt(key,"Disable")=1 ;developed
-	s opt(key,"TabMenu","Close")=1
 	s opt(key,"Menu")=Level2
 
 	s key="menu-second2"
@@ -20939,7 +21358,6 @@ what modes are available</Description>
 	s opt(key,"ClassName")=..%ClassName(1)
 	s opt(key,"Method")="ShowTabAbout"
 	s opt(key,"Disable")=1 ;developed
-	s opt(key,"TabMenu","Close")=1
 	s opt(key,"Menu")=Level2
 
 	
@@ -21886,6 +22304,212 @@ nk71qAAAAABJRU5ErkJggg==
 </Class>
 
 
+<Class name="apptools.python.xlsx">
+<IncludeCode>apptools.core</IncludeCode>
+<TimeChanged>65968,77555.431457</TimeChanged>
+<TimeCreated>65923,76431.799769265</TimeCreated>
+
+<Method name="sql2xlsx">
+<Description>
+do ##class(apptools.python.xlsx).sql2xlsx("select * from apptools_core.Log order by id desc","n,,,,,n,,,,d","/tmp/sample-py.xlsx")</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>sql,format="",file:%String="d:\_proj\python\sample-py-*.xlsx",title=""</FormalSpec>
+<Implementation><![CDATA[
+	set st=$$$OK
+	set myQuery = ##CLASS(%ResultSet).%New("%DynamicQuery:SQL")
+	set st=myQuery.Prepare(sql)
+	if 'st q st
+	set st=myQuery.Execute()
+	if 'st q st
+	
+	;prepare XLSX
+	set file=$Replace(file,"*",$Tr($zts,".,"))
+	try {
+        set openpyxl = ##class(%SYS.Python).Import("openpyxl") 
+    } catch err {
+        set sc = ##class(%SYS.Python).Install("openpyxl")
+        set openpyxl = ##class(%SYS.Python).Import("openpyxl") 
+    }
+	set wb = openpyxl.Workbook()
+	#; grab the active worksheet
+	set ws = wb.active
+	set ws.title = "Report"
+	set pybuiltins = $system.Python.Import("builtins")
+	set pycols = pybuiltins.list()
+	do pycols.append(" ")
+	do ws.append(pycols)
+	set ws."__getitem__"("A2").value=title
+
+	set pycols = pybuiltins.list()
+	set (count)=0
+	set ColCount=myQuery.GetColumnCount()
+	for i=1:1:ColCount {	
+		do pycols.append(myQuery.GetColumnName(i))
+		set col=$C(i+64)
+		if i<27 set ws."column_dimensions"."__getitem__"(col).width = "20"
+	}
+	do ws.append(pycols)
+
+	while (myQuery.Next())	{
+		set count=count+1
+		set pyrows = pybuiltins.list()
+		for ii=1:1:ColCount {
+			set val=myQuery.GetData(ii)
+			if $P(format,",",ii)="d" { //date
+				set dt = ##class(%SYS.Python).Import("datetime")
+				set val=dt.datetime(+$p(val,"-",1), +$p(val,"-",2), +$p($p(val,"-",3)," "),+$p($p(val,":",1)," ",2),+$p($p(val,":",2)," ",2),+$p($p(val,":",3)," ",2))
+			}
+			if $P(format,",",ii)="n" { //number
+				set val=+val
+			}
+			do pyrows.append(val)
+		}
+		do ws.append(pyrows)
+	}
+   ;}
+	write !,"Save into "_file_" rows: "_count
+	do wb.save(file)
+	q $GET(count)
+]]></Implementation>
+</Method>
+
+<Method name="rest">
+<Description>
+do ##class(apptools.python.xlsx).rest(.par)</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>par</FormalSpec>
+<Implementation><![CDATA[
+	Set json = $$$NewDynObj
+ 	set json.jsonrpc="2.0"
+	set json.code=1
+	;set json.params=par
+	set json.message="OK"
+	set json.ns=$namespace
+	if $GET(par("params"))'="" {
+		set params={}.%FromJSON(par("params"))
+		set gn=params.gn
+		if gn'="" {
+			if 1 {
+				job ##class(apptools.python.xlsx).globals2xlsx(gn)::1 
+				if $t set json.result="Task runed. "_gn
+				else  set json.result="Task not runed. "_gn
+			}
+			else {
+				set st=##class(apptools.python.xlsx).globals2xlsx(gn)
+				set json.result="Runed "_gn
+			}
+		}
+	}
+	else {
+		set json.result="Job not started."
+	}
+	$$$DynObjToJSON(json)
+	q $$$OK
+]]></Implementation>
+</Method>
+
+<Method name="globals2xlsx">
+<Description>
+do ##class(apptools.python.xlsx).globals2xlsx("^tmpQuery","/backup/temp/giszkh-*.xlsx")</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>gn</FormalSpec>
+<Implementation><![CDATA[
+	set patternxlsx=$lg(@gn,9)
+	set paternfile=$lg(@gn,1) //;set pattern="/backup/temp/reports/gis-*.xlsx"
+	set transname=$lg(@gn,10)
+	set q=""
+	for { set q=$o(@gn@(q)) q:q=""
+		set GN=$na(@gn@(q))
+		if '$d(@GN@(-3,"par"),data) set stat="Is not report "_GN continue
+		set format=$lg(data,2)
+		set name=$lg(data,1)
+		set rows=$lg(data,4)
+		set file=$replace(paternfile,"*",transname_"-"_$zd($h,3)_"_"_$zt($p($h,",",2),1))
+		set file=$tr(file,":")
+		set st=##class(apptools.python.xlsx).gn2xlsx(GN,format,file,name,patternxlsx)
+		set stat="rows="_rows_" -> "_st
+		set @GN@(-3,"par")=@GN@(-3,"par")_$lb(file)
+	}
+	quit $G(stat)
+]]></Implementation>
+</Method>
+
+<Method name="gn2xlsx">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>gn,format="",file:%String,title="",patternxlsx=""</FormalSpec>
+<Implementation><![CDATA[
+	set st=$$$OK
+
+	if '$d(@gn@(1)) q $$$ERROR($$$GeneralError,"Is empty glovals data")
+
+	try {
+        set openpyxl = ##class(%SYS.Python).Import("openpyxl") 
+    } catch err {
+        set sc = ##class(%SYS.Python).Install("openpyxl")
+        set openpyxl = ##class(%SYS.Python).Import("openpyxl")
+    }
+
+	if patternxlsx'="" {
+		try {
+			set wb = openpyxl."load_workbook"(patternxlsx)
+		} catch err {
+			set wb = openpyxl.Workbook()
+		}
+	}
+	else {		
+		set wb = openpyxl.Workbook()
+	}
+	;set sheetname="Report"
+	set sheetname=$qs(gn,1)
+	
+	#; grab the active worksheet
+	set ws = wb.active
+	set ws.title = sheetname_$g(a)
+	set pybuiltins = $system.Python.Import("builtins")
+	set pycols = pybuiltins.list()
+	;do pycols.append(" ")
+	;do ws.append(pycols)
+	set ws."__getitem__"("A1").value=title
+
+	set pycols = pybuiltins.list()
+	set (count)=0
+	set ColCount=$ll(@gn@(0))
+	for i=1:1:ColCount {	
+		do pycols.append($lg(@gn@(0),i))
+		set col=$C(i+64)
+		if i<27 {
+			set width=$s($P(format,",",i)="d":17,$P(format,",",i)="n":10,1:30)
+			set ws."column_dimensions"."__getitem__"(col).width = width
+		}
+	}
+	do ws.append(pycols)
+
+	for row=1:1 {
+		quit:'$d(@gn@(row),data)
+		set count=count+1
+		set pyrows = pybuiltins.list()
+		for ii=1:1:ColCount {
+			set val=$lg(data,ii)
+			if $P(format,",",ii)="d",val'="" { //date
+				set dt = ##class(%SYS.Python).Import("datetime")
+				set val=dt.datetime(+$p(val,"-",1), +$p(val,"-",2), +$p($p(val,"-",3)," "),+$p($p(val,":",1)," ",2),+$p($p(val,":",2)," ",2),+$p($p(val,":",3)," ",2))
+			}
+			if $P(format,",",ii)="n" { //number
+				set val=+val
+			}
+			do pyrows.append(val)
+		}
+		do ws.append(pyrows)
+	}
+   ;}
+	write !,"Save into "_file_" rows: "_count
+	do wb.save(file)
+	q $GET(count)
+]]></Implementation>
+</Method>
+</Class>
+
+
 <Class name="apptools.util.XLSX">
 <Description>
 Report generation in a given directory upon request with a given field format</Description>
@@ -22075,532 +22699,6 @@ Outputs XML to be fed into %SYS.ZENReportExcelExporter Excel-compliant stream fr
  <sheet excelSheetName="Report">
 ]]></Data>
 </XData>
-</Class>
-
-
-<Class name="apptools.util.database">
-<Description>
-Utility for creating and deleting databases with one command 
-Create DataBase and Namespace with CSP, REST application 
-Forked from https://openexchange.intersystems.com/package/isc-generate-db
-
-Added resource and role creation for the database. (Many modules ZPM require MatchRoles=":{$dbrole}")
-Added deletion of DataBases, role resources and Namespace.
-Adding rest application is optional.
-
-example:
-write $System.Status.GetErrorText(##class(apptools.util.database).CreateDBNS("TESTDB2"))
-write $System.Status.GetErrorText(##class(apptools.util.database).DeleteDBNS("TESTDB2"))
-create db and namespace without resource and role
-write $System.Status.GetErrorText(##class(%ZPM.PackageManager.Developer.UnitTest.Utils).CreateNamespace("testdb14"))
-write $System.Status.GetErrorText(##class(%ZPM.PackageManager.Developer.UnitTest.Utils).DeleteNamespace("testdb14"))</Description>
-<Abstract>1</Abstract>
-<TimeChanged>65835,69829.516</TimeChanged>
-<TimeCreated>65687,72123.672838</TimeCreated>
-
-<Parameter name="LIBRARY">
-<Expression>$Select($Select($ZVersion["IRIS":1,1:0):"IRISLIB",1:"CACHELIB")</Expression>
-</Parameter>
-
-<Parameter name="SYSGLOBALS">
-<Expression>$Select($Select($ZVersion["IRIS":1,1:0):"IRISSYS",1:"CACHESYS")</Expression>
-</Parameter>
-
-<Parameter name="TEMPGLOBALS">
-<Expression>$Select($Select($ZVersion["IRIS":1,1:0):"IRISTEMP",1:"CACHETEMP")</Expression>
-</Parameter>
-
-<Parameter name="DATABASENAME">
-<Expression>$Select($Select($ZVersion["IRIS":1,1:0):"IRIS.DAT",1:"CACHE.DAT")</Expression>
-</Parameter>
-
-<Method name="Init">
-<ClassMethod>1</ClassMethod>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	write !,"Creating and deleting db, namespace, resource and role with one command"
-	write !,"example:"
-	write !,"write $System.Status.GetErrorText(##class(appmsw.util.database).CreateDBNS(""TESTDB2""))"
-	write !,"write $System.Status.GetErrorText(##class(appmsw.util.database).DeleteDBNS(""TESTDB2""))",!
-	quit $$$OK
-]]></Implementation>
-</Method>
-
-<Method name="CreateDBNS">
-<Description>
-write ##class(apptools.util.database).CreateDBNS("NEWNS")</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pNamespace:%String,pCodeData:%Boolean=0,pPathDataset:%String="",pInterOperability:%Boolean=1,pREST:%String=""</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	set pNamespace=$ZCONVERT(pNamespace,"L")
-	quit ..Install(pNamespace, pCodeData, pPathDataset, pInterOperability, pREST)
-]]></Implementation>
-</Method>
-
-<Method name="Install">
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pNamespace:%String,pCodeData:%Boolean=1,pPathDataset:%String="",pInterOperability:%Boolean=0,pREST:%String=""</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-    Set sc = $$$OK
-    Try {
-        Set sc = $$$ADDSC(sc,..CreateDatabase(pNamespace, pCodeData, pPathDataset)) quit:$$$ISERR(sc)
-        Set sc = $$$ADDSC(sc,..CreateNamespace(pNamespace, pCodeData, pInterOperability, pREST)) quit:$$$ISERR(sc)
-    }
-    Catch (err) {
-        Set sc = $$$ADDSC(sc,err.AsStatus())
-    }
-    Return sc
-]]></Implementation>
-</Method>
-
-<Method name="CreateDatabase">
-<Description>
-Create new database directory</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pNamespace:%String,pCodeData:%Boolean,pPathDataset:%String=""</FormalSpec>
-<Private>1</Private>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	set CurrNS=$Namespace
-    New $Namespace
-    Set $Namespace = "%SYS"
-    Set sc = $$$OK
-    Try {
-        Set dbList = $Listbuild("")
-        Set:(pCodeData = $$$YES) dbList= $Listbuild("-CODE","-DATA") 
-
-        For i = 1:1:$Listlength(dbList) {
-            Set dbSuffix = $Listget(dbList,i)
-            If (pPathDataset '= "") {
-                Set directory = pPathDataset_$Case($$$isWINDOWS,1:"\",:"/")_pNamespace_dbSuffix
-            }
-            Else {
-                Set directory = ..GetDatabaseDirectory(pNamespace_dbSuffix)
-            }
-
-            #; create a new directory if does not exist
-            If '..CheckDatabaseDirExists(directory) {
-                Set directory = $ZStrip(directory,"<>W")
-                Set sc = $$$ADDSC(sc,##class(%File).CreateDirectoryChain(directory))
-                If $$$ISERR(sc) {
-                    Set msg = directory_": Could not create this directory. Please check the directory and try again."
-                    Set sc = $$$ADDSC(sc,$$$ERROR($$$GeneralError,msg))				
-                }
-            }
-            Else {
-                #; abort if database is already created
-                If ..CheckDatabaseExists(directory) {
-                    Set msg = directory_": Database already existent in this directory. Please check the directory and try again."
-                    Set sc = $$$ADDSC(sc,$$$ERROR($$$GeneralError,msg))
-                }
-            }
-            Quit:$$$ISERR(sc)
-
-            #; create new Resource
-            Set dbName = pNamespace_dbSuffix
-            set $Namespace=CurrNS
-            Set sc = $$$ADDSC(sc,..CreateRole($ZCONVERT(dbName,"U")))
-            Quit:$$$ISERR(sc)
-            Set $Namespace = "%SYS"
-            
-            #; create new database
-            Write "Creating Database "_dbName_"... "
-            Set size = 1
-            Set blockSize = 8192
-            Set properties("Directory") = directory
-            Set journalState = 1
-            Set sc = $$$ADDSC(sc,##class(SYS.Database).CreateDatabase(directory,size,blockSize,0,"%DB_"_dbName,journalState,"",""))
-            Quit:$$$ISERR(sc)
-
-            #; Handle if we have dismounted then deleted the database at the O/S level,
-            #; but the CPF entry still exists with the same directory, then recreate the DB only
-            If ##class(Config.Databases).Exists(dbName,.obj) {
-                If obj.Directory '= ##class(%File).ComputeFullDBDir(directory) {
-                    Set sc = $$$ADDSC(sc,##Class(Config.Databases).Create(dbName,.properties))
-                    Quit:$$$ISERR(sc)
-                }
-            }
-            Else {
-                Set sc = $$$ADDSC(sc,##Class(Config.Databases).Create(dbName,.properties))
-                Quit:$$$ISERR(sc)
-            }
-            Write "done!",!
-        }
-    }
-    Catch (err) {
-        Set sc = $$$ADDSC(sc,err.AsStatus())
-    }
-    Return sc
-]]></Implementation>
-</Method>
-
-<Method name="CreateRole">
-<Description>
-Create new Role
-w $system.Status.GetErrorText(##class(apptools.util.database).CreateRole("SWAGGERUI-CODE"))</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>dbName:%String</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-   ;create new role
-   New $Namespace
-   Set $Namespace = "%SYS"
-   Set sc = $$$OK
-   s nameR="%DB_"_dbName,desc="Role for "_nameR 
-	s pResources=nameR_":RW" 
-	if '##class(Security.Resources).Exists(nameR) {
-		Set sc = $$$ADDSC(sc,##class(Security.Resources).Create(nameR,"Resources for "_nameR,"RW"))
-		Quit:$$$ISERR(sc) sc
-	}
-	s pRolesGranted=""
-	if '##class(Security.Roles).Exists(nameR) {
-		Set sc = $$$ADDSC(sc,##class(Security.Roles).Create(nameR,desc,pResources,pRolesGranted))
-		Quit:$$$ISERR(sc) sc
-		w !,"Create new role "_nameR
-	}
-	Return sc
-]]></Implementation>
-</Method>
-
-<Method name="CreateResource">
-<Description>
-Create new Resource
-w $system.Status.GetErrorText(##class(apptools.util.database).CreateResource("DSW-DATA"))</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>dbName:%String,Permiss:%String="RW"</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-   ;create new resource
-   New $Namespace
-   Set $Namespace = "%SYS"
-    Set sc = $$$OK
-   s nameR="%DB_"_dbName,desc="Resource for "_nameR 
-	if '##class(Security.Resources).Exists(nameR) {
-		Set sc = $$$ADDSC(sc,##class(Security.Resources).Create(nameR,desc,Permiss))
-		Quit:$$$ISERR(sc) sc
-		w !,"Create new Resource "_nameR
-	}
-	Return sc
-]]></Implementation>
-</Method>
-
-<Method name="DeleteResource">
-<Description>
-Delete Resource
-w $system.Status.GetErrorText(##class(apptools.util.database).DeleteResource("DSWDATA"))</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>dbName:%String</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
- New $Namespace
- Set $Namespace = "%SYS"
- Set sc = $$$OK
-   s nameR="%DB_"_dbName
-	if ##class(Security.Resources).Exists(nameR) {
-		Set sc = $$$ADDSC(sc,##class(Security.Resources).Delete(nameR))
-		Quit:$$$ISERR(sc) sc
-		w !,"Delete Resource "_nameR
-	}
-	Return sc
-]]></Implementation>
-</Method>
-
-<Method name="DeleteRole">
-<Description>
-Delete Role
-w $system.Status.GetErrorText(##class(apptools.util.database).DeleteRole("DSWDATA"))</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>dbName:%String</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
- New $Namespace
- Set $Namespace = "%SYS"
- Set sc = $$$OK
-   s nameR="%DB_"_dbName
-	if ##class(Security.Roles).Exists(nameR) {
-		Set sc = $$$ADDSC(sc,##class(Security.Roles).Delete(nameR))
-		Quit:$$$ISERR(sc) sc
-		w !,"Delete role "_nameR
-	}
-	Return sc
-]]></Implementation>
-</Method>
-
-<Method name="CreateNamespace">
-<Description>
-Create new namespace</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pNamespace:%String,pCodeData:%Boolean,pInterOperability:%Boolean,pREST:%String</FormalSpec>
-<Private>1</Private>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-
-    New $Namespace
-    Set $Namespace = "%SYS"
-
-    If (pCodeData = $$$YES) {
-        Set strGlobals = pNamespace_"-DATA"
-        Set strRoutine = pNamespace_"-CODE"
-    }
-    Else {
-        Set (strGlobals, strRoutine) = pNamespace
-    }
-
-    Set sc = $$$OK
-    Try {
-
-        Write "Creating Namespace "_pNamespace_"... "
-
-        Set nsProperties("Globals") = strGlobals
-        Set nsProperties("Library") = ..#LIBRARY
-        Set nsProperties("Routines") = strRoutine
-        Set nsProperties("SysGlobals") = ..#SYSGLOBALS
-        Set nsProperties("SysRoutines") = ..#SYSGLOBALS
-        Set nsProperties("TempGlobals") = ..#TEMPGLOBALS
-        Set sc = $$$ADDSC(sc,##Class(Config.Namespaces).Create(pNamespace,.nsProperties))
-
-        Write "done!",!
-
-        #; enable Interoperability
-        If (pInterOperability = $$$YES) {
-            Write "Creating Interoperability mappings ... "
-            #; create InterOperability mappings
-            Set:'$Data(^%SYS("Ensemble","InstalledNamespace",pNamespace)) ^%SYS("Ensemble","InstalledNamespace",pNamespace)=""
-            Set sc = $$$ADDSC(sc,##class(%EnsembleMgr).createMappings(pNamespace))
-            Write "done!",!
-
-            Write "Adding Interoperability SQL privileges ... "
-            #; add InterOperability SQL privileges
-            Set sc = $$$ADDSC(sc,##class(%EnsembleMgr).addEnsembleSQLPrivileges(pNamespace))	
-            Write "done!",!
-        }
-        Set sc = $$$ADDSC(sc,..CreateCSPApplication(pNamespace))
-        If (pREST '= "") {
-            Set sc = $$$ADDSC(sc,..createRESTApp(pNamespace,pREST))
-        }
-    }
-    Catch (err) {
-        Set sc = $$$ADDSC(sc,err.AsStatus())
-    }
-    Return sc
-]]></Implementation>
-</Method>
-
-<Method name="CreateCSPApplication">
-<Description>
-Create CSP application</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pNamespace:%String</FormalSpec>
-<Private>1</Private>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-    Set sc = $$$OK
-    New $Namespace
-    Set $Namespace="%SYS"
-    Try {
-        Write "Creating CSP Application ... "
-        Set lower = $ZConvert(pNamespace,"L")
-        Set del = $Case($$$isWINDOWS,1:"\",:"/")
-        Set cspName = "/csp/"_lower
-
-        Set properties("Name") = cspName
-        Set properties("CookiePath") = "/csp/"_lower
-        Set properties("AutheEnabled") = $$$AutheUnauthenticated
-        Set properties("NameSpace") = pNamespace
-        Set properties("Path") = $System.Util.InstallDirectory()_"csp"_del_lower
-        Set properties("GroupById") = $$$IscMgtPortalId
-        Set properties("AutoCompile") = 1
-
-        // If the application exists, quit
-        If '##class(Security.Applications).Exists(cspName,.existingApp,.sc2) {
-            // Create the csp application properties	
-            Set sc = $$$ADDSC(sc,##class(Security.Applications).Create(cspName,.properties))
-        }
-        Else {
-            Set sc = $$$ADDSC(sc,sc2)
-        }
-        Write "done!",!
-    }
-    Catch (err) {
-        Set sc = $$$ADDSC(sc,err.AsStatus())
-    }
-    Return sc
-]]></Implementation>
-</Method>
-
-<Method name="createRESTApp">
-<Description>
-Create REST Application</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pNamespace:%String,DispatchClass="REST.Dispatch"</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-    #dim sc As %Status = $$$OK
-
-    New $Namespace
-    Set $Namespace = "%SYS"
-
-    Write "Creating CSP Application ... "
-
-    Set lower = $ZConvert(pNamespace,"L")
-    Set restName = "/rest/"_lower
-
-    If '##class(Security.Applications).Exists(restName) {
-        Set props("AutheEnabled") = $$$AutheUnauthenticated
-        Set props("NameSpace") = pNamespace
-        Set props("IsNameSpaceDefault") = $$$NO
-        Set props("DispatchClass") = DispatchClass
-        Set props("MatchRoles")=":%All"
-        Set sc = ##class(Security.Applications).Create(restName, .props)
-        Write "done!",!
-
-
-        Write "Creating "_DispatchClass_".cls ... "
-        Do ..CreateDispatchClass(pNamespace,DispatchClass)
-        Write "done!",!
-    }
-
-    Quit sc
-]]></Implementation>
-</Method>
-
-<Method name="CreateDispatchClass">
-<Description>
-Create a dummy REST service to populate messages</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pNamespace:%String,classname="REST.Dispatch"</FormalSpec>
-<Private>1</Private>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-    New $Namespace
-    Set $Namespace = pNamespace
-    Set sc = $$$OK
-    Try {
-        ;Set classname = "REST.Dispatch"
-        Set class = ##class(%Dictionary.ClassDefinition).%New(classname)
-        Set class.GeneratedBy = $ClassName()
-        Set class.Super = "%CSP.REST"
-
-        Set xdata = ##class(%Dictionary.XDataDefinition).%New()
-        Set xdata.Name = "UrlMap"
-        Set xdata.XMLNamespace = "http://www.intersystems.com/urlmap"
-        Do xdata.Data.WriteLine("<Routes>")
-        Do xdata.Data.WriteLine("<Route Url=""/"" Method=""GET"" Call=""Test"" Cors=""true""/>")
-        Do xdata.Data.WriteLine("</Routes>")
-        Do class.XDatas.Insert(xdata)
-        Set sc = $$$ADDSC(sc,class.%Save())
-
-        Set method = ##class(%Dictionary.MethodDefinition).%New(classname)
-        Set method.Name = "Test"
-        Set method.ClassMethod = 1
-        Set method.ReturnType = "%Status"
-        Set stream = ##class(%Stream.TmpCharacter).%New()
-        Do stream.WriteLine("	Set %response.ContentType = ""application/json"" ")
-        Do stream.WriteLine("	Set retObj = {}")
-        Do stream.WriteLine("	Set retMessage = ""Hello World!"" ")
-        Do stream.WriteLine("	Set retObj.Message = retMessage")
-        Do stream.WriteLine("	Write retObj.%ToJSON()")
-        Do stream.WriteLine("	Quit $$$OK")
-        Set method.Implementation = stream
-        Set sc = $$$ADDSC(sc,method.%Save())
-
-        Set sc = $$$ADDSC(sc,$System.OBJ.Compile(classname,"fck-dv"))
-    }
-    Catch (err) {
-        Set sc = $$$ADDSC(sc,err.AsStatus())
-    }
-    Return sc
-]]></Implementation>
-</Method>
-
-<Method name="GetDatabaseDirectory">
-<Description>
-Get database directory</Description>
-<ClassMethod>1</ClassMethod>
-<CodeMode>expression</CodeMode>
-<FormalSpec>pNamespace:%String</FormalSpec>
-<ReturnType>%String</ReturnType>
-<Implementation><![CDATA[##class(%File).SubDirectoryName($System.Util.ManagerDirectory(),pNamespace)
-]]></Implementation>
-</Method>
-
-<Method name="CheckDatabaseDirExists">
-<Description>
-Checks if database directory exist</Description>
-<ClassMethod>1</ClassMethod>
-<CodeMode>expression</CodeMode>
-<FormalSpec>directory:%String</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[##class(%File).DirectoryExists(directory)
-]]></Implementation>
-</Method>
-
-<Method name="CheckDatabaseExists">
-<Description>
-Checks if database directory exist</Description>
-<ClassMethod>1</ClassMethod>
-<CodeMode>expression</CodeMode>
-<FormalSpec>directory:%String</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[##class(%File).Exists(directory_$Case($$$isWINDOWS,1:"\",:"/")_..#DATABASENAME)
-]]></Implementation>
-</Method>
-
-<Method name="DeleteDBNS">
-<Description>
-w $system.Status.GetErrorText(##class(apptools.util.database).DeleteDBNS("SWAGGERUI", 0))</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>pNamespace</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	if $namespace=$ZCONVERT(pNamespace,"U") set $namespace="%SYS"
-	Set sc = ##class(%ZPM.PackageManager.Developer.UnitTest.Utils).DeleteNamespace($ZCONVERT(pNamespace,"L"))
-	Quit:$$$ISERR(sc) sc
-	Set sc = ..DeleteResource($ZCONVERT(pNamespace,"U"))
-	;Quit:$$$ISERR(sc) sc
-	Set sc = ..DeleteRole($ZCONVERT(pNamespace,"U"))
-	;Quit:$$$ISERR(sc) sc
-	q sc
-]]></Implementation>
-</Method>
-
-<Method name="DismountListDB">
-<Description>
-zn "app" w $System.Status.GetErrorText(##class(apptools.util.database).DismountListDB("DOJO"))</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>Database</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	s st=..DismountDB(Database)
-	if st {
-		s st1=..DismountDB(Database_"ENSTEMP")
-		if 'st1 q st1
-		s st2=..DismountDB(Database_"SECONDARY")
-		if st2 q st2
-	} else { q st }
-	q $$$OK
-]]></Implementation>
-</Method>
-
-<Method name="DismountDB">
-<Description>
-write $System.Status.GetErrorText(##class(apptools.util.database).DismountDB("PROD"))</Description>
-<ClassMethod>1</ClassMethod>
-<FormalSpec>Database</FormalSpec>
-<ReturnType>%Status</ReturnType>
-<Implementation><![CDATA[
-	new $namespace
-	zn "%sys"
-	s st=$$$OK
-	If ##Class(Config.Databases).Get(Database,.Properties) {
-		Set Directory = $G(Properties("Directory"))
-  		Set st = ##class(SYS.Database).DismountDatabase(Directory)
-	}
-	q st
-]]></Implementation>
-</Method>
 </Class>
 
 

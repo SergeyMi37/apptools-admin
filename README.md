@@ -16,9 +16,11 @@
 Application tools for technical support and DBMS administrator. View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files. A few simple graphs on the protocols of the system.
 This solution can be installed in earlier versions of Caché and Ensemble (tested 2016.1+). This can be done by importing xml.
 
-## What's new
 This project is not only a set of [tools for the administrator](#PanelAdmin), but a platform for the rapid creation of a prototype of any solution.
 For example, Photo Album, Music Player, and Personal Books Library all come together in a user-friendly treasure chest design.
+
+## What's new
+The module for converting queries to a xlsx file based on the python openpyxl library is included.
 
 ## Installation with ZPM
 

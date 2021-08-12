@@ -42,6 +42,234 @@ ClassMethod GetAppCSP(app) As %Status
 	q $$$OK
 }
 
+/// s h=##class(apptools.core.rest).getStatic("apptools.lte.adminStatic:AddStyle") w !,h,!
+XData AddStyle [ MimeType = application/yaml ]
+{
+<style type="text/css">
+ 
+ 	/* https://habr.com/ru/post/453744/
+table {
+  overflow: hidden;
+}
+
+tr:hover {
+  background-color: #ffa;
+}
+
+td, th {
+  position: relative;
+}
+td:hover::after,
+th:hover::after {
+  content: "";
+  position: absolute;
+  background-color: #ffa;
+  left: 0;
+  top: -5000px;
+  height: 10000px;
+  width: 100%;
+  z-index: -1;
+}
+*/
+
+ 
+ /*
+	div {
+  max-width: 400px;
+  max-height: 150px;
+  overflow: scroll;
+}
+*/
+
+/* Use position: sticky to have it stick to the edge
+ * and top, right, or left to choose which edge to stick to: */
+
+thead th {
+  position: -webkit-sticky; /* for Safari */
+  position: sticky;
+  top: 0;
+}
+
+tbody th {
+  position: -webkit-sticky; /* for Safari */
+  position: sticky;
+  left: 0;
+}
+
+/* To have the header in the first column stick to the left: */
+
+thead th:first-child {
+  left: 0;
+  z-index: 1;
+}
+
+
+/* Just to display it nicely: */
+
+thead th {
+  background: #E7EBF9;
+  color: blue;
+
+}
+
+tbody th {
+  background: #E7EBF9;
+  color: blue;
+
+}
+
+table {
+  border-radius: 10px; 
+  border: 1px solid #72a7cf
+}
+
+td,
+th {
+  padding: 0.5em;
+}
+
+.bigbox { 
+height: 20px; width: 20px 
+}
+ 
+</style>
+}
+
+/// s h=##class(apptools.core.rest).getStatic("apptools.lte.adminStatic:AddJS") w !,h,!
+XData AddJS [ MimeType = application/yaml ]
+{
+<script language='javascript'>
+$('#tWHAT').keydown(function (e) {
+  	if (e.ctrlKey && e.keyCode == 13) {
+    // Ctrl-Enter pressed
+    document.getElementById('WHAT').value=document.getElementById('tWHAT').value;
+    document.forms['loginfo'].submit();
+   }
+});
+// 
+function ActionJs(FormId,ResultId,appClass,appMethod,appPar,appNsp){
+	var $data =[];
+	//;var appNspace ='#(ns)#';
+	//;if (!appNsp) {appNsp =appNspace;}
+	//var classname ='#(class)#';
+	//if (!appClass) var appClass =classname;
+	if (FormId) {
+		$data = $('#'+FormId).serializeArray(); 
+		//alert(FormId);
+	}
+	//Add to array
+	$data.push({name:"appClass",value:appClass});
+	$data.push({name:"appMethod",value:appMethod});
+	$data.push({name:"appNsp",value:appNsp});
+	$data.push({name:"appPar",value:appPar});
+	$.ajax({
+	  url: 'apptools.core.Action.cls',
+	  type: 'post',
+	  data: $data,
+	  crossDomain: true,
+	  success: function(result) {
+	  if (ResultId) {$('#'+ResultId).html(result);}
+	  }
+	});
+}
+// Collect data from the form, serialize, send to the server, execute and paste the result into the container
+// FormId - source form identifier <form id='FormInpur'>...</form>
+// ResultId -  identifier of the target container <div id='ResultDiv'>...</div>
+// appAct -  parameters for executing code on the server
+//     namespace:classname:methodname:par1=val1&par2=val2...&parX-valX
+function AppAct(FormId,ResultId,appAct){
+	var $data =[]; //json array initialization
+	$data.push({name:"params",value:{}});
+	if (FormId) { //if the form id is specified, then we collect all input elements from it
+		// elements must have an id attribute matching the name.
+		// For example <input type='text' id='elem2' name='elem2'>
+		$data = $('#'+FormId).serializeArray();
+	}
+	$data.push({name:"appAct",value:appAct}); //add execution parameters that will be parsed in apptools.core.Action.cls
+	//if (jsonExt) {
+	//  if there is additional json, then add it
+	//	$data.push({"jsonExt":jsonExt});
+	//	}
+	//var url1='apptools.core.Action.cls';	if (url2) { url1=url2;}
+	//execute an asynchronous request to the apptools.core.Action.cls
+	$.ajax({  
+	  url: 'apptools.core.Action.cls',
+	  type: 'post',
+	  data: $data,
+	  success: function(result) {  // if successful
+	  	// if the resulting container is specified, put everything sent from the server into it
+	  	if (ResultId) {$('#'+ResultId).html(result);}
+	  }
+	});
+}
+// Collect data from the form, serialize, send to the server, execute and paste the result into the container
+// FormId - source form identifier <form id='FormInpur'>...</form>
+// ResultId -  identifier of the target container <div id='ResultDiv'>...</div>
+// appAct -  parameters for executing code on the server
+//     namespace:classname:methodname:par1=val1&par2=val2...&parX-valX
+//     namespace:routine:label:par1=val1&par2=val2...&parX-valX
+function AppRpc(FormId,ResultId,appAct,url,json){
+	var data ={"jsonrpc":"2.0",params:{}};
+	
+	if (FormId) {
+		data.params.formId=FormId;
+		data.params.form=JSON.stringify($('#'+FormId).serializeArray());
+	}
+	if (json) {
+		data.params.json = json;
+	}
+
+	data.method=appAct;
+	$.ajax({
+	  url: url,
+	  type: 'post',
+	  contentType:'application/json; charset=UTF-8',
+	  dataType:'html', 
+	  crossDomain: true,
+	  data: JSON.stringify(data),
+	  success: function(result) {
+	  if (ResultId) {
+		  $('#'+ResultId).html(result);
+	  }
+	  else {
+		  return result;
+	  	}
+	  }
+	});
+}
+
+// The function of opening the dialog box
+function WinOpen(ns,classname,met,el,title,rest) {
+	
+	var titlename="Method "+met+" parameter "+decodeURIComponent(el);
+	if (title) {titlename=title;}
+
+	//$("#dialogContent").load("apptools.core.Action.cls","appClass="+classname+"&appMethod="+met+"&appNsp="+ns+"&appPar="+el);
+	
+	if (rest) {AppRpc('anyForm','dialogContent',ns+':'+classname+':'+met+':'+decodeURIComponent(el),rest);}
+	else { ActionJs('anyForm',"dialogContent",classname,met,el,ns);}
+	$( "#dialog" ).dialog({
+		modal: true, 
+        title: titlename, 
+        autoOpen: true, 
+        width:window.innerWidth-200, 
+        height:window.innerHeight-300,
+		position: { my: 'top', at: 'top+150' },
+		buttons: [
+		{
+			text: "Cancel",
+			click: function() {
+				$( this ).dialog( "close" );
+			}
+		}
+		]
+		});
+	try { event.preventDefault();
+	} catch (e){};
+}
+</script>
+}
+
 /// s h=##class(apptools.core.rest).getStatic("apptools.Uikit.AdminLTE:html") w !,h,!
 XData html [ MimeType = application/yaml ]
 {

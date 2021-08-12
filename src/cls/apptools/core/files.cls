@@ -221,38 +221,49 @@ ClassMethod getPathcconsole(ByRef dir, ByRef logname)
 ClassMethod getDate(Line, yyyy, mm, dd)
 {
 	Set mm=$p(Line,"/",1)
-	;Set dd=$p(Line,"/",2)
+	Set dd=$p(Line,"/",2)
 	Set yyyy="20"_$p($p(Line,"/",3),"-")
 	q mm'=""&&(yyyy'="")
 }
 
+ClassMethod GetContextForAlert()
+{
+	quit $lb("Close a transaction that failed to roll back","Shutdown complete","CPUusage Alert: CPUusage","Paging Alert: Physical Memory is","Lock table full","DiskPercentFull","Multiple sensors critically above normal")
+}
+
+ClassMethod GetContextForAlertExclude()
+{
+	quit $lb("ResourceCleanup: Dead job cleanup","JobType=Background","JobType=CSP","SSL/TLS Certificate(s) expiring within")
+}
+
 /// Search important events
-ClassMethod Alert(Line, ByRef bd)
+ClassMethod Alert(Line, ByRef bd, hdt)
 {
 	q:'..getDate(Line,.yyyy,.mm) $$$OK
-	if Line["Shutdown complete"	{
-		i $i(bd("Reboot",yyyy,mm))
+	set context=..GetContextForAlert()
+	for i=1:1:$ll(context) {
+		if Line[$lg(context,i)	{
+			if $i(bd($lg(context,i),yyyy,mm)) set stop=1 quit
+		}
 	}
-	elseif 0,Line["DELETE:",Line["journals"	{
-		i $i(bd("DELETE journals",yyyy,mm))
-	}
-	elseif 0,Line["Automatic journal file roll"	{
-		i $i(bd("Automatic journal file roll",yyyy,mm))
-	}
-	elseif Line["Paging Alert: Physical Memory is"	{
-		i $i(bd("Paging Alert: Physical Memory is used",yyyy,mm))
-	}
-	elseif Line["Error reading from SNMP port"	{
-		i $i(bd("Error reading from SNMP port",yyyy,mm))
-	}
-	elseif Line["Lock table full"	{
-		i $i(bd("Lock table full",yyyy,mm))
+	quit:$Get(stop) $$$OK
+	set Exclude=..GetContextForAlertExclude()
+	if $p(Line," ",3)>2 {
+		for i=1:1:$ll(Exclude) {
+			if Line[$lg(Exclude,i)	{
+				set stop=1 quit
+			}
+		}
+		quit:$Get(stop) $$$OK
+		
+		set context=$p(Line," ",5,7)
+		if $i(bd(context,yyyy,mm))
 	}
 	q $$$OK
 }
 
 /// Search of time of the extension of the database
-ClassMethod ExpansionDB(Line, ByRef bd)
+ClassMethod ExpansionDB(Line, ByRef bd, hdt)
 {
 	s context = "Expansion completed"
 	if Line[context	{
@@ -309,13 +320,14 @@ ClassMethod FindContextInLog(days, method, bd) [ PublicList = (tProductionName, 
 {
 	Set gn=$$$GNmessages
 	KILL res
-	d ##class(apptools.core.files).getPathcconsole(.dir,.logname) ;w !,dir
-	d ##class(apptools.core.files).GetList(dir,logname_"*",.List) ;zw List
-	s i="" f { s i=$o(List(i)) q:i="" 
+	do ##class(apptools.core.files).getPathcconsole(.dir,.logname) ;w !,dir
+	do ##class(apptools.core.files).GetList(dir,logname_"*",.List) ;zw List
+	set i="" for { set i=$o(List(i)) q:i="" 
 		do ParseFile(gn,i)
 	}
-	
-	s bd=##class(apptools.core.files).getPeriod(days,.FromDateTime,.ToDateTime,.df,.dt) ;df_" "_dt
+	;w !,days
+	s period=##class(apptools.core.files).getPeriod(days,.FromDateTime,.ToDateTime,.df,.dt) 
+	;w !,df_" "_dt
 	
 	if FromDateTime="" Set HFromDateTime="1.1"
 	else  Set HFromDateTime=$$DataTimeCConsole2H(FromDateTime)
@@ -323,55 +335,69 @@ ClassMethod FindContextInLog(days, method, bd) [ PublicList = (tProductionName, 
 	else  Set HToDateTime=$$DataTimeCConsole2H(ToDateTime)
 	
 	;w !,HFromDateTime_" "_HToDateTime
-	
-	s hdt=HFromDateTime
-	s class=$p($p(method,"(",2),")"),method=$p($p(method,")",2),".",2)
-	f { s hdt=$o(@gn@(hdt),1,Line) q:hdt=""  q:hdt>HToDateTime
+	;w !,FromDateTime_" "_ToDateTime
+	;set hdt=HFromDateTime
+	set from=$p(df,".",3)_$p(df,".",2)_$p(df,".",1)_"000000"
+	set to=$p(dt,".",3)_$p(dt,".",2)_$p(dt,".",1)_"235959"
+	;w !,from," ",to
+	set class=$p($p(method,"(",2),")"),method=$p($p(method,")",2),".",2)
+	for i=1:1 {
+		 set from=$o(@gn@(from),1,Line) 
+		 quit:from=""  
+		 quit:from>to
+		;w !,$zr,!,Line
+		;w !,$na(@gn@(from)),!,@gn@(from)
 		// Search context 
-		d $classmethod(class,method,Line,.bd)
+		d $classmethod(class,method,Line,.bd,from)
 	}
+	set bd=period
 	quit $$$OK
 
 
 /// Function parse Protocol of the file on the date required depth
 /// To skanirovat cconsole.log the result to put 
 ParseFile(gnTemp,InFile)
-	if $g(@gnTemp)[InFile,InFile'["cconsole.log" q 1 ;already archive dismantled
+	if $g(@gnTemp)[InFile,InFile'["messages.log" q 1 ;already archive dismantled
 	;w !,InFile
 	Set File2 = ##class(%File).%New(InFile)
 	Do File2.Open("RSK\UTF8\")
 	Do {
 		Set Line = File2.ReadLine()
-		s H=$$DataTimeCConsole2H($p(Line,":",1,3))
-		i H="",$g(zts)'="" {
-			i $l($g(@gnTemp@(zts)))>32000 continue
-			;i $i(@gnTemp@(0))
-			s @gnTemp@(zts)=$g(@gnTemp@(zts))_" "_Line ;glue from the previous
+		set H=$$DataTimeCConsole2H($p(Line,":",1,3),.GGGGMMDD)
+		
+		if H="",$g(zts)'="" {
+			if $l($g(@gnTemp@(zts)))>32000 continue
+			if @gnTemp@(zts)[Line continue
+			set @gnTemp@(zts)=$g(@gnTemp@(zts))_" "_Line ;glue from the previous
 			continue
 		}
-		s zts=H_","_$p($p(Line,":",4)," ")
-		i $g(@gnTemp@(zts))'="",$g(@gnTemp@(zts))'=Line {
-			 i $l($g(@gnTemp@(zts)))>32000 continue
-			 ;i $i(@gnTemp@(0))
-			 s @gnTemp@(zts)=$g(@gnTemp@(zts))_" "_Line  
+		;s zts=H_","_$p($p(Line,":",4)," ")
+		set zts=GGGGMMDD_"."_$p($p(Line,":",4)," ")
+		set zts=+zts
+		if $g(@gnTemp@(zts))'="",$g(@gnTemp@(zts))'=Line {
+			 if $l($g(@gnTemp@(zts)))>32000 continue
+			 if @gnTemp@(zts)[Line continue
+			 set @gnTemp@(zts)=$g(@gnTemp@(zts))_" "_Line  
 			 continue
 		}
 		;i $i(@gnTemp@(0)) ;i '(@gnTemp@(0)#1000) w "."
 		s @gnTemp@(zts)=Line
-		} While 'File2.AtEnd
+	} While 'File2.AtEnd
 	Do File2.Close()
-	s:$g(@gnTemp)'[InFile @gnTemp=$g(@gnTemp)_"*"_InFile ;add the name of zagolovok for exceptions in the following analysis
+	set:$g(@gnTemp)'[InFile @gnTemp=$g(@gnTemp)_"*"_InFile ;add the name of zagolovok for exceptions in the following analysis
  quit $g(@gnTemp)
 
 /// Transform the date 09/01/17-10:31:15 in $Horolog.
-DataTimeCConsole2H(DT) 
-		s dc=""
+DataTimeCConsole2H(DT,GGGGMMDD)
+		set dc=""
 		Set Date1=$p(DT,"-")
 		Set Time1=$p(DT,"-",2)
 		try {
-			Set dh=$zdh($p(Date1,"/",1,2)_"/20"_$p(Date1,"/",3),1)
+			set da=$p(Date1,"/",1,2)_"/20"_$p(Date1,"/",3)
+			Set dh=$zdh(da,1)
 			Set th=$zth(Time1,1)
 			Set dc=dh_"."_th
+			set GGGGMMDD=$p(da,"/",3)_$p(da,"/",1)_$p(da,"/",2)_$tr(Time1,":")
 		} catch {}
  quit $g(dc)
 
@@ -699,6 +725,44 @@ ClassMethod GetFileIdView(FileName, gn = "", ContentType = "") As %String
  		;set @gn@(id,"origname")=origname
  		;set URL=..%ClassName(1)_".cls?"_cgivar_"="_id
  	quit id
+}
+
+/// do ##class(apptools.core.files).Test(30,.res)
+ClassMethod Test(days, res)
+{
+ 	;set method="class(apptools.core.files).Alert" 
+	set method="class(apptools.core.files).AlertDays" 
+	do ##class(apptools.core.files).FindContextInLog(days,method,.res)
+}
+
+/// Search important events
+ClassMethod AlertDays(Line, ByRef bd, dt)
+{
+	q:'..getDate(Line,.yyyy,.mm,.dd) $$$OK
+	set context=..GetContextForAlert()
+	;w !,dt," ",Line
+	
+	for i=1:1:$ll(context) {
+		if Line[$lg(context,i)	{
+			set bd($i(bd))=Line
+			set stop=1 quit
+		}
+	}
+	quit:$Get(stop) $$$OK
+	
+	set Exclude=..GetContextForAlertExclude()
+	if $p(Line," ",3)>1 {
+		for i=1:1:$ll(Exclude) {
+			if Line[$lg(Exclude,i)	{
+				set stop=1 quit
+			}
+		}
+	
+		quit:$Get(stop) $$$OK
+		;set context=$p(Line," ",3)_" "_$p(Line," ",5,7)
+		set bd($i(bd))=Line
+	}
+	q $$$OK
 }
 
 }

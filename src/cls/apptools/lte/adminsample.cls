@@ -47,7 +47,7 @@ ClassMethod GetAllApps(opt) As %Status
 	set opt(key,"ClassName")=..%ClassName(1)
 	set opt(key,"Method")="ShowTabSample"
 	set opt(key,"Disable")=0 ;developed
-	set opt(key,"TabMenu","Close")=1
+	set opt(key,"TabMenu","Close")=0 ;the tab cannot be deleted
 	set opt(key,"Menu")=$lb(1,"Mode",1,"fa-cog") ;$lg(,3)=1 - open menu level 1
 	set opt(key,"Active")=1 ;active menu item
 	set opt(key,"aw-icon")="fa-list-alt" ;fa-table"
@@ -59,7 +59,6 @@ ClassMethod GetAllApps(opt) As %Status
 	set opt(key,"ClassName")=..%ClassName(1)
 	set opt(key,"Method")="ShowTabSample"
 	set opt(key,"Disable")=0 ;developed
-	set opt(key,"TabMenu","Close")=1
 	set opt(key,"Menu")=$lb(1,"Mode",1) ;$lg(,3)=1 - open menu level 1
 	
 	set key="menu-second"

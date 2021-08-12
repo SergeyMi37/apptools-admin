@@ -48,7 +48,6 @@ ClassMethod GetAllApps(opt) As %Status
 	s opt(key,"ClassName")=..%ClassName(1)
 	s opt(key,"Method")="ShowTabSample"
 	s opt(key,"Disable")=0 ;developed
-	s opt(key,"TabMenu","Close")=1
 	s opt(key,"Menu")=Level1
 	s opt(key,"Active")=1 ;active menu item
 
@@ -59,7 +58,6 @@ ClassMethod GetAllApps(opt) As %Status
 	s opt(key,"ClassName")=..%ClassName(1)
 	s opt(key,"Method")="ShowTabSample"
 	s opt(key,"Disable")=0 ;developed
-	s opt(key,"TabMenu","Close")=1
 	s opt(key,"Menu")=Level1
 
 	;----------
@@ -71,7 +69,6 @@ ClassMethod GetAllApps(opt) As %Status
 	s opt(key,"ClassName")=..%ClassName(1)
 	s opt(key,"MethodUrl")="http://ShowTabAbout.cls"
 	s opt(key,"Disable")=1 ;developed
-	s opt(key,"TabMenu","Close")=1
 	s opt(key,"Menu")=Level2
 
 	s key="menu-second2"
@@ -81,7 +78,6 @@ ClassMethod GetAllApps(opt) As %Status
 	s opt(key,"ClassName")=..%ClassName(1)
 	s opt(key,"Method")="ShowTabAbout"
 	s opt(key,"Disable")=1 ;developed
-	s opt(key,"TabMenu","Close")=1
 	s opt(key,"Menu")=Level2
 
 	

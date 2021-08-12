@@ -41,7 +41,7 @@ ClassMethod GetAllApps(opt) As %Status
 			set opt(key,"Role")="%All"
 			set opt(key,"Namespace")="%SYS"
 			set opt(key,"Method")="ShowTabSample"
-			set opt(key,"TabMenu","Close")=1
+			set opt(key,"TabMenu","Close")=0 ;the tab cannot be deleted
 			set opt(key,"Active")=1 ;active menu item
 			set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
 

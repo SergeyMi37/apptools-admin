@@ -34,6 +34,7 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 
 <Route Url="/products/:mode" Method="GET" Call="getProductions"/>
 <Route Url="/productslist/:ns" Method="GET" Call="getListErrProducts"/>
+<Route Url="/alerts/:count" Method="GET" Call="GetAlerts"/>
 
 <Route Url="/proj/:proj/:metrics/:mode" Method="GET" Call="apptools.MVK.Metrics:getProj"/>
 </Routes>
@@ -73,7 +74,7 @@ ClassMethod jsonrpc(ns = "", class = "", meth = "") As %Status
 			d %request.Content.Rewind() 
 			set json=%request.Content.Read($$$MaxStringLength) 
 			set json = $ZCVT(json,"I","UTF8") 
-			s $$$AppL("MML","jsonrpc-json")=json
+			;s $$$AppL("MML","jsonrpc-json")=json
 	 		if ($g(json)["{") {
 	 			set method={}.$$$jsonFromJSON(json).method
 	 			set params={}.$$$jsonFromJSON(json).params
@@ -81,7 +82,8 @@ ClassMethod jsonrpc(ns = "", class = "", meth = "") As %Status
 	 			set id={}.$$$jsonFromJSON(json).id
 	 			if jsonrpc'="2.0" w ..jsonrpcError(2,"Version not supported "_jsonrpc) q
 	 			s appPar=""
-	 			if method[":" { if $p(method,":",1)'="" s ns=$p(method,":",1)
+	 			if method[":" { 
+	 				if $p(method,":",1)'="" s ns=$p(method,":",1)
 					if $p(method,":",2)'="" s class=$p(method,":",2)
 					if $p(method,":",3)'="" s meth=$p(method,":",3)
 					if $p(method,":",4)'="" s appPar=$p(method,":",4,*)
@@ -99,9 +101,25 @@ ClassMethod jsonrpc(ns = "", class = "", meth = "") As %Status
 				   ;set %response.CharSet = "utf-8"
     			;	set %response.ContentType = "text/html"
     				;s appPar("params")=params
-    				if $isobject(params) d ##class(apptools.core.Action).GetElemParseForm(params.form,.appPar,"z",0)
-      				do $classmethod(class,meth,.appPar) 
+    				if $isobject(params) {
+	    				d ##class(apptools.core.Action).GetElemParseForm(params.form,.appPar,"z",0)
+	    				s appPar("params")=params.%ToJSON()
+    				}
+    				do $classmethod(class,meth,.appPar) 
 					quit
+					/*
+					if $isobject(params.form) {
+	    				d ##class(apptools.core.Action).GetElemParseForm(params.form,.appPar,"z",0)
+	    				do $classmethod(class,meth,.appPar) 
+    				}
+    				elseif $isobject(params) {
+	    				do $classmethod(class,meth,.params) 
+    				}
+	    			else {
+		    			;d ##class(apptools.core.Action).GetElemParseForm(params.form,.appPar,"z",0)
+      					do $classmethod(class,meth,.appPar) 
+	    			}
+					quit */
 				}
 				;w "{""text"":""Hello world"",""inn"":"""_params.inn_"""}" q
 				;w $ZCVT(str,"O","UTF8") 
@@ -319,7 +337,7 @@ ClassMethod getStatic(name As %String, ByRef Description) As %String
 }
 
 /// To sorted sizes subdirs for Linux
-/// w ##class(apptools.core.rest).getDirSize("/opt/isc/ensemble/mgr/")
+/// kill res set res="" write ##class(apptools.core.rest).getDirSize("/opt2/isc/iris/mgr/",.res,0)
 ClassMethod getDirSize(path = "", ByRef res, minsize = 10) As %Status
 {
 	set gn = "^||tmpfile"
@@ -333,6 +351,7 @@ ClassMethod getDirSize(path = "", ByRef res, minsize = 10) As %Status
 	set tempfile=$SYSTEM.Util.InstallDirectory()_"mgr/Temp/dirsize.log"
 	kill @gn set nl = $c(10)
 	try {
+		;du -sm /opt2/isc/iris/mgr/*| sort -nr
 		set cmd="du -sm "_path_"*| sort -nr >"_tempfile
 		set result = $zf(-1, cmd)
 		if (result '= 0) { 
@@ -352,12 +371,13 @@ ClassMethod getDirSize(path = "", ByRef res, minsize = 10) As %Status
 		set st = ex.AsStatus()
 		;$$$TRACE($system.Status.GetErrorText(st))
 	}
+	do ##class(%File).Delete(tempfile)
 	zn curNs
 	quit st
 }
 
 /// The size of the database in Gigabytes
-/// d ##class(apptools.core.rest).getDBsize("dbsize",.list)
+/// do ##class(apptools.core.rest).getDBsize("dbsize",.list) write list
 ClassMethod getDBsize(prefix = {..#ISCPREFIX_"_dbsize"}, dbname, int = 1, all = 0) As %Status
 {
 	set nl = $c(10)
@@ -371,12 +391,24 @@ ClassMethod getDBsize(prefix = {..#ISCPREFIX_"_dbsize"}, dbname, int = 1, all = 
 	for i=1:1 { q:'$d(@r@(i))   ;pass the loop through the entire report
 		continue:$g(@r@(i,1))=""
 		;by default, we give all sizes to Gigabytes
-		set free=$g(@r@(i,8))
+
 		set dir=$g(@r@(i,2))
 		set name=$g(@r@(i,1))
 		if 'all,(","_listDb_",")'[(","_name_",") continue
 		if 'all,(dir)[("secondary/")||((dir)[("temp/")) continue
-		set size=$g(@r@(i,4))
+		
+		set size=$$ToGB($g(@r@(i,4)))
+		set free=$$ToGB($g(@r@(i,8)))
+		set dbname(dir)=size
+		set dbname(dir,"name")=name
+		set dbname(dir,"free")=free
+		write:'int prefix_"_"_name_" "_size_nl
+		write:'int prefix_"_"_name_"_DiskFreeSpace "_(+free)_nl
+	}
+	set dbname=free
+	write nl
+	quit $$$OK
+ToGB(size) 
 		if size["MB" {s size=$j(size/(1024),"",3) ;if in MB, then divide
 		}
 		elseif size["TB" {s size=size*1024  ;if TB then multiply
@@ -384,14 +416,7 @@ ClassMethod getDBsize(prefix = {..#ISCPREFIX_"_dbsize"}, dbname, int = 1, all = 
 		else {
 			set size=+size  ;if GB then translate into the number
 		}
-		set dbname(dir)=size
-		set dbname(dir,"name")=name
-		set dbname(dir,"free")=+free
-		write:'int prefix_"_"_name_" "_size_nl
-		write:'int prefix_"_"_name_"_DiskFreeSpace "_(+free)_nl
-	}
-	write nl
-	quit $$$OK
+	quit size
 }
 
 /// http://localhost:57772/apptoolsrest/productslist/-SPGZ
@@ -421,6 +446,53 @@ ClassMethod getProductions(day = "1") As %Status
 	;	w $s(co:"/",1:"\")_"server_"_$zu(110)_"_"_ns_" Errors: "_co_$$$NL
 	;}
 	q $$$OK
+}
+
+/// do ##class(%SYS.System).WriteToConsoleLog("InterSystems Interoperability Test",,3)
+/// do ##class(apptools.core.rest).GetAlertsSys(,.json)
+ClassMethod GetAlertsSys(count = 10, ByRef sys) As %Status
+{
+	do ##class(%SYSTEM.Monitor).GetAlerts(,.str,.last)
+	set sys = {}
+	set sys.host = $ZU(110)
+	set sys.instance = $P($ZU(86),"*",2)
+	set sys.version = $zv
+	set sys.alerts = []
+	
+	set i=""
+	for ii=1:1 { set i=$Order(str(i),-1,val) quit:i=""
+		if ii>count quit
+		set alert={}
+		set alert.type=$P(val," ",3)
+		set alert.text=val
+		do sys.alerts.%Push(alert)
+	}
+	do sys.%ToJSON()
+ quit $$$OK
+}
+
+/// do ##class(apptools.core.rest).GetAlerts(,.json)
+ClassMethod GetAlerts(days = 1, ByRef sys) As %Status
+{
+ 	;set method="class(apptools.core.files).Alert" 
+	set method="class(apptools.core.files).AlertDays" 
+	do ##class(apptools.core.files).FindContextInLog(days,method,.str)
+	set sys = {}
+	set sys.host = $ZU(110)
+	set sys.instance = $P($ZU(86),"*",2)
+	set sys.version = $zv
+	set sys.period = $G(str)
+	set sys.alerts = []
+	set i=""
+	for ii=1:1 { set i=$Order(str(i),-1,val) quit:i=""
+		;if ii>count quit
+		set alert={}
+		set alert.type=$P(val," ",3)
+		set alert.text=val
+		do sys.alerts.%Push(alert)
+	}
+	do sys.%ToJSON()
+	 quit $$$OK
 }
 
 XData Themecache

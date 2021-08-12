@@ -54,13 +54,21 @@ ClassMethod CheckRoleMenu(ByRef opt) As %Status
 		kill found
 		if $GET(opt(i,"Roles"))'="" {
 			set roles=$GET(opt(i,"Roles"))
-			for r=1:1:$l(roles,",") { continue:$p(roles,",",r)=""
-				if (","_$roles_",")[(","_$p(roles,",",r)_",") set found=1 quit
-			}
+			set found=..CheckRole(roles)
+		}
+		else { set found=1
 		}
 		if '$GET(found) KILL opt(i)
 	}
 	quit $$$OK
+}
+
+ClassMethod CheckRole(roles) As %String
+{
+	for r=1:1:$l(roles,",") { continue:$p(roles,",",r)=""
+		if (","_$roles_",")[(","_$p(roles,",",r)_",") set found=1 quit
+	}
+	quit +$GET(found)
 }
 
 /// Icon from png
@@ -110,38 +118,28 @@ ClassMethod RepaceParameter(ByRef h, ByRef par) As %Status
 
 ClassMethod GetStringJs(ns, cls, postload = 0, autoload = "") As %String
 {
- set io=$i
- OPEN 2:$j USE 2
+ set js=""
  if postload {
-	 write $$$NL
- $$$jsstart write $$$NL
- 	write ##class(apptools.core.Action).WriteActJs(%request,"","account_status",..%ClassName(1),"DrawStatus","")_$$$NL
+  set js=js_$$$NL_"<script language='javascript'>"_$$$NL
+  set js=js_$$$NL_##class(apptools.core.Action).WriteActJs(%request,"","account_status",..%ClassName(1),"DrawStatus","")_$$$NL
  	set enter=##class(apptools.core.Action).WriteActJs(%request,"","MainHidden",..%ClassName(1),"ShowTab","&appPar=Search&Searchstr='+document.getElementById('searchstr').value")_$$$NL
- 	write "$('#searchstr').keydown(function (e) { if (e.keyCode == 13) { "_enter_" }});"_$$$NL
+ 	set js=js_$$$NL_"$('#searchstr').keydown(function (e) { if (e.keyCode == 13) { "_enter_" }});"_$$$NL
   	if autoload="" {
 	 	do ..GetAllApps(.opt) 
 	 	set i="" 
 	 	for { set i=$o(opt(i)) q:i=""
-	 		if $GET(opt(i,"Active")) write "$('#Menu"_opt(i,"id")_"').trigger('click');"_$$$NL
+	 		if $GET(opt(i,"Active")) set js=js_$$$NL_"$('#Menu"_opt(i,"id")_"').trigger('click');"_$$$NL
 	 	}
  	} else {
-	 	write "$('#Menu"_autoload_"').trigger('click');"_$$$NL
+	 	set js=js_$$$NL_"$('#Menu"_autoload_"').trigger('click');"_$$$NL
  	}
- 	write $$$NL
- $$$jsstop write $$$NL
+ 	set js=js_$$$NL
+  set js=js_$$$NL_"</script>"_$$$NL
  }
  else {
- 	do ##class(apptools.core.LogInfoPane).AddJS(ns,cls)
- 	do ##class(apptools.core.LogInfoPane).AddStyle()
+ 	set js=js_$$$NL_##class(apptools.core.rest).getStatic("apptools.lte.adminStatic:AddJS")_$$$NL
+ 	set js=js_$$$NL_##class(apptools.core.rest).getStatic("apptools.lte.adminStatic:AddStyle")_$$$NL
  }
- set i=""
- 	,js=""
- for { set i=$o(^SPOOL($j,i),1,s) q:i=""
-		set js=js_s_$$$NL
- 	}
- 	KILL ^SPOOL($j)
-
- use io
  quit js
 }
 
@@ -219,7 +217,7 @@ ClassMethod DrawMenu(Par) As %String
 		 	set ret=ret_	
 			"<ul class=""nav nav-treeview"">"_
               "<li class=""nav-item"">"_
-                "<a id='Menu"_$g(opt(i,"id"))_"' href=""#"" onclick="""_onclick_""" class=""nav-link"">"_
+                "<a id='Menu"_$g(opt(i,"id"))_"' href=""#"" onclick="""_onclick_""" class=""nav-link""  title="""_$g(opt(i))_""">"_
                 "<i class=""nav-icon fas "_iconInem_"""></i>"_
                 			
                   "<p>"_$g(opt(i))_"</p>"_
@@ -338,7 +336,7 @@ ClassMethod ShowTabApps(Par, opt) As %Status
 	}
 	set tabId="tab-"_opt(Par,"id")
 	set tabIdMenu="tabMenu-"_opt(Par,"id")
-	if $g(opt(Par,"TabMenu","Close"))'="" s IconMenu="<span class=""uk-margin-small-left uk-icon uk-close"" uk-icon=""close"" onclick=""$(\'#"_tabIdMenu_",#"_tabId_"\').remove();""></span>"
+	if $g(opt(Par,"TabMenu","Close"))'="0" s IconMenu="<span class=""uk-margin-small-left uk-icon uk-close"" uk-icon=""close"" onclick=""$(\'#"_tabIdMenu_",#"_tabId_"\').remove();""></span>"
  	if $DATA(opt(Par,"TabMenu","Close"))>9 { //there are more points
  		;TODO
  	}
@@ -574,7 +572,7 @@ ClassMethod DrawTableUi(mode = "beg", divId = "tab2", attr = "", ByRef Enum) As 
 
 /// Get property element object
 /// do ##class(apptools.lte.adminTabs).GetElemProp("","test",.gn,"pref",,.tag)
-ClassMethod GetElemProp(obj = "", propName, ByRef gn, PrefixIdDIV = "", Mode = "", ByRef tags = "")
+ClassMethod GetElemProp(obj = "", propName, ByRef gn, PrefixIdDIV = "", Mode = "", ByRef tags = "", ByRef Par = "")
 {
 	set sysType=$g(gn("Properties",propName,"Type"))
 	
@@ -587,12 +585,13 @@ ClassMethod GetElemProp(obj = "", propName, ByRef gn, PrefixIdDIV = "", Mode = "
 	set ReadOnly=$g(gn("Properties",propName,"ReadOnly"))
 	set Parameters=$g(gn("Properties",propName,"Parameters"))
 	
-	set Value=""
+	set Value=$G(Par("ValueElement"))
 	if $iso(obj) set Value=$property(obj,Name)
 	
 	set redstar="" if Required s redstar="<font color=red title='"_$$$aText("Required field","")_"'>*</font>"
 	
 	do ##class(apptools.core.Form).GetJsonProp(obj, propName, .gn, .pr)
+	if $GET(Par("attr"))'="" set pr("attr")=Par("attr") 
 	if 'ReadOnly set ReadOnly=$g(pr("readOnly"))
 	if 'Mode set ReadOnly=1
 	
@@ -689,7 +688,7 @@ ClassMethod SelectFieldYesNo(idSelect = "selectmenu", dfltKey = "", ByRef tags) 
 ClassMethod SelectField(KeyList = "", ONCHANGE = "", ValueList = "", gnRet, order = 1, idSelect = "selectmenu", dfltKey = "", width = 500, ByRef tags) As %Status
 {
 	kill gnRet
-	set selectNS="<SELECT id='"_idSelect_"' name='"_idSelect_"' "_$s(NoWrite:"ONCHANGE='"_ONCHANGE_"'",1:"")_">",
+	set selectNS="<SELECT id='"_idSelect_"' name='"_idSelect_"' "_$s(ONCHANGE'="":"ONCHANGE='"_ONCHANGE_"'",1:"")_">",
 		tags=""
 	set gnRet($i(gnRet))=selectNS
 	for i=1:1:$ll(KeyList) { 

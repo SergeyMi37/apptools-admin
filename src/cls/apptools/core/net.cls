@@ -31,6 +31,7 @@ ClassMethod SendFilesToEmail(subj, text, files, zip = 1, email = "") As %Status
 /// subj - subject
 /// text - the text of the letter
 /// attach - an array of files the link
+/// samples write ##class(apptools.core.net).SendMail(server, port, ssl, UseSTARTTLS, timezone, username, psw, from, subscrible, subj, text, attach)
 ClassMethod SendMail(server, port, ssl, UseSTARTTLS, timezone, username, psw, from, subscrible, subj, text, attach) As %Status
 {
  #dim smtp As %Net.SMTP

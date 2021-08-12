@@ -117,7 +117,7 @@ ClassMethod ListDB(info, Flag = "")
 }
 
 /// Get a list of domain namespaces separated by commas
-/// w ##class(apptools.core.sys).ListNS(.info,"NotPre,Ens")
+/// write ##class(apptools.core.sys).ListNS(.info,"NotPre,Ens")
 /// Flag = "Ens" - only where the ensemble is installed
 /// Flag = "NotPre" - exclude prepared
 ClassMethod ListNS(info, Flag = "")
@@ -507,15 +507,15 @@ ClassMethod GetRoles(mask = "", ByRef list) As %String
 }
 
 /// Get system users
-/// kill users w ##class(App.sys).GetUsers("super",.users,.sql) w !,sql,! zw users 
-/// kill users w ##class(App.sys).GetUsers("sup%,adm%",.users,.sql) w !,sql,! zw users 
-/// kill users w ##class(App.sys).GetUsers("sup%,admin",.users,.sql) w !,sql,! zw users 
-ClassMethod GetUsers(mask = "", ByRef list, ByRef sql) As %String
+/// kill users set ext(1)=" or FullName like '%Manager%'" w ##class(apptools.core.sys).GetUsers("super",.users,.sql,.ext) w !,sql,! zw users 
+/// kill users w ##class(apptools.core.sys).GetUsers("sup%,adm%",.users,.sql) w !,sql,! zw users 
+/// kill users w ##class(apptools.core.sys).GetUsers("sup%,admin",.users,.sql) w !,sql,! zw users 
+ClassMethod GetUsers(mask = "", ByRef list, ByRef sql, ByRef ext) As %String
 {
   NEW $NAMESPACE
   SET $NAMESPACE = "%SYS"
   set mask=$zconvert(mask,"L")
-  set sql="select NameLowerCase,FullName,Comment,Roles,EmailAddress FROM Security.Users where (1=1)"
+  set sql="select NameLowerCase,FullName,Comment,Roles,EmailAddress,Enabled FROM Security.Users where (1=1)"
   if mask[",",mask'["%" { set mask=$replace($ZStrip(mask,"<>W"),",","','")
   	set sql=sql_" and NameLowerCase in ('"_mask_"')"
   } 
@@ -532,6 +532,12 @@ ClassMethod GetUsers(mask = "", ByRef list, ByRef sql) As %String
   elseif mask'="" {
 	  set sql=sql_" and NameLowerCase like '%"_mask_"%'"
   }
+  if $DATA(ext) {
+	  set i=""
+	  for { set i=$order(ext(i),1,data) quit:i=""
+	  	set sql=sql_" "_data
+	  }
+  }
 	set result=##CLASS(%ResultSet).%New("%DynamicQuery:SQL")
 	set tSC=result.Prepare(sql)
 	set:tSC tSC=result.Execute()
@@ -540,7 +546,7 @@ ClassMethod GetUsers(mask = "", ByRef list, ByRef sql) As %String
 	}
 	else {
 		while result.Next() {
-			set list(result.Data("NameLowerCase"))=$lb(result.Data("FullName"),result.Data("Comment"),result.Data("Roles"),result.Data("EmailAddress"))
+			set list(result.Data("NameLowerCase"))=$lb(result.Data("FullName"),result.Data("Comment"),result.Data("Roles"),result.Data("EmailAddress"),result.Data("Enabled"))
 		}
 	}
 	quit $$$OK

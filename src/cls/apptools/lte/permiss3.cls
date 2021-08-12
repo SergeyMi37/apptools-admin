@@ -41,7 +41,7 @@ ClassMethod GetAllApps(opt) As %Status
 			set opt(key,"Role")="%All"
 			set opt(key,"Namespace")="%SYS"
 			set opt(key,"Method")="ShowTabSample"
-			set opt(key,"TabMenu","Close")=1
+			set opt(key,"TabMenu","Close")=0 ;the tab cannot be deleted
 			set opt(key,"Active")=1 ;active menu item
 			set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
 
@@ -54,7 +54,6 @@ ClassMethod GetAllApps(opt) As %Status
 			set opt(key,"Role")="%All"
 			set opt(key,"Namespace")="%SYS"
 			set opt(key,"Method")="ShowTabSample"
-			set opt(key,"TabMenu","Close")=1
 			set opt(key,"aw-icon")="fa-table"   ;https://fontawesome.com/icons?d=gallery&p=2&m=free
 
 	;top menu
@@ -77,7 +76,6 @@ ClassMethod GetAllApps(opt) As %Status
 		set opt(key,"ClassName")=..%ClassName(1)
 		set opt(key,"Method")="ShowInIFrame" 
 		set opt(key,"InFrameUrl")="http://"_$zu(110)_":52773/csp/sys/sec/%25CSP.UI.Portal.User.zen?PID="_$username
-		set opt(key,"TabMenu","Close")=1
 		set opt(key,"MenuTop")=$lb(topMenuNumer,topMenuName)
 	set key="menu-top-account3"
 		set opt(key,"MenuTop")=$lb(topMenuNumer,topMenuName) ; 99-account has nested items
@@ -94,7 +92,6 @@ ClassMethod GetAllApps(opt) As %Status
 	s opt(key,"TabName")="Search"_"-"
 	s opt(key,"ClassName")=..%ClassName(1)
 	s opt(key,"Method")="ShowTabSearch"
-	s opt(key,"TabMenu","Close")=1
 	s opt(key,"TabMenu","Mode")=0 ;1 - for each new search bar to make new tab, 0-tab is always the same
 	
 	do ..CheckRoleMenu(.opt)

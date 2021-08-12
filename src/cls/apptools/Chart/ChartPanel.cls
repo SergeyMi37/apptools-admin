@@ -19,7 +19,7 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 	set arg("type")="bar" ;line
 	set arg("datasets")="{   label: """_$$$aText("Error display on the graph","")_""", borderColor: 'rgb(255, 199, 132)',  data: [30],  }"
 
-	set days=1000
+	set days=365 ;1000
 	if %request.Get("days") S days=%request.Get("days")
 	
 	if %request.Get("panel")'="" {

@@ -443,7 +443,7 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 				 | <a target='Tabs' name='Tabs' href='#("apptools.Tabs.PanelSample.cls")#' id='Param'>#($$$aText("Sample Tabs Application",""))#</a>
 				 
 				 | <a target='Chart' name='Chart'  id='Chart' href='#("apptools.Chart.Chart.cls?panel=class(apptools.Chart.ChartPanel).ChartDbSize&NSP="_$Namespace)#'>#($$$aText("Database growth Chart",""))#</a>
-				 | <a target='ChartAlert' name='ChartAlert'  id='ChartAlert' href='#("apptools.Chart.Chart.cls?panel=class(apptools.Chart.ChartPanel).ChartAlert&NSP="_$Namespace)#'>#($$$aText("Event Chart",""))#</a>
+				 | <a target='ChartAlert' name='ChartAlert'  id='ChartAlert' href='#("apptools.Chart.Chart.cls?panel=class(apptools.Chart.ChartPanel).ChartAlert&days=365&NSP="_$Namespace)#'>#($$$aText("Event Chart",""))#</a>
  			 | 
  			</td>
 		</tr>
@@ -639,7 +639,8 @@ ClassMethod AddC1310(a)
 }
 
 /// do ##class(apptools.core.LogInfoPane).DrawGN(a)
-ClassMethod DrawGN(a)
+/// do ##class(apptools.core.LogInfoPane).DrawGN($lb("^tmp**",1000,$namespace,1),0,.res) zwrite @res ;get list global directory with allocations blocks
+ClassMethod DrawGN(a, print = 1, ByRef result)
 {
 	set $lb(gn, MaxNode, NSpace, Next, Message ,exp, Filtr, ExecuteDraw, exportXLS, exportXLSfile, exportXLSfileEmail)=a
 		if gn["*" {
@@ -669,19 +670,31 @@ ClassMethod DrawGN(a)
 						if $d(dir(dir,r.%Get("Name"))) { 
 							set row=dir(dir,r.%Get("Name"))
 							set alloc=r.%Get("Allocated MB")
-							set @GN@(sql,0,row,14)=$select(alloc<1:alloc,1:"<font color=red><b>"_alloc_"</b></font>")
+							set @GN@(sql,0,row,14)=$select('print:alloc,alloc<1:alloc,1:"<font color=red><b>"_alloc_"</b></font>")
 							if gn["***" { set used=r.%Get("Used MB")
-								set @GN@(sql,0,row,15)=$select(used<1:used,1:"<font color=red><b>"_used_"</b></font>")
+								set @GN@(sql,0,row,15)=$select('print:used,used<1:used,1:"<font color=red><b>"_used_"</b></font>")
 							}
 							
 						}
 					}
 			 	}
 		 	}
-		 	set st=..DrawSQL("result "_$na(@GN@(sql,0)),MaxNode,NSpace,$g(Message),$g(ExecuteDraw),$lb(exportXLS,exportXLSfile,exportXLSfileEmail))
+		 	if print {
+		 		set st=..DrawSQL("result "_$na(@GN@(sql,0)),MaxNode,NSpace,$g(Message),$g(ExecuteDraw),$lb(exportXLS,exportXLSfile,exportXLSfileEmail))
+		 	}
+		 	else {
+			 	set result=$na(@GN@(sql))
+			 	set st=$$$OK
+		 	}
 		}
 		else {
-			set st=..DrawArray(gn,MaxNode,NSpace,Next,$g(Message),$g(exp),Filtr,$g(ExecuteDraw),$lb(exportXLS,exportXLSfile,exportXLSfileEmail))
+		 	if print {			
+				set st=..DrawArray(gn,MaxNode,NSpace,Next,$g(Message),$g(exp),Filtr,$g(ExecuteDraw),$lb(exportXLS,exportXLSfile,exportXLSfileEmail))
+		 	}
+		 	else {
+			 	set result=gn
+			 	set st=$$$OK
+		 	}
 		}
 		q $$$OK
 }
@@ -1180,7 +1193,7 @@ ClassMethod CloseXLSfile(fileXLS, ByRef exportXLSfileEmail, ByRef exportXLSfile,
 	// Send file to e-mail
 	i exportXLSfileEmail'="" {
 		s sc=##class(apptools.core.LogInfo).SendEmail(exportXLSfileEmail, $$$aText("Send file","")_" "_exportXLSfile, $g(msg)_"<br> "_$$$aText("Namespace","")_" :"_$Namespace_"<br> "_$$$aText("Query","")_": "_SQL, exportXLSfile)
-		;i 'sc ;s $$$AppL("APP","CloseXLSfile-SendEmail")=$System.Status.GetErrorText(sc) 
+		i 'sc write $System.Status.GetErrorText(sc) ;s $$$AppL("APP","CloseXLSfile-SendEmail")=$System.Status.GetErrorText(sc) 
 		}
 	write !,"<br><h5>"_$$$aText("Query result","")_" ("_(+count)_" "_$$$aText("lines) uploaded to file","")_" "_exportXLSfile_"</h5>"
 	quit
@@ -1191,8 +1204,12 @@ ClassMethod CloseXLSfile(fileXLS, ByRef exportXLSfileEmail, ByRef exportXLSfile,
 ///  $lg(fileXLS,1) =1 flag 
 /// 	s exportXLSfileEmail=$lg(fileXLS,3) - parcel addresses separated by commas, to which to send the file
 /// 	s exportXLSfile=$lg(fileXLS,2) - full path to the file where to write the table
+///  mode=1 - not included number colomn
+/// 
+/// d ##class(App.LogInfoPane).DrawSQL("query %SYS.GlobalQuery:NameSpaceList %SYS %S*",10000,$namespace," ")
 ClassMethod DrawSQL(SQL As %String = "", MaxNode = {$$$MAXSHOW}, NSpace = "", msg = "", Execute = "", fileXLS = "", Mode = "", FiltrRow = "") As %Status
 {
+	set hoverClass="hc"_$tr($zts,",.")
 	if ($zconvert($e(SQL,1),"L")="q") {
 		try { set st=1
 			if $e($p(SQL," ",2,99),1,2)="##" {
@@ -1244,7 +1261,7 @@ ClassMethod DrawSQL(SQL As %String = "", MaxNode = {$$$MAXSHOW}, NSpace = "", ms
 	<h7>#($s(msg'="":msg,1:"Query: "_SQL))#</h7>
 	<table style="border-radius: 10px; border: 1px solid #72a7cf" cellpadding="2" cellspacing="0" class="DetailTable" bgcolor="#c4d6d6" width="90%">
 	<thead>
-		<tr class=trs >
+		<tr class='trs #(hoverClass)#' >
 		>
 	if 'Mode write "<th width=""1%"">#</th>"
 	
@@ -1305,7 +1322,7 @@ ClassMethod DrawSQL(SQL As %String = "", MaxNode = {$$$MAXSHOW}, NSpace = "", ms
 	;Set the hover for table rows
 	i '$d(%DrawSQL) {
 	$$$jsstart
-		w "$('.trs').hover(function(){ " // set the function when you hover the cursor over the element and during its lead	ui-state-hover
+		w "$('."_hoverClass_"').hover(function(){ " // set the function when you hover the cursor over the element and during its lead	ui-state-hover
 		w "  $(this).toggleClass( 'ui-widget-content' )" 
 		w " });"
 	$$$jsstop
@@ -1315,7 +1332,7 @@ ClassMethod DrawSQL(SQL As %String = "", MaxNode = {$$$MAXSHOW}, NSpace = "", ms
  // Handling one query string
 qNext(GetData,cou="")
 		set count=count+1
-		write "<tr class=trs >"
+		write "<tr class='trs "_hoverClass_"' >"
 		if 'Mode write "<th>"_$s(cou="":count,1:cou)_"</th>"
 		if count>MaxNode w "<th style='color:red'>... "_$$$aText("More entries","")_" "_MaxNode_"</th></tr>" s stopWrite=1 QUIT
 		for ii=1:1:ColCount {	

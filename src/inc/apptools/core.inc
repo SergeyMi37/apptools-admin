@@ -172,6 +172,7 @@ ROUTINE apptools.core [Type=INC]
 #; To add an active link to the panel
 #define addAppLog(%text,%title,%input,%target) "<a title='"_%title_"' "_$g(%target)_" href=""apptools.core.LogInfo.cls?NSP="_$zu(5)_"&WHAT="_$zconvert(%input,"O","URL")_""">"_%text_"</a>"
 #define addAppL(%text) "<a target="""_$ZCRC(%text,7)_""" href=""apptools.core.LogInfo.cls?NSP="_$zu(5)_"&WHAT="_$zconvert(%text,"O","URL")_""">"_%text_"</a>"
+#define addLoadLogInfo(%text,%title,%input,%http) "<a title='"_%title_"' target=LogInfo"_$tr($zts,",.")_" href="""_%http_"apptools.core.LogInfo.cls?NSP="_$zu(5)_"&WHAT="_$zconvert(%input,"O","URL")_""">"_%text_"</a>"
 
 #; To obtain the date and time YYYY-MM-DD HH:MM:SS
 #define AppDT(%h) $zd(+%h,3)_" "_##class(apptools.core.type).GetValidZT(%h)
@@ -221,10 +222,16 @@ ROUTINE apptools.core [Type=INC]
 
 #define appTab3(%n1,%n2,%n3) "<table cellpadding=2 cellspacing=0 border=1 class=""DetailTable"" width=""90%""><tbody><tr><th align=""left"" width=""5px"">"_%n1_"</th><th align=""left"" width=""50px"">"_%n2_"</th><th align=""left"" width=""50px"">"_%n3_"</th></tr>"
 
-#define jsstart w "<script language='javascript'>"
-#define jsstop w "</script>"
+#define jsbegin "<script language='javascript'>"_$$$NL
+#define jsend "</script>"_$$$NL
+#define jsstart write $$$jsbegin
+#define jsstop write $$$jsend
 #define styleurl "text-decoration:underline; color:blue; cursor:hand;"
 #define blockui(%msg)  "$.blockUI( { message: '"_%msg_"' , css: { border: 'none', padding: '15px', backgroundColor: '#000', '-webkit-border-radius': '10px','-moz-border-radius': '10px', opacity: .5, color: '#fff' }} );"
+
+#define Msg(%c,%t) "<span class='brand-text font-weight-light' style='color:"_%c_"'>"_%t_"</span><br>"
+#define Message(%t) "<span class='brand-text font-weight-light'>"_%t_"</span><br>"
+#define MessErr(%t) "<span class='brand-text font-weight-light' style='color:hotpink'>"_%t_"</span><br>"
 
 #;	Localization
 #define GNLangDOMAIN "AppTools"

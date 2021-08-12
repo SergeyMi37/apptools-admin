@@ -78,9 +78,9 @@ ClassMethod GetYear(h) As %String
 
 /// To get a date in the format 2018-04-03T16:40:30
 /// w ##class(apptools.core.type).GetDateTime($h)
-ClassMethod GetDateTime(h) As %String
+ClassMethod GetDateTime(h, delim = "T") As %String
 {
-	q $zd(h,3)_"T"_##class(apptools.core.type).GetValidZT(h)
+	q $zd(h,3)_delim_##class(apptools.core.type).GetValidZT(h)
 }
 
 /// To check the validity and display the time

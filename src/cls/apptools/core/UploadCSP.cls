@@ -43,6 +43,7 @@ ClassMethod OnPage(Par = "") As %Status
 	   ;zw %request TODO
 	   ;%request.AppData %request.Application
 	   if %request.Application["apptoolsrest" set pathcsp="/csp/spgz/"
+	   if %request.Application["/arest/" set pathcsp="/csp/spgz/"
   }
  &html<
     <script>

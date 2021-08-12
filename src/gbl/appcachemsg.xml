@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="IRIS" version="26" zv="IRIS for Windows (x86-64) 2020.3 (Build 302U)" ts="2021-04-10 08:05:11">
+<Export generator="IRIS" version="26" zv="IRIS for UNIX (Red Hat Enterprise Linux for x86-64) 2020.3 (Build 304U)" ts="2021-08-12 21:35:06">
 <Global>
 <Node><Sub>^%AppCacheMsg</Sub>
 <Node><Sub>AppTools</Sub>
@@ -717,6 +717,9 @@
 <Node><Sub>28475559</Sub>
 <Data>to calculate the size globalaw our database USER</Data>
 </Node>
+<Node><Sub>48528159</Sub>
+<Data>Username copy to</Data>
+</Node>
 <Node><Sub>53110623</Sub>
 <Data>Contextual changes or allotments</Data>
 </Node>
@@ -800,6 +803,9 @@
 </Node>
 <Node><Sub>771203951</Sub>
 <Data>Class description</Data>
+</Node>
+<Node><Sub>783977175</Sub>
+<Data>Find Users</Data>
 </Node>
 <Node><Sub>792743423</Sub>
 <Data>No object</Data>
@@ -990,6 +996,9 @@
 <Node><Sub>1799422394</Sub>
 <Data>Commands not defined</Data>
 </Node>
+<Node><Sub>1808393236</Sub>
+<Data>Login</Data>
+</Node>
 <Node><Sub>1819719459</Sub>
 <Data>WebTerminal</Data>
 </Node>
@@ -1019,6 +1028,9 @@
 </Node>
 <Node><Sub>1949977550</Sub>
 <Data>Show command input history</Data>
+</Node>
+<Node><Sub>1960604555</Sub>
+<Data>Username copy from</Data>
 </Node>
 <Node><Sub>1961231829</Sub>
 <Data>and send to</Data>
@@ -1052,6 +1064,9 @@
 </Node>
 <Node><Sub>2202536061</Sub>
 <Data>Export Source</Data>
+</Node>
+<Node><Sub>2232051201</Sub>
+<Data>The output of System produced</Data>
 </Node>
 <Node><Sub>2263765174</Sub>
 <Data>Sent to %1 file %2</Data>
@@ -1167,6 +1182,9 @@
 <Node><Sub>2983365390</Sub>
 <Data>Call examples</Data>
 </Node>
+<Node><Sub>2994933403</Sub>
+<Data>UserCopy</Data>
+</Node>
 <Node><Sub>3003771833</Sub>
 <Data>Load WebTerminal</Data>
 </Node>
@@ -1248,6 +1266,9 @@
 <Node><Sub>3307136828</Sub>
 <Data>Undefined object identifier</Data>
 </Node>
+<Node><Sub>3311138391</Sub>
+<Data>ExecutePost</Data>
+</Node>
 <Node><Sub>3344198908</Sub>
 <Data>Preview mode in two columns</Data>
 </Node>
@@ -1302,6 +1323,9 @@
 <Node><Sub>3565164930</Sub>
 <Data>Class %1 does not have a Query or XData element named %2</Data>
 </Node>
+<Node><Sub>3568428558</Sub>
+<Data>Copy Users</Data>
+</Node>
 <Node><Sub>3569599040</Sub>
 <Data>About is already underway</Data>
 </Node>
@@ -1347,6 +1371,9 @@
 <Node><Sub>3813010884</Sub>
 <Data>August</Data>
 </Node>
+<Node><Sub>3842669952</Sub>
+<Data>Make tab</Data>
+</Node>
 <Node><Sub>3850148591</Sub>
 <Data>Query</Data>
 </Node>
@@ -1373,6 +1400,9 @@
 </Node>
 <Node><Sub>3948683721</Sub>
 <Data>Search string must be at least 3 characters</Data>
+</Node>
+<Node><Sub>3950563313</Sub>
+<Data>Description</Data>
 </Node>
 <Node><Sub>3951820451</Sub>
 <Data>To run in the background scanning logs to collect information about modifiable globalaw yesterday</Data>
