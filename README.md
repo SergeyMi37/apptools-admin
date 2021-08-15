@@ -20,7 +20,7 @@ This project is not only a set of [tools for the administrator](#PanelAdmin), bu
 For example, Photo Album, Music Player, and Personal Books Library all come together in a user-friendly treasure chest design.
 
 ## What's new
-The module for converting queries to a xlsx file based on the python openpyxl library is included.
+The module for converting query results to a xlsx file based on the python openpyxl library is included.
 
 ## Installation with ZPM
 
