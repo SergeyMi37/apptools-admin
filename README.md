@@ -20,7 +20,7 @@ This project is not only a set of [tools for the administrator](#PanelAdmin), bu
 For example, Photo Album, Music Player, and Personal Books Library all come together in a user-friendly treasure chest design.
 
 ## What's new
-The module for converting query results to a xlsx file based on the python openpyxl library is included.
+A service has been added to the project to support informing via telegram messenger and email about the status of products and systems
 
 ## Installation with ZPM
 
@@ -197,6 +197,12 @@ Export to report CSV file
 %SYS>do ##class(apptools.core.files).Export2CSV("/tmp/JrnCount*.csv","^tmpJRN")
 
 Written to the file /tmp/JrnCount20200322173446.csv
+```
+
+## The module for converting query results to a xlsx file based on the python openpyxl library is included.
+```
+zn "user"
+USER>do ##class(apptools.python.xlsx).sql2xlsx("select * from apptools_core.Log order by id desc","n,,,,,n,,,,d","/tmp/sample-py.xlsx")
 ```
 
 ## Group product management in various namespaces

@@ -412,7 +412,7 @@ ClassMethod FindAndDrawAllErr(sql, nspaces, result) As %String
 	}
 }
 
-/// Procedure for ##class(apptools.core.LogInfoPane).DrawSQL 5 Argument
+/// Procedure for ##class(apptools.core.Production).AddTraceUrl
 ClassMethod AddTraceUrl(Val, Col, Head, Temp, Del = 0) As %String
 {
 	set res=Val
@@ -427,6 +427,20 @@ ClassMethod AddTraceUrl(Val, Col, Head, Temp, Del = 0) As %String
 	quit res
 }
 
+///  do ##class(apptools.core.Production).GetQueryTotal(.info)
+ClassMethod GetQueryTotal(ByRef total) As %String
+{
+	set serv="",total=0
+	for { 	set serv=$order(^Ens.Queue(serv)) quit:serv=""
+			set count=$get(^Ens.Queue(serv,0,"count"))
+			set total(serv)=count
+			if count {
+				set total=$g(total)+count
+			}
+		}
+	quit $$$OK
+}
+
 ///  do ##class(apptools.core.Production).FindAndDrawAllQueue(##class(apptools.core.sys).ListNS(.info,"NotPre,Ens"))
 ClassMethod FindAndDrawAllQueue(nspaces) As %String
 {
@@ -437,12 +451,7 @@ ClassMethod FindAndDrawAllQueue(nspaces) As %String
 		if $DATA(^Ens.Queue) {
 			set serv="",total=0
 			set ns=$p(nspaces,",",i)
-			for { 	set serv=$order(^Ens.Queue(serv)) quit:serv=""
-					set count=$get(^Ens.Queue(serv,0,"count"))
-					if count {
-						set total=$g(total)+count
-					}
-				}
+			do ..GetQueryTotal(.total)
 			set csp="csp"
 			set url="/"_csp_"/"_$zconvert(ns,"L")_"/EnsPortal.Queues.zen?$NAMESPACE="_ns
 			write "<tr><td><a target=Que"_ns_" href='"_url_"'>"_ns_"</a></td><td>"_total_"</td></tr>"
@@ -450,6 +459,30 @@ ClassMethod FindAndDrawAllQueue(nspaces) As %String
 		$$$NspReturn(curNs)
 	}
 	write "</Table>"
+}
+
+/// do ##class(Spgz.ReloadItemProd).ReloadList("BP2,BP3")
+ClassMethod ReloadList(list As %String) As %String
+{
+	for in=1:1:$L(list,",") {
+		continue:$p(list,",",in)=""
+		d ..Reload($p(list,",",in))
+	}
+	q $$$OK
+}
+
+ClassMethod Reload(item As %String) As %String
+{
+	do ##class(apptools.core.Production).GetQueryTotal(.info)
+	if '$g(info(item)) {
+		set st=##class(Ens.Director).EnableConfigItem(item,0)
+		set st=##class(Ens.Director).EnableConfigItem(item)
+		write !,item," reload"
+	}
+	else {
+		write !,item," continue"
+	}
+	q $$$OK
 }
 
 /// do ##class(apptools.core.Production).ShowGlobals("^tmp**",##class(apptools.core.sys).ListNS(.info,"NotPre,Ens"))

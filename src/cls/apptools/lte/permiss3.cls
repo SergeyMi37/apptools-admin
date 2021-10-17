@@ -1,6 +1,6 @@
 Include apptools.core
 
-/// http://hp-msw:52773/apptoolsrest/a/permiss2
+/// http://localhost:52773/apptoolsrest/a/permiss2
 Class apptools.lte.permiss3 Extends apptools.lte.adminTabs [ ClassType = "", DependsOn = apptools.core.msg, ProcedureBlock ]
 {
 
@@ -41,7 +41,7 @@ ClassMethod GetAllApps(opt) As %Status
 			set opt(key,"Role")="%All"
 			set opt(key,"Namespace")="%SYS"
 			set opt(key,"Method")="ShowTabSample"
-			set opt(key,"TabMenu","Close")=0 ;the tab cannot be deleted
+			set opt(key,"TabMenu","Close")=0 ;0 = the tab cannot be deleted
 			set opt(key,"Active")=1 ;active menu item
 			set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
 

@@ -428,7 +428,7 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 		<table width="90%" style="border-radius: 10px; border: 1px solid #72a7cf" cellpadding="2" cellspacing="0" class="DetailTable" bgcolor="#c4d6d6" >
 		<tr>
 			<td>
-				 #($wc($zhex("2692"))_##class(apptools.core.LogInfoPane).GetSysinfo(color,"utl"))#
+				 #($$$emojiHammerPick_##class(apptools.core.LogInfoPane).GetSysinfo(color,"utl"))#
 				 <a target='ccons' name='ccons' href='#("/csp/sys/op/UtilSysConsoleLog.csp#bottom")#' id='Param'>#($$$aText("Console log",""))#</a>
 				 <a target='TabsPM' name='TabsPM' href='#("apptools.Tabs.PanelUikitPermissMatrx.cls?autoload=Matrix")#' title='#($$$aText("Sample Application Access Matrix",""))#' id='Param'>#($$$aText("Access Matrix",""))#</a>
 			</td>

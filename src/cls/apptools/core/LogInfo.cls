@@ -88,7 +88,7 @@ ClassMethod GetInputXLSTagsVal(exportXLS, exportXLSfile, exportXLSfileEmail, SDN
 ClassMethod SendEmail(supportemail = "", subj = "", msg = "", file = "") As %Status
 {
 		set subj=$$$aText("Server","")_" : "_$zu(110)_", "_subj
-		set text="<html><head></head><body color=greay><h4>"_$$$aText("Hello","")_"</h4><br><br>"_$g(msg)
+		set text="<html><head></head><body color=greay><h4>"_$$$aText("Hello","")_"!</h4><br><br>"_$g(msg)
 		set text=text_"</body></html>"
 		// support
 		if supportemail="" set supportemail=$$$EMAILSUPPORT		
@@ -101,6 +101,7 @@ ClassMethod SendEmail(supportemail = "", subj = "", msg = "", file = "") As %Sta
 			s file=$lb($p(file,$$$slash,1,*-1)_$$$slash,$p(file,$$$slash,*))
 		}
 		set sc=##class(apptools.core.net).SendMail($$$EMAILSERVERIP,$$$EMAILSERVERPORT, 0, 0, "", authFrom, authFromPass, authFrom, email_","_supportemail, subj, text,.file)
+		;set ^logMSW($i(^logMSW))=$lb(sc,$$$EMAILSERVERIP,$$$EMAILSERVERPORT, 0, 0, "", authFrom, authFromPass, authFrom, email_","_supportemail, subj)
 		if 'sc {
 			w !,"Error "_$System.Status.GetErrorText(sc) 
 			$$$AppLogTab("ERROR","()",$System.Status.GetErrorText(sc))

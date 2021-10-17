@@ -1,6 +1,6 @@
 Include apptools.core
 
-/// http://hp-msw:52773/apptoolsrest/a/permiss
+/// http://localhost:52773/apptoolsrest/a/permiss
 Class apptools.lte.permiss Extends apptools.lte.adminTabs [ ClassType = "", DependsOn = apptools.core.msg, ProcedureBlock ]
 {
 

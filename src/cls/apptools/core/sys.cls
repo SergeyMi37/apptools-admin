@@ -468,8 +468,8 @@ ClassMethod SaveGateway(sql, pDSN, usr, pwd, result, top = 100000)
 ClassMethod GetFullName(login) As %String
 {
   new $namespace
-  set $namespace="%SYS"
   try {
+  	set $namespace="%SYS"
 	if ##class(Security.Users).Exists(login,.User,.Status) {
 			if $isobject(User) {
 				s fullName=User.FullName 

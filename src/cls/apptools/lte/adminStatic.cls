@@ -22,6 +22,7 @@ ClassMethod GetMain(parameter, class = "") As %Status
 	set par("input-cgivar")=cgivar
     set par("=path=")="/apptools/"
     set par("=Message-default=")=""
+	set par("<!--FooterLeft-->")="Applications Tools for Admin."
 	set h=##class(apptools.core.rest).getStatic("apptools.lte.adminStatic:html")
     set st=$classmethod(class,"MainParameter",.h,.par) 
 
@@ -306,7 +307,7 @@ XData html [ MimeType = application/yaml ]
 	
     <ul class="navbar-nav">
       <li class="nav-item">
-        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        <a class="nav-link" id="HideSideMenu" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
       <!--<li class="nav-item d-none d-sm-inline-block">
         <a href="#" onclick="document.location.reload();" class="nav-link">Home</a>
@@ -435,9 +436,10 @@ XData html [ MimeType = application/yaml ]
 
   <!-- Main Footer -->
   <footer class="main-footer">
-    <strong>Applications Tools for Admin.</strong>
+    <strong><!--FooterLeft--></strong>
    
     <div class="float-right d-none d-sm-inline-block">
+      <!--FooterRight-->
       <!--<b>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a> All rights reserved. Version</b> 3.1.0-rc-->
     </div>
   </footer>

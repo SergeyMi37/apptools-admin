@@ -1,6 +1,6 @@
 Include apptools.core
 
-/// http://hp-msw:52773/apptoolsrest/a/dev
+/// http://localhost:52773/apptoolsrest/a/dev
 Class apptools.lte.dev Extends apptools.lte.adminStatic [ ClassType = "", DependsOn = apptools.core.msg, ProcedureBlock ]
 {
 

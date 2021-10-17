@@ -295,5 +295,13 @@ ROUTINE apptools.core [Type=INC]
 
 #EndIf
 
-
+#; --------------- Icons - https://apps.timwhitlock.info/emoji/tables/unicode
+#; Hammer and Pick
+#define emojiHammerPick $wc($zhex("2692"))
+#;  neutral face  
+#define emojiNeutralFace $wc($zhex("1F610"))
+#; pouting face
+#define emojiPoutingFace $wc($zhex("1F621")) 
+#; black down-pointing double triangle
+#define emojiDoubleTriangle $wc($zhex("23EC")) 
 

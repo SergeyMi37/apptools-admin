@@ -1,25 +1,31 @@
 Include apptools.core
 
-/// http://localhost:52773/apptoolsrest/a/permiss2
-Class apptools.lte.permiss2 Extends apptools.lte.adminTabs [ ClassType = "", DependsOn = apptools.core.msg, ProcedureBlock ]
+/// http://localhost:52773/apptoolsrest/a/info
+Class apptools.lte.info Extends apptools.lte.adminTabs [ ClassType = "", DependsOn = apptools.core.msg, ProcedureBlock ]
 {
 
 /// Application title
-Parameter HeaderText = "Permissions";
+Parameter HeaderText = "Info";
 
 /// Global Name Store Referens files
-Parameter GNStore = "^apptools.Permissions";
+Parameter GNStore = "^apptools.Info";
 
-Parameter AppRoles = "ui_Permissions";
+/// Roles
+Parameter AppRoles = "ui_Info";
+
+/// Default query to productions logs
+Parameter DefaultQuery = "Select * from Ens_Util.Log where Type='2' and TimeLogged>? order by id desc";
 
 /// Replace parameters
 ClassMethod MainParameter(ByRef h, ByRef par) As %Status
 {
  set path=par("=path=")
- set par("=Brand-Text=")="Admin v.2"
+ set par("=Brand-Text=")=$system
  set par("=Logo-image=")=path_"adminlte/dist/img/ApptoolsLogo.png"
- set par("=titleAppToolsadmin=")=..#HeaderText
+ set par("=titleAppToolsadmin=")=$system ;..#HeaderText
  set par("<!--=LinkIcon=-->")=..GetAppIcon(path_"adminlte/dist/img/ApptoolsLogo","png")
+ set par("<!--FooterLeft-->")=$system_" - "_$zv
+ set par("<!--FooterRight-->")="<a target='license' href=""/csp/sys/op/UtilDashboard.csp?$NAMESPACE=%25SYS""> "_$$$aText("System Dashboard","")_"</a>"
  quit ..RepaceParameter(.h,.par)
 }
 
@@ -27,9 +33,64 @@ ClassMethod MainParameter(ByRef h, ByRef par) As %Status
 ClassMethod GetAllApps(opt) As %Status
 {
 	;side menu
-	set sideMenuName="Permission",
+	set sideMenuName="Configuration",
 		sideMenuNumer=1,
 		sideMenuOpen=1,        //3 =1 open menu
+		sideMenuIcon="fa-cog"  //4  icon   https://fontawesome.com/icons?d=gallery&p=2&m=free
+		set sideMenu=$lb(sideMenuNumer,sideMenuName,sideMenuOpen,sideMenuIcon) 
+		set key="Products"
+		set opt(key,"Menu")=sideMenu
+		set opt(key)=key
+		set opt(key,"id")=key
+		set opt(key,"TabName")=key
+		set opt(key,"ClassName")=..%ClassName(1)
+		set opt(key,"Role")="%All"
+		set opt(key,"Namespace")="%SYS"
+		set opt(key,"Method")="ShowTabSample"
+		set opt(key,"TabMenu","Close")=1 ;0 = the tab cannot be deleted
+		set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
+
+		set key="Options"
+		set opt(key,"Menu")=sideMenu
+		set opt(key)=key
+		set opt(key,"id")=key
+		set opt(key,"TabName")=key
+		set opt(key,"ClassName")=..%ClassName(1)
+		set opt(key,"Role")="%All"
+		set opt(key,"Namespace")="%SYS"
+		set opt(key,"Method")="ShowTabSample"
+		set opt(key,"TabMenu","Close")=1 ;0 = the tab cannot be deleted
+		set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
+		set opt(key,"Active")=1 ;active menu item
+
+		/*
+		set key="Namespaces"
+		set opt(key,"Menu")=sideMenu
+		set opt(key)=key
+		set opt(key,"id")=key
+		set opt(key,"TabName")=key
+		set opt(key,"ClassName")=..%ClassName(1)
+		set opt(key,"Role")="%All"
+		set opt(key,"Namespace")="%SYS"
+		set opt(key,"Method")="ShowTabSample"
+		set opt(key,"TabMenu","Close")=1 ;0 = the tab cannot be deleted
+		set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
+
+		set key="Databases"
+		set opt(key,"Menu")=sideMenu
+		set opt(key)=key
+		set opt(key,"id")=key
+		set opt(key,"TabName")=key
+		set opt(key,"ClassName")=..%ClassName(1)
+		set opt(key,"Role")="%All"
+		set opt(key,"Namespace")="%SYS"
+		set opt(key,"Method")="ShowTabSample"
+		set opt(key,"TabMenu","Close")=1 ;0 = the tab cannot be deleted
+		set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
+		*/
+	set sideMenuName="Permission",
+		sideMenuNumer=2,
+		sideMenuOpen=0,        //3 =1 open menu
 		sideMenuIcon="fa-cog"  //4  icon   https://fontawesome.com/icons?d=gallery&p=2&m=free
 		set sideMenu=$lb(sideMenuNumer,sideMenuName,sideMenuOpen,sideMenuIcon) 
 			set key="MenuMatrix"
@@ -41,8 +102,8 @@ ClassMethod GetAllApps(opt) As %Status
 			set opt(key,"Role")="%All"
 			set opt(key,"Namespace")="%SYS"
 			set opt(key,"Method")="ShowTabSample"
-			set opt(key,"TabMenu","Close")=0 ;the tab cannot be deleted
-			set opt(key,"Active")=1 ;active menu item
+			set opt(key,"TabMenu","Close")=1 ;0 = the tab cannot be deleted
+			;set opt(key,"Active")=1 ;active menu item
 			set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
 
 			set key="User-Copy"
@@ -54,7 +115,6 @@ ClassMethod GetAllApps(opt) As %Status
 			set opt(key,"Role")="%All"
 			set opt(key,"Namespace")="%SYS"
 			set opt(key,"Method")="ShowTabSample"
-			set opt(key,"TabMenu","Close")=1
 			set opt(key,"aw-icon")="fa-table"   ;https://fontawesome.com/icons?d=gallery&p=2&m=free
 
 	;top menu
@@ -64,7 +124,7 @@ ClassMethod GetAllApps(opt) As %Status
 		s opt(key,"id")="Support"
 		s opt(key,"TabName")="Support" 
 		s opt(key,"ClassName")=..%ClassName(1)
-		s opt(key,"Method")="ShowTabSupport"
+		s opt(key,"Method")="ShowTabAbout"
 		s opt(key,"TabMenu","Close")=1
 		s opt(key,"MenuTop")=$lb(LeftMenuNumer,LeftMenuName)
 	
@@ -77,7 +137,6 @@ ClassMethod GetAllApps(opt) As %Status
 		set opt(key,"ClassName")=..%ClassName(1)
 		set opt(key,"Method")="ShowInIFrame" 
 		set opt(key,"InFrameUrl")="http://"_$zu(110)_":52773/csp/sys/sec/%25CSP.UI.Portal.User.zen?PID="_$username
-		set opt(key,"TabMenu","Close")=1
 		set opt(key,"MenuTop")=$lb(topMenuNumer,topMenuName)
 	set key="menu-top-account3"
 		set opt(key,"MenuTop")=$lb(topMenuNumer,topMenuName) ; 99-account has nested items
@@ -87,19 +146,118 @@ ClassMethod GetAllApps(opt) As %Status
 		set opt(key,"ClassName")=..%ClassName(1)
 		set opt(key,"Method")="Logout"
 	
+	;----- Setup the search in the top menu
+	s key="Search"
+	s opt(key)="Search"
+	s opt(key,"id")="Search-"
+	s opt(key,"TabName")="Search"_"-"
+	s opt(key,"ClassName")=..%ClassName(1)
+	s opt(key,"Method")="ShowTabSearch"
+	s opt(key,"TabMenu","Mode")=0 ;1 - for each new search bar to make new tab, 0-tab is always the same
+	
 	do ..CheckRoleMenu(.opt)
 	quit $$$OK
 }
 
-/// the render Tab On the program"
-/// Par - code menu item from the GetAllApps ..
-ClassMethod ShowTabSupport(key = "") As %Status
+ClassMethod OptionsFirstHead(Par = "") As %Status
 {
-	if $g(key("appPar"))'="" set key=key("appPar")
-	do ..GetAllApps(.opt) 
-	if $g(opt(key,"Disable")) write ..GetSupportInfo() quit $$$OK
-	set divId=$g(opt(key,"id"))
-	write ..#ToAdmin
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	;set %ui=1
+	set onclick=$$$blockui("Load...")_
+		$$$onclick(divId_"MainForm",divId_"MainContent",$namespace,..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
+	write key_divId
+}
+
+ClassMethod ProductsFirstHead(Par = "") As %Status
+{
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	;set %ui=1
+	set onclick=$$$blockui("Load...")_
+		$$$onclick(divId_"MainForm",divId_"MainContent",$namespace,..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
+	set nspaces=##class(apptools.core.sys).ListNS(.info,"NotPre,Ens")
+	set sqldef=..#DefaultQuery
+	set sql2=$replace(sqldef,"*","count(*)")
+	set sql2=$replace(sql2,"?","'"_$zd($h-1,3)_" 21:00'")
+	do ##class(apptools.lte.info).FindAllErr(sql2,nspaces,.result,.index)
+	set cnt=""
+	for { set cnt=$o(index(cnt),-1) quit:cnt=""
+		set qu=""
+		for { set qu=$o(index(cnt,qu)) quit:qu=""
+			set ns=""
+			for { set ns=$o(index(cnt,qu,ns)) quit:ns=""
+				write $$$appButton(divId_"appButtonResult"_ns,"title='Count Errors = "_cnt_", Query = "_qu_"' onclick="""_$replace(onclick,"*",ns_"&cnt="_cnt_"&qu="_qu)_"""",ns_"_"_cnt_"_"_qu)
+			}
+		}
+	}
+	$$$SetHeightContent(divId,250)
+	q $$$OK
+}
+
+///  do ##class(apptools.lte.info).FindAllErr(,,.result)
+ClassMethod FindAllErr(sqldef = {..#DefaultQuery}, nspaces = "", result, index) As %String
+{
+	set GN=##class(apptools.core.Production).#SettingsGN
+	if '$Data(@GN) do ##class(apptools.core.Production).SaveStat(1)
+	if nspaces="" set nspaces=##class(apptools.core.sys).ListNS(.info,"NotPre,Ens")
+	for i=1:1:$l(nspaces,",") { continue:$p(nspaces,",",i)=""||("%All"[$p(nspaces,",",i))
+		$$$NspGoto(curNs,$p(nspaces,",",i))
+		set NS=$p(nspaces,",",i)
+		if '$D(@GN@(NS)) continue ; there is no namespace in the system, skip
+		;w "<li>",NS
+		set PN=""
+		set p="" for { set p=$o(@GN@(NS,"Ens",p)) quit:p=""
+			if $lg($g(@GN@(NS,"Ens",p)),1)[$$$EnsProductStatusRun s PN=p quit
+		}
+		set onclicknone="$('.taberrors').css('display','none'); "
+		set url="<b><a target='ensprod2"_($Namespace)_"' href='/csp/"_$zconvert($Namespace,"L")_"/EnsPortal.ProductionConfig.zen?$NAMESPACE="_$Namespace_"' >"_NS_"</a></b>"
+		if PN="" s result(NS,"NoRun")="<li>"_url_" no running products" continue
+		if $Namespace'=NS s result(NS,"Err")="<br><font color=red>Go to error "_url_"</font>" continue
+		
+		set gn="tmpErrEns"
+		do ##class(apptools.core.sys).SaveSQL(sqldef,gn)
+		set (ec,cnt,result(NS,"Count"))=+$lg($g(@gn@(1)),1)
+		    ;if NS="MVK" zw @gn
+		set result(NS,"ProdUrl")=url
+		
+		;Query
+		set serv="",total=0
+		for { s serv=$o(^Ens.Queue(serv)) q:serv=""
+			s total=$g(total)+$g(^Ens.Queue(serv,0,"count"))
+		}
+		set result(NS,"Query")=total
+		set url="/csp/"_$zconvert(NS,"L")_"/EnsPortal.Queues.zen?$NAMESPACE="_NS
+		set result(NS,"QueryUrl")="<a target="_$zts_" href="_url_" > Query "_total_" </a>"
+		set index(+cnt,total,NS)=""		
+		$$$NspReturn(curNs)
+	}
+	quit $$$OK
+}
+
+/// Search result 
+ClassMethod ProductsResult(Par = "") As %Status
+{
+	set %ui=1
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set mode=Par("mode")
+	set cnt=Par("cnt")
+	set qu=Par("qu")
+	zn mode
+	do ##class(apptools.lte.info).FindAllErr(,mode,.result,.index)
+	write $G(result(mode,"ProdUrl"))_" Errors="_(+cnt)_" "_$G(result(mode,"QueryUrl"))_" Query="_(+qu)_"<br>"
+	if cnt {
+		set exec="##class(apptools.core.Production).AddTraceUrl(.%AppLogInfoVal, %AppLogInfoCol, %AppLogInfoHead, .%AppLogInfoTemp)"
+		set sqldef=..#DefaultQuery
+		set sql2=$replace(sqldef,"?","'"_$zd($h-1,3)_" 21:00'")
+		set st=##class(apptools.core.LogInfoPane).DrawSQL(sql2,$g(Max,10000),$Namespace," Ensemble Errors ",$g(exec))
+		w st
+	}
+	write ..ButtonAgain(divId,key) ;,key_" - "_mode)
 	quit $$$OK
 }
 

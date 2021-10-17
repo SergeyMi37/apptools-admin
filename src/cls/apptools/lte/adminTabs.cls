@@ -25,7 +25,7 @@ ClassMethod IsPermiss(role = "") As %Status
 	for i=1:1:$L(role,",") { continue:$P(role,",",i)=""
 		if (","_$roles_",")[(","_$P(role,",",i)_",") set st=$$$OK quit
 	}
-	if 'st quit $$$ERROR($$$GeneralError,"Protect")
+	if 'st quit $$$ERROR($$$GeneralError,"Protect st="_st_"="_$roles_"="_role_"=")
 	quit st
 }
 
@@ -124,6 +124,7 @@ ClassMethod GetStringJs(ns, cls, postload = 0, autoload = "") As %String
   set js=js_$$$NL_##class(apptools.core.Action).WriteActJs(%request,"","account_status",..%ClassName(1),"DrawStatus","")_$$$NL
  	set enter=##class(apptools.core.Action).WriteActJs(%request,"","MainHidden",..%ClassName(1),"ShowTab","&appPar=Search&Searchstr='+document.getElementById('searchstr').value")_$$$NL
  	set js=js_$$$NL_"$('#searchstr').keydown(function (e) { if (e.keyCode == 13) { "_enter_" }});"_$$$NL
+ 	set js=js_$$$NL_"$('#HideSideMenu').click();"_$$$NL
   	if autoload="" {
 	 	do ..GetAllApps(.opt) 
 	 	set i="" 
@@ -402,12 +403,13 @@ ClassMethod Logout(Par) As %Status
 }
 
 /// The output of the First button
-ClassMethod ButtonAgain(divId = "", key = "") As %Status
+ClassMethod ButtonAgain(divId = "", key = "", text = "") As %Status
 {
 	//set onclick="$('#"_divId_"MainContent"_"').empty();"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainHeader",..%ClassName(1),divId_"FirstHead","&key="_key_"&divId="_divId)
 	set onclick="$('#"_divId_"MainContent"_"').empty();"_
 		$$$onclick(divId_"MainForm",divId_"MainHeader",$namespace,..%ClassName(1),divId_"FirstHead","&key="_key_"&divId="_divId)
-	quit $$$appButton("appButtonExit","onclick="""_$g(onclick)_"""",$$$aText("Again",""))
+	if text="" set text=$$$aText("Again","")
+	quit $$$appButton("appButtonExit","onclick="""_$g(onclick)_"""",text)
 }
 
 /// the render Tab On the program"

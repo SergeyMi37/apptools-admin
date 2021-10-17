@@ -407,12 +407,12 @@ ClassMethod GetIPext(url = {"https://pr-cy.ru/browser-details/"}, ByRef ip) As %
 
 /// Get current URI
 /// write ##class(apptools.core.net).GetURI(.prop)
-ClassMethod GetURI(Properties) As %String
+ClassMethod GetURI(Properties, suff = "") As %String
 {
 	New $Namespace
 	set $Namespace="%SYS"
 	set Status=##Class(Config.Startup).Get(.Properties)
-	if Status s ServerPort="http://"_$zu(110)_":"_$g(Properties("WebServerPort"),57772)
+	if Status s ServerPort="http://"_$zu(110)_suff_":"_$g(Properties("WebServerPort"),57772)
 	quit $G(ServerPort)
 }
 
