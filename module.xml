@@ -6,26 +6,32 @@
       <Version>1.1.12</Version>
       <Description>Application tools for technical support and DBMS administrator. View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files</Description>
       <Packaging>module</Packaging>
-	  <Keywords>Application tools admin</Keywords>
-		<Author>
-		<Person>Mikhaylenko Sergey</Person>
-		<CopyrightDate>2021</CopyrightDate>
-		<License>MIT</License>
-		</Author>
-      <SourcesRoot>src</SourcesRoot>
-	  <Invokes>
-        <Invoke Class="apptools.core.Installer" Method="AddFavorites"></Invoke>
-      </Invokes>
+  <Keywords>Application tools admin</Keywords>
+<Author>
+<Person>Mikhaylenko Sergey</Person>
+<CopyrightDate>2021</CopyrightDate>
+<License>MIT</License>
+<Notes>
+repository:
+https://github.com/SergeyMi37/apptools-admin
+description:
+An example of deploying a solution with databases from the archive. (Can be expanded without source codes).Application tools for technical support and DBMS administrator. View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files.
+</Notes>
+</Author>
+	<SourcesRoot>src</SourcesRoot>
+	<Invokes>
+	    <Invoke Class="apptools.core.Installer" Method="AddFavorites" Phase="Activate" When="After" ></Invoke>
+        </Invokes>
 	<Resource Name="apptools.core.PKG"/>
 	<Resource Name="apptools.core.INC"/>
         <Resource Name="apptools.Chart.PKG"/>
         <Resource Name="apptools.Form.PKG"/>
         <Resource Name="apptools.lte.PKG"/>
-		<Resource Name="apptools.Tabs.PKG"/>
-		<Resource Name="apptools.python.PKG"/>
+	<Resource Name="apptools.Tabs.PKG"/>
+	<Resource Name="apptools.python.PKG"/>
         <Resource Name="apptools.Uikit.PKG"/>
 	<Resource Name="appcachemsg.GBL"/>
-    <CSPApplication 
+        <CSPApplication 
             SourcePath="/web"
             DeployPath="${cspdir}/apptools"
             Url="/apptools" 
@@ -42,11 +48,13 @@
             AuthenticationMethods="32" 
             MatchRoles=":%ALL"
             DispatchClass="apptools.core.rest"
-			Path="${cspdir}/apptools"
-			Recurse="1"
-			UnauthenticatedEnabled="0"
-			Generated="true"/>  
-            
-    </Module>
-  </Document>
+	    Path="${cspdir}/apptools"
+	    Recurse="1"
+	    UnauthenticatedEnabled="0"
+	    Generated="true"/>  
+<AfterInstallMessage>
+ You can load admins panel at: ${webroot}apptools/apptools.core.LogInfo.cls
+</AfterInstallMessage>
+</Module>
+</Document>
 </Export>
