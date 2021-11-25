@@ -1,4 +1,4 @@
-![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/hammer-red.png)
+![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/hammer-min.png)
 ## apptools-admin
 [![Gitter](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/apptools-admin) 
 [![GitHub all releases](https://img.shields.io/badge/Available%20on-GitHub-black)](https://github.com/SergeyMi37/apptools-admin)
