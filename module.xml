@@ -3,7 +3,7 @@
   <Document name="apptools-admin.ZPM">
     <Module>
       <Name>apptools-admin</Name>
-      <Version>1.1.13</Version>
+      <Version>1.1.14</Version>
       <Description>Application tools for technical support and DBMS administrator. View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files</Description>
       <Packaging>module</Packaging>
   <Keywords>Application tools admin</Keywords>
@@ -53,7 +53,8 @@ An example of deploying a solution with databases from the archive. (Can be expa
 	    UnauthenticatedEnabled="0"
 	    Generated="true"/>  
 <AfterInstallMessage>
- You can load admins panel at: ${webroot}apptools/apptools.core.LogInfo.cls
+ You can load admins panel at:
+&#13; ${webroot}apptools/apptools.core.LogInfo.cls
 </AfterInstallMessage>
 </Module>
 </Document>
