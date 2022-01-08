@@ -190,8 +190,8 @@ ClassMethod getSQLConnection(ByRef List As %String = "")
 
 /// Get the value of a field by its name from GN or a list of values
 /// Format $listbuild
-/// w a=##class(apptools.core.sys).GetValueGN(gn,2,"QUANTITY,PRIMARY_UNIT_OF_MEASURE")
-ClassMethod GetValueGN(gn, row, NameFields) As %Status
+/// write ##class(apptools.core.sys).GetValueGN(gn,2,"QUANTITY,PRIMARY_UNIT_OF_MEASURE")
+ClassMethod GetValueGN(gn, row, NameFields) As %String
 {
 	i NameFields'["," q $lb(..GetValue(gn,row,NameFields))
 	set ret=""
@@ -202,8 +202,8 @@ ClassMethod GetValueGN(gn, row, NameFields) As %Status
 }
 
 /// Get one field value by its name from GN
-/// w a=##class(apptools.core.sys).GetValue(gn,2,"QUANTITY")
-ClassMethod GetValue(gn, row, NameField) As %Status
+/// set a=##class(apptools.core.sys).GetValue(gn,2,"QUANTITY")
+ClassMethod GetValue(gn, row, NameField) As %String
 {
  i $g(@gn@(-1,NameField))="" q "" ;undefined field: "_NameField
  i '$d(@gn@(row)) q "undefined row: "_row
@@ -238,39 +238,109 @@ ClassMethod SaveQuery(query = "%SYSTEM.License:Counts", gn = "^%apptools.Task", 
 /// <br>\example d ##class(apptools.core.sys).SaveSQL("select * from Ens.MessageHeader where id=1461","^logMSW2") */
 ClassMethod SaveSQL(SQL, gn = "^mtempSQLGN", ext = 0) As %String
 {
-	s st=$$$OK,hr=$h,ts=$$$AppDT(hr)
-	s myQuery = ##CLASS(%ResultSet).%New("%DynamicQuery:SQL")
-	s st=myQuery.Prepare(SQL)
-	i 'st q st
+	set st=$$$OK,hr=$h,ts=$$$AppDT(hr)
+	set myQuery = ##CLASS(%ResultSet).%New("%DynamicQuery:SQL")
+	set st=myQuery.Prepare(SQL)
+	if 'st q st
 	s st=myQuery.Execute()
-	i 'st q st
-	s (count)=0
-	k @gn
-	s ColCount=myQuery.GetColumnCount()
-	F i=1:1:ColCount {	s @gn@(0)=$g(@gn@(0))_$lb(myQuery.GetColumnName(i))	
+	if 'st q st
+	set (count)=0
+	kill @gn
+	set ColCount=myQuery.GetColumnCount()
+	For i=1:1:ColCount {	s @gn@(0)=$g(@gn@(0))_$lb(myQuery.GetColumnName(i))	
 		s @gn@(-1,$ZStrip(myQuery.GetColumnName(i),"<>WCP"))=i //Name = Number
 	}
 	while (myQuery.Next())	{
-		s count=count+1
+		set count=count+1
 		if ext s @gn@(-2,$ZStrip(myQuery.Get("Name"),"<>WCP"))=count  ; w "<li>"_myQuery.Get("Name")_" "_count_" "_$zr
-		f ii=1:1:ColCount {
+		for ii=1:1:ColCount {
 			s @gn@(count)=$g(@gn@(count))_$lb(myQuery.GetData(ii))
 			}
 	}
-	s @gn@(-3,"sql")=$lb(SQL)
-	s @gn@(-3,"timestamp")=$lb(ts,$$$AppDT($h),##class(apptools.core.type).GetCountSec($h)-##class(apptools.core.type).GetCountSec(hr))
-	q count
+	set @gn@(-3,"sql")=$lb(SQL)
+	set @gn@(-3,"timestamp")=$lb(ts,$$$AppDT($h),##class(apptools.core.type).GetCountSec($h)-##class(apptools.core.type).GetCountSec(hr))
+	quit count
+}
+
+/// Create intexes of the talitsa based on the values of the specified fields
+/// w ##class(apptools.core.sys).IndBuild(gn,ListFields)
+ClassMethod IndBuild(gn, ByRef ListFields, empty = 0) As %Status
+{
+	kill @gn@(-4,"ind")
+	set hr=$h,ts=$$$AppDT(hr)
+	set st=$$$OK
+	for i=1:1:$l(ListFields,",") { continue:$p(ListFields,",",i)=""
+		set FieldNumber=$p(ListFields,",",i)
+		if FieldNumber'=(+FieldNumber) {
+			set FieldNumber=$GET(@gn@(-1,FieldNumber))
+			if FieldNumber="" set st=$$$ERROR($$$GeneralError,"Colomn undef "_$p(ListFields,",",i)) quit
+			set @gn@(-4,"ind",FieldNumber)=$p(ListFields,",",i)
+		}
+		else {
+			if '$DATA(@gn@(0,FieldNumber)) set st=$$$ERROR($$$GeneralError,"Colomn undef "_FieldNumber) quit
+			set @gn@(-4,"ind",FieldNumber)=$lg(@gn@(0,FieldNumber),1)
+		}
+		;set fn(FieldNumber)=""
+		//set fn=$g(fn)_FieldNumber_","
+		set fn=$g(fn)_$lb(FieldNumber)
+	}
+	if 'st quit st
+	for row=1:1 { quit:'$DATA(@gn@(row))
+		;set i="" for { set i=$o(fn(i)) quit:i="" 
+		//for ii=1:1:$l(fn,",") { set i=$p(fn,",",ii) continue:i="" 
+		for ii=1:1:$ll(fn) { set i=$lg(fn,ii) continue:i="" 
+			set val=$lg(@gn@(row),i)
+			if empty set val=" "_val
+			if val'="" {
+				set @gn@(-4,"ind",i,$e(val,1,1000),row)="" 
+				;if $i(@gn@(-4,"ind",i,$e(val,1,1000))) //no uniq ?
+			}
+		}
+	}
+	set @gn@(-4,"timestamp")=$lb(ts,$$$AppDT($h),##class(apptools.core.type).GetCountSec($h)-##class(apptools.core.type).GetCountSec(hr))
+	quit st
+}
+
+/// Get table rows by field value
+/// set Fields(2)="109-19" write ##class(apptools.core.sys).IndGetRows(gn,.Fields,.out)
+ClassMethod IndGetRows(gn, ByRef FieldsValue, ByRef out) As %Status
+{
+	set i=""
+	kill out
+	set st=$$$OK
+	for { set i=$o(FieldsValue(i),1,data) quit:i=""
+		set FieldNumber=i
+		if FieldNumber'=(+FieldNumber) {
+			set FieldNumber=$GET(@gn@(-1,FieldNumber))
+			if FieldNumber="" set st=$$$ERROR($$$GeneralError,"Colomn undef "_i) quit
+			;set out(FieldNumber)=i
+			set FieldName=i
+		}
+		else {
+			if '$D(@gn@(0,FieldNumber)) set st=$$$ERROR($$$GeneralError,"Colomn undef "_FieldNumber) quit
+			;set out(FieldNumber)=$lg(@gn@(0,FieldNumber),1)
+			set FieldName=$lg(@gn@(0,FieldNumber),1)
+		}
+		;w !,"-----",FieldNumber,"---",data
+		if $data(@gn@(-4,"ind",FieldNumber,data)) {
+			set row=""
+			for { set row=$o(@gn@(-4,"ind",FieldNumber,data,row)) quit:row=""
+				set out(FieldName,row)=""				
+			}
+		}
+	}
+	quit st
 }
 
 /// Is there such a class
 /// w ##class(apptools.core.sys).ClassExist("Spgz.model.spgz")
 ClassMethod ClassExist(class) As %String
 {
-	q:class="" ""
+	quit:class="" ""
 	try {
-		s st=$d($$$comClassRaw(class))
+		set st=$d($$$comClassRaw(class))
 	} catch e { s st=$ze }
-  q $g(st)
+  quit $g(st)
 }
 
 /// Global list
@@ -331,6 +401,84 @@ ClassMethod GetObj(Query)
 
 /// Get a DSN request
 /// w $System.Status.GetErrorText(##class(apptools.core.sys).SqlToDSN("SELECT * FROM xxmv.xx_t359_pzn","OEBS-Daily","^tmMSWq"))
+ClassMethod SqlToDSN2(sql, DSN, result, top = 100000) As %Status
+{
+	#dim %JDBCGateway As %Net.Remote.Java.JDBCGateway
+	s hr=$h,ts=$$$AppDT(hr)
+	kill %objlasterror
+	set conn = $system.SQLGateway.GetJDBCConnection(DSN)
+	if (conn = "") {
+		   	Set sc = $g(%objlasterror, $$$OK)
+   			Set sc = $$$ADDSC(sc, $$$ERROR($$$GeneralError, "Cannot get connection for " _ DSN))
+			quit sc
+	}
+	;set st = %JDBCGateway.prepareStatement(conn, sql)
+	set st = %JDBCGateway.prepareCall(conn, sql)
+	
+	 if %JDBCGateway.wasError()		{
+			set sc = $$$ERROR($$$GeneralError, %JDBCGateway.getErrorText())
+			quit sc
+		}
+	
+	set %JDBCGateway.StatementCache(conn) = st
+	;set query = %JDBCGateway.execQuery(st)
+	set query = %JDBCGateway.execUpdate(st)
+	w !,"===",query,"==="
+	;s sql2="SELECT SYS_CONTEXT ('USERENV', 'NLS_DATE_FORMAT') FROM DUAL"
+	;s sql2="select * from mvk.cch_plan_or_stat"
+	s sql2="select mvk$bil.MVK$bil_Sys_Context.Get_Context('CCH_LOG_DATE') from dual"
+	set st = %JDBCGateway.prepareStatement(conn, sql2)
+	set query = %JDBCGateway.execQuery(st)
+	if (query = -1)	{
+		;w %JDBCGateway.getErrorText() q 0
+		set sc = $$$ERROR($$$GeneralError, %JDBCGateway.getErrorText())
+		do %JDBCGateway.removeStatement(conn)
+		;if $isObject($g(%JDBCGateway)) do %JDBCGateway.closeAll()
+		quit sc
+	}
+	;q 1 ;!!!!!
+	
+	i $g(result)'="" s gn=result k @gn
+	e  s gn="result" 
+	
+	set columns = %JDBCGateway.getColumnCount(st)
+	
+	;set pos = 0
+	for i=1:1:columns 
+	{
+	  set name = $ZStrip(%JDBCGateway.getColumnName(st,i),"<>WCP")
+	  set size = %JDBCGateway.getColumnDisplaySize(st,i)
+	  set Type= %JDBCGateway.getColumnType(st,i)
+	  set TypeName= %JDBCGateway.getColumnTypeName(st,i)
+	  s @gn@(0,i)=$lb(name,size,Type,TypeName)
+	  set @gn@(-1,name)=i //	  ;s @gn@(-1)=$g(@gn@(-1))_$lb($lb(size,Type,TypeName))
+	  ;set pos(i) = pos
+	  ;set pos = pos + size + 1
+	  ;w name,!
+	}
+
+	set cnt = 1
+	while %JDBCGateway.next(st)
+	{
+		;write !
+		for i=1:1:columns {
+			;write "!",%JDBCGateway.getString(st, i) 
+			s @gn@(cnt)=$g(@gn@(cnt))_$lb(%JDBCGateway.getString(st, i))
+		}
+		set cnt = cnt + 1
+		q:cnt>top
+	}
+	;w !,cnt,!
+	;if $isObject($g(%JDBCGateway)) do %JDBCGateway.closeAll()
+	do %JDBCGateway.removeStatement(conn)
+	s @gn=cnt-1
+	s @gn@(-3,"sql")=$lb(sql,DSN,top)
+	s @gn@(-3,"timestamp")=$lb(ts,$$$AppDT($h),##class(apptools.core.type).GetCountSec($h)-##class(apptools.core.type).GetCountSec(hr))
+	quit $$$OK
+}
+
+/// Get a DSN request
+/// w $System.Status.GetErrorText(##class(apptools.core.sys).SqlToDSN("SELECT * FROM xxmv.xx_t359_pzn","OEBS-Daily","^tmMSWq"))
 ClassMethod SqlToDSN(sql, DSN, result, top = 100000) As %Status
 {
 	#dim %JDBCGateway As %Net.Remote.Java.JDBCGateway
@@ -343,6 +491,7 @@ ClassMethod SqlToDSN(sql, DSN, result, top = 100000) As %Status
 			quit sc
 	}
 	set st = %JDBCGateway.prepareStatement(conn, sql)
+	
 	 if %JDBCGateway.wasError()		{
 			set sc = $$$ERROR($$$GeneralError, %JDBCGateway.getErrorText())
 			quit sc

@@ -474,6 +474,7 @@ ClassMethod GetAlertsSys(count = 10, ByRef sys) As %Status
 /// do ##class(apptools.core.rest).GetAlerts(,.json)
 ClassMethod GetAlerts(days = 1, ByRef sys) As %Status
 {
+ 	;set method="class(apptools.core.files).Alert" 
 	set method="class(apptools.core.files).AlertDays" 
 	do ##class(apptools.core.files).FindContextInLog(days,method,.str)
 	set sys = {}

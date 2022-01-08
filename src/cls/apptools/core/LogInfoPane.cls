@@ -350,6 +350,7 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 
 	// Preparing variables for export to Excel
 	do ##class(apptools.core.LogInfo).GetInputXLSTagsVal(.exportXLS, .exportXLSfile, .exportXLSfileEmail)
+	set %LBXLS=$lb(exportXLS,exportXLSfile,exportXLSfileEmail)
 	do ..AddHistory(what,NSpace,DSN,MaxNode,Next,Filtr)
 	if ($e(what,1)="^"),what'="^" {
 		set gn=""
