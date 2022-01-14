@@ -8,9 +8,15 @@ Parameter XMLTYPE = "apptools.Chart.ChartPanel";
 /// Drawing graphs
 Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what, field, value, type, typeclass, caption) ]
 {
+ 	quit ..Drawcanvas(.pInstance)
+}
+
+ClassMethod Drawcanvas(pInstance = "") As %Status [ PublicList = (nsp, what, field, value, type, typeclass, caption) ]
+{
  	write ##class(apptools.core.LogInfoPane).AddJsScripts("chart")
 	set $ZT="errors"
-	set nsp=%request.Get("NSP")
+	;set nsp=%request.Get("NSP")
+	set nsp=##class(apptools.core.Action).GetParam(.%request,"NSP",pInstance)
 	if nsp'="" try {zn nsp set NSpace=nsp } catch e {}
 	set NSpace=$zu(5)
 
@@ -20,16 +26,18 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 	set arg("datasets")="{   label: """_$$$aText("Error display on the graph","")_""", borderColor: 'rgb(255, 199, 132)',  data: [30],  }"
 
 	set days=365 ;1000
-	if %request.Get("days") S days=%request.Get("days")
-	
-	if %request.Get("panel")'="" {
-		set class=$p($p(%request.Get("panel"),"(",2),")"),method=$p($p(%request.Get("panel"),")",2),".",2)
+	;if %request.Get("days") S days=%request.Get("days")
+	set days=##class(apptools.core.Action).GetParam(.%request,"days",pInstance)
+	set panel=##class(apptools.core.Action).GetParam(.%request,"panel",pInstance)
+	if panel'="" {
+		set class=$p($p(panel,"(",2),")"),method=$p($p(panel,")",2),".",2)
 		set st=$classmethod(class,method,.arg,days)
 	}
-	&html< <canvas id="Chart"></canvas>
+	set ChartId="Chart"_($p($h,",",2))
+	&html< <canvas id='#(ChartId)#' style="background:white" ></canvas>
 	>
 	$$$jsstart
- 	write "var ctx = document.getElementById('Chart').getContext('2d');"
+ 	write "var ctx = document.getElementById('"_ChartId_"').getContext('2d');"
  	write "var chart = new Chart(ctx, {   type: '"_$g(arg("type"),"bar")_"',"
     // The data for our dataset
     write "data: {  labels: "_$g(arg("labels"))_","   // ["January", "February", "March", "April", "May", "June", "July"],
@@ -41,6 +49,7 @@ errors
  	write !,$ze
  	quit $$$OK
 }
+
 
 /// d ##class(apptools.Chart.ChartPanel).ColorRGBa(32,0.2)
 ClassMethod ColorRGBa(num, alfa = 1)
