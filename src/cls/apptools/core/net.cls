@@ -109,7 +109,7 @@ ClassMethod GetResult(url As %String, user = "", pass = "", ByRef result As %ZEN
 /// To receive from the data server at the URL
 /// If TempDir is specified, then the file will be written there 
 /// w ##class(apptools.core.net).GetHttp("https://codeload.github.com/SergeyMi37/cache-iris-app-tools/zip/master",.out2,"D:\temp\")
-ClassMethod GetHttp(aURL = "", aDATA, TempDir = "", tmpGN = "", user = "", pass = "") As %Status
+ClassMethod GetHttp(aURL = "", aDATA, TempDir = "", tmpGN = "", user = "", pass = "", ByRef HttpRequest) As %Status
 {
 	set part1=$p(aURL,"/",3),part2=$p(aURL,"/",4,$l(aURL,"/")),params=$p(aURL,"?",2)
 	#; Server

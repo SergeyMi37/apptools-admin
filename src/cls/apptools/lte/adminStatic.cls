@@ -12,7 +12,7 @@ ClassMethod GetMain(parameter, class = "") As %Status
 	set app=$p(parameter,"&")
 	if (app["apptools.core.UploadCSP") quit ..GetAppCSP(app)
 	if (app["apptools.core.DownloadCSP") quit ..DownLoadFile(app)
-	if parameter["&class=" set class=$p($p(parameter,"&class=",2),"&")	
+	if parameter["&class=" set class=$p($p(parameter,"&class=",2),"&")		
 	set:class="" class="apptools.lte."_app
 	set par("input-class=")=class
 	;if '##class(apptools.core.sys).ClassExist(class) set class="apptools.lte.page404"

@@ -364,7 +364,7 @@ ParseFile(gnTemp,InFile)
 	Do {
 		Set Line = File2.ReadLine()
 		set H=$$DataTimeCConsole2H($p(Line,":",1,3),.GGGGMMDD)
-		if '$d(GGGGMMDD) continue
+		
 		if H="",$g(zts)'="" {
 			if $l($g(@gnTemp@(zts)))>32000 continue
 			if @gnTemp@(zts)[Line continue

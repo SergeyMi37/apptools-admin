@@ -201,6 +201,21 @@ ClassMethod GetValueGN(gn, row, NameFields) As %String
 	q ret
 }
 
+///  set a=##class(apptools.core.sys).GetTabInfo(gn,.Q)
+ClassMethod GetTabInfo(gn, info) As %String
+{
+	if '$d(@gn) quit $$$ERROR($$$GeneralError,"Is undefined "_gn)
+	if '$d(@gn@(-1)) quit $$$ERROR($$$GeneralError,"Is undefined "_$na(@gn@(-1)))
+	for i=0,-1,-3 merge info(i)=@gn@(i)
+	if $d(@gn@(-4,"ind")) set info(-4,"ind")=""
+	set row=$o(@gn@(""),-1)
+	set info("rows")=row
+	if $d(@gn@(0))=1 set cols=$ll(@gn@(0))
+	else  set cols=$o(@gn@(0,""),-1)
+	set info("cols")=cols
+	quit $$$OK
+}
+
 /// Get one field value by its name from GN
 /// set a=##class(apptools.core.sys).GetValue(gn,2,"QUANTITY")
 ClassMethod GetValue(gn, row, NameField) As %String
@@ -218,11 +233,11 @@ ClassMethod SaveQuery(query = "%SYSTEM.License:Counts", gn = "^%apptools.Task", 
 	set:datetime="" datetime=$$$AppDT($h)
 	set gnTask=$na(@gn@(query,datetime))
 	Set rset=##class(%Library.ResultSet).%New($p(query," ",1))
-	If rset="" s @gnTask@("Create Query failed")= $System.Status.DisplayError(%objlasterror) q %objlasterror
+	If rset="" s @gnTask@("Create Query failed")= $System.Status.GetErrorText(%objlasterror) q %objlasterror
 	if $p(query," ",3)'=""	{Set status=rset.Execute($p(query," ",2),$p(query," ",3))}
 	elseif $p(query," ",2)'=""	{Set status=rset.Execute($p(query," ",2))}
 	else { Set status=rset.Execute()}
-	If $$$ISERR(status) s @gnTask@("Execute Query failed:")= $System.Status.DisplayError(status) q status
+	If $$$ISERR(status) s @gnTask@("Execute Query failed:")= $System.Status.GetErrorText(status) q status
 	Set colcnt=rset.GetColumnCount()
 	For i=1:1:colcnt s @gnTask@(0,i)=rset.GetColumnName(i)
 	while rset.Next() {	if $I(row)
@@ -264,7 +279,7 @@ ClassMethod SaveSQL(SQL, gn = "^mtempSQLGN", ext = 0) As %String
 
 /// Create intexes of the talitsa based on the values of the specified fields
 /// w ##class(apptools.core.sys).IndBuild(gn,ListFields)
-ClassMethod IndBuild(gn, ByRef ListFields, empty = 0) As %Status
+ClassMethod IndBuild(gn, ByRef ListFields, empty = 0, clean = 0) As %Status
 {
 	kill @gn@(-4,"ind")
 	set hr=$h,ts=$$$AppDT(hr)
@@ -277,8 +292,15 @@ ClassMethod IndBuild(gn, ByRef ListFields, empty = 0) As %Status
 			set @gn@(-4,"ind",FieldNumber)=$p(ListFields,",",i)
 		}
 		else {
-			if '$DATA(@gn@(0,FieldNumber)) set st=$$$ERROR($$$GeneralError,"Colomn undef "_FieldNumber) quit
-			set @gn@(-4,"ind",FieldNumber)=$lg(@gn@(0,FieldNumber),1)
+			if $DATA(@gn@(0))=1 {
+				if '$lv(@gn@(0)) set st=$$$ERROR($$$GeneralError,"Colomn node 0 is undef") quit
+				set FieldName=$lg(@gn@(0),FieldNumber)
+				if FieldName="" set st=$$$ERROR($$$GeneralError,"Colomn FieldName is empty") quit
+			}
+			else {
+				set FieldName=$lg(@gn@(0,FieldNumber),1)
+			}
+			set @gn@(-4,"ind",FieldNumber)=FieldName
 		}
 		;set fn(FieldNumber)=""
 		//set fn=$g(fn)_FieldNumber_","
@@ -290,6 +312,10 @@ ClassMethod IndBuild(gn, ByRef ListFields, empty = 0) As %Status
 		//for ii=1:1:$l(fn,",") { set i=$p(fn,",",ii) continue:i="" 
 		for ii=1:1:$ll(fn) { set i=$lg(fn,ii) continue:i="" 
 			set val=$lg(@gn@(row),i)
+			if clean {
+				set val=$zstrip(val,"<>WC") ;очистка от начальный и концевых пробелов и управляющих
+		 		set val=$translate(val,$c(13,10),"") ;убираем управляющие
+			}
 			if empty set val=" "_val
 			if val'="" {
 				set @gn@(-4,"ind",i,$e(val,1,1000),row)="" 
@@ -312,22 +338,23 @@ ClassMethod IndGetRows(gn, ByRef FieldsValue, ByRef out) As %Status
 		set FieldNumber=i
 		if FieldNumber'=(+FieldNumber) {
 			set FieldNumber=$GET(@gn@(-1,FieldNumber))
-			if FieldNumber="" set st=$$$ERROR($$$GeneralError,"Colomn undef "_i) quit
+			if FieldNumber="" set st=$$$ERROR($$$GeneralError,"Colomn is undefined "_i) quit
 			;set out(FieldNumber)=i
 			set FieldName=i
 		}
 		else {
-			if '$D(@gn@(0,FieldNumber)) set st=$$$ERROR($$$GeneralError,"Colomn undef "_FieldNumber) quit
-			;set out(FieldNumber)=$lg(@gn@(0,FieldNumber),1)
-			set FieldName=$lg(@gn@(0,FieldNumber),1)
-		}
-		;w !,"-----",FieldNumber,"---",data
-		if $data(@gn@(-4,"ind",FieldNumber,data)) {
-			set row=""
-			for { set row=$o(@gn@(-4,"ind",FieldNumber,data,row)) quit:row=""
-				set out(FieldName,row)=""				
+			if $DATA(@gn@(0))=1 {
+				if '$lv(@gn@(0)) set st=$$$ERROR($$$GeneralError,"Colomn node 0 is undef") quit
+				;set out(FieldNumber)=$lg(@gn@(0,FieldNumber),1)
+				set FieldName=$lg(@gn@(0),FieldNumber)
+				if FieldName="" set st=$$$ERROR($$$GeneralError,"Colomn FieldName is empty") quit
+			}
+			else {
+				set FieldName=$lg(@gn@(0,FieldNumber),1)
 			}
 		}
+		;w !,gn_"---",FieldNumber,"---",FieldName,"---",data
+		MERGE:data'="" out(i)=@gn@(-4,"ind",FieldNumber,data)
 	}
 	quit st
 }
