@@ -5,8 +5,8 @@
 
 ![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/hammer-min.png)
 ## apptools-admin
-[![Gitter](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/apptools-admin) 
-[![GitHub all releases](https://img.shields.io/badge/Available%20on-GitHub-black)](https://github.com/SergeyMi37/apptools-admin)
+[![OEX](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/apptools-admin) 
+[![Demo](https://img.shields.io/badge/Demo%20on-GCR-black)](https://apptools.demo.community.intersystems.com/apptools/apptools.core.LogInfo.cls)
 [![Habr](https://img.shields.io/badge/Available%20article%20on-Intersystems%20Community-orange)](https://community.intersystems.com/post/intersystems-solution-technical-support-and-dbms-interoperability-administration)
 [![Habr](https://img.shields.io/badge/Есть%20статья%20на-Хабре-blue)](https://habr.com/en/post/436042/)
 
