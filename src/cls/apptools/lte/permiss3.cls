@@ -112,7 +112,7 @@ ClassMethod MatrixFirstHead(Par = "") As %Status
 		<table>
 		<tr>
 			<td>
- 			Login <br>#($$$appText(divId_"name","title='"_$$$aText("Names separated by a comma or by context","")_"'","ms"))#
+ 			Login <br>#($$$appText(divId_"name","title='"_$$$aText("Names separated by a comma or by context","")_"'","s"))#
 			</td>
 			<td>
 			Roles <br>#($$$appText(divId_"roles","title='"_$$$aText("Roles separated by a comma or by context","")_"'","d"))#

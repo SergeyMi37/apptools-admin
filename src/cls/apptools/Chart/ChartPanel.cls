@@ -50,7 +50,6 @@ errors
  	quit $$$OK
 }
 
-
 /// d ##class(apptools.Chart.ChartPanel).ColorRGBa(32,0.2)
 ClassMethod ColorRGBa(num, alfa = 1)
 {
@@ -138,6 +137,7 @@ ClassMethod ChartDbSize(arg, days, res, list, mm)
 {
 	set method="class(apptools.core.files).ExpansionDB" 
 	do ##class(apptools.core.files).FindContextInLog(days,method,.res) //to disassemble the Protocol to calculate the monthly growth of the database in megabytes
+	if '$D(res) quit $$$OK
 	do ##class(apptools.core.rest).getDBsize("dbsize",.list) //to calculate the current database size in gigabytes
 	//let's go back in time taking masany growth
 	s df=$p(res," ",1)
@@ -197,7 +197,7 @@ ClassMethod ChartDbSize(arg, days, res, list, mm)
 	s labels=$e(labels,1,*-1)_"]"
 	s arg("datasets")=datasets
 	s arg("labels")=labels
-	q 1
+	q $$$OK
 }
 
 /// Plot the error of the ensemble Protocol Ens_Util.Log where Type='2' 

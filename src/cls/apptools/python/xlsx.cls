@@ -18,7 +18,7 @@ ClassMethod sql2xlsx(sql, format = "", file As %String = "d:\_proj\python\sample
 	try {
         set openpyxl = ##class(%SYS.Python).Import("openpyxl") 
     } catch err {
-        set sc = ##class(%SYS.Python).Install("openpyxl")
+        do ..InstallPy("openpyxl")
         set openpyxl = ##class(%SYS.Python).Import("openpyxl") 
     }
 	set wb = openpyxl.Workbook()
@@ -45,10 +45,9 @@ ClassMethod sql2xlsx(sql, format = "", file As %String = "d:\_proj\python\sample
 		set count=count+1
 		set pyrows = pybuiltins.list()
 		for ii=1:1:ColCount {
-			set val=myQuery.GetData(ii)
+			set val=..CleanCtrl(myQuery.GetData(ii))
 			if $P(format,",",ii)="d" { //date
-				set dt = ##class(%SYS.Python).Import("datetime")
-				set val=dt.datetime(+$p(val,"-",1), +$p(val,"-",2), +$p($p(val,"-",3)," "),+$p($p(val,":",1)," ",2),+$p($p(val,":",2)," ",2),+$p($p(val,":",3)," ",2))
+				set val=..ToPyDate(val)
 			}
 			if $P(format,",",ii)="n" { //number
 				set val=+val
@@ -125,7 +124,7 @@ ClassMethod gn2xlsx(gn, format = "", file As %String, title = "", patternxlsx = 
 	try {
         set openpyxl = ##class(%SYS.Python).Import("openpyxl") 
     } catch err {
-        set sc = ##class(%SYS.Python).Install("openpyxl")
+        do ..InstallPy("openpyxl")
         set openpyxl = ##class(%SYS.Python).Import("openpyxl")
     }
 
@@ -169,10 +168,9 @@ ClassMethod gn2xlsx(gn, format = "", file As %String, title = "", patternxlsx = 
 		set count=count+1
 		set pyrows = pybuiltins.list()
 		for ii=1:1:ColCount {
-			set val=$lg(data,ii)
+			set val=..CleanCtrl($lg(data,ii))
 			if $P(format,",",ii)="d",val'="" { //date
-				set dt = ##class(%SYS.Python).Import("datetime")
-				set val=dt.datetime(+$p(val,"-",1), +$p(val,"-",2), +$p($p(val,"-",3)," "),+$p($p(val,":",1)," ",2),+$p($p(val,":",2)," ",2),+$p($p(val,":",3)," ",2))
+				set val=..ToPyDate(val)
 			}
 			if $P(format,",",ii)="n" { //number
 				set val=+val
@@ -185,6 +183,34 @@ ClassMethod gn2xlsx(gn, format = "", file As %String, title = "", patternxlsx = 
 	write !,"Save into "_file_" rows: "_count
 	do wb.save(file)
 	q $GET(count)
+}
+
+/// do ##class(apptools.python.xlsx).InstallPy("openpyxl")
+ClassMethod InstallPy(lib)
+{
+    //  depricated  ;set sc = ##class(%SYS.Python).Install("openpyxl")
+    set cmd="pip3 install --target /usr/irissys/mgr/python/ "_lib
+    if '$zversion(1)=3 {
+        set tMgrDir = $System.Util.ManagerDirectory()
+		set tBinDir = $System.Util.BinaryDirectory()_"irispip.exe"
+		set cmd=tBinDir_" install --target "_tMgrDir_"python "_lib
+    }
+    set st=##class(%ZPM.PackageManager.Developer.Utils).RunCommandViaZF(cmd,.tLog,.tErr)
+    quit $$$OK
+}
+
+/// Date YYYY-MM-DD to Python dt.datetime
+ClassMethod ToPyDate(val, ByRef dt)
+{
+	if val'["-" set val=$zd(+val,3) // $h format
+	set dt = ##class(%SYS.Python).Import("datetime")
+	set val=dt.datetime(+$p(val,"-",1), +$p(val,"-",2), +$p($p(val,"-",3)," "),+$p($p(val,":",1)," ",2),+$p($p(val,":",2)," ",2),+$p($p(val,":",3)," ",2))
+	quit val
+}
+
+ClassMethod CleanCtrl(val)
+{
+	quit $zstrip(val,"*C")
 }
 
 }

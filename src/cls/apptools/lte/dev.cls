@@ -37,9 +37,7 @@ ClassMethod MainParameter(ByRef h, ByRef par) As %Status
 /// what are the available modes
 ClassMethod GetAllApps(opt) As %Status
 {
- 
-
-	;make sidebar
+ 	;make sidebar
 	quit $$$OK
 }
 

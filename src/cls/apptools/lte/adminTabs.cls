@@ -213,12 +213,13 @@ ClassMethod DrawMenu(Par) As %String
 
 		for { set i=$o(menu(m,i)) quit:i=""
 			set ns=$GET(opt(i,"Namespace"))
+			set Title=$GET(opt(i,"Title"),$g(opt(i)))
 	   		set onclick=##class(apptools.core.Action).WriteActJs(%request,"","MainHidden",..%ClassName(1),"ShowTab","&appPar="_i,ns)
 			set iconInem=$select($g(opt(i,"aw-icon"))'="":$g(opt(i,"aw-icon")),1:"fa-ellipsis-h")
 		 	set ret=ret_	
 			"<ul class=""nav nav-treeview"">"_
               "<li class=""nav-item"">"_
-                "<a id='Menu"_$g(opt(i,"id"))_"' href=""#"" onclick="""_onclick_""" class=""nav-link""  title="""_$g(opt(i))_""">"_
+                "<a id='Menu"_$g(opt(i,"id"))_"' href=""#"" onclick="""_onclick_""" class=""nav-link""  title="""_Title_""">"_
                 "<i class=""nav-icon fas "_iconInem_"""></i>"_
                 			
                   "<p>"_$g(opt(i))_"</p>"_
@@ -403,13 +404,23 @@ ClassMethod Logout(Par) As %Status
 }
 
 /// The output of the First button
-ClassMethod ButtonAgain(divId = "", key = "", text = "") As %Status
+ClassMethod ButtonAgainOld(divId = "", key = "", text = "") As %Status
 {
 	//set onclick="$('#"_divId_"MainContent"_"').empty();"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainHeader",..%ClassName(1),divId_"FirstHead","&key="_key_"&divId="_divId)
 	set onclick="$('#"_divId_"MainContent"_"').empty();"_
 		$$$onclick(divId_"MainForm",divId_"MainHeader",$namespace,..%ClassName(1),divId_"FirstHead","&key="_key_"&divId="_divId)
 	if text="" set text=$$$aText("Again","")
 	quit $$$appButton("appButtonExit","onclick="""_$g(onclick)_"""",text)
+}
+
+/// The output of the First button
+ClassMethod ButtonAgain(divId = "", key = "", text = "", metod = "", title = "") As %Status
+{
+	if metod="" set metod=divId
+	set onclick="$('#"_divId_"MainContent"_"').empty();"_
+		$$$onclick(divId_"MainForm",divId_"MainHeader",$namespace,..%ClassName(1),metod_"FirstHead","&key="_key_"&divId="_divId)
+	if text="" set text=$$$aText("Again","")
+	quit $$$appButton("appButtonExit",title_" onclick="""_$g(onclick)_"""",text)
 }
 
 /// the render Tab On the program"
@@ -439,6 +450,7 @@ ClassMethod ShowInIFrame(key = "") As %Status
  set pref=$g(opt(key,"id"))
  set mhead=pref_"MainHeader"
  set mcont=pref_"MainContent"
+
  ;  <iframe id="#(mcont)#" width="100%" height="100%" style='overflow: auto;' src='#($g(opt(key,"InFrameUrl")))#' ></iframe>
  &html<
 <form id="#(pref_"MainForm")#">
@@ -460,6 +472,8 @@ ClassMethod ShowTabSample(key = "") As %Status
  if $g(opt(key,"Disable")) write ..GetSupportInfo() quit $$$OK
  set NSpace=$zu(5)
  set pref=$g(opt(key,"id"))
+ set ClassMetod=pref_"FirstHead"
+ if $D(opt(key,"ClassMetod"),data) set ClassMetod=data
  set mhead=pref_"MainHeader"
  set mcont=pref_"MainContent"
  &html<
@@ -474,7 +488,7 @@ ClassMethod ShowTabSample(key = "") As %Status
  
  $$$jsstart
   	; to calculate the height of the container as a result of wijetunge victory container-Taba height of the container header
-    write ##class(apptools.core.Action).WriteActJs(%request,pref_"MainForm",mhead,..%ClassName(1),pref_"FirstHead","&divId="_pref_"&key="_key)_$$$NL
+    write ##class(apptools.core.Action).WriteActJs(%request,pref_"MainForm",mhead,..%ClassName(1),ClassMetod,"&divId="_pref_"&key="_key)_$$$NL
   	write $$$blockui($$$aText("Loading...",""))_$$$NL
   	;write "$('#"_mcont_"').height($(window).height()-($('#"_mhead_"').height()+$('#t1').height()+300)); //^^^height"_$$$NL
   	;write "console.log('^^^height');"_$$$NL

@@ -327,6 +327,7 @@ ClassMethod FindContextInLog(days, method, bd) [ PublicList = (tProductionName, 
 	}
 	;w !,days
 	s period=##class(apptools.core.files).getPeriod(days,.FromDateTime,.ToDateTime,.df,.dt) 
+	if '$D(df) quit $$$ERROR($$$GeneralError,"No data from")
 	;w !,df_" "_dt
 	
 	if FromDateTime="" Set HFromDateTime="1.1"

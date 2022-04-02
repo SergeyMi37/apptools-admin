@@ -377,6 +377,10 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 	elseif $p($zconvert(what,"L")," ",1)="xec" {
 		set execute=$e(what,5,*)
 	}
+	#; Run command OS
+	elseif $p($zconvert(what,"L")," ",1)="zpipe" {
+		set zpipe=$e(what,7,*)
+	}
 	#; Description of the class or instance of the class
 	elseif $p($zconvert(what,"L")," ",1)="obj" { ;,$zconvert($e(what,1,2),"L")="##"||($zconvert($e(what,1,2),"L")="=#") {
 		set classname=$p($p(what,"(",2),")",1)
@@ -489,6 +493,11 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 			set execute=code
 		}
 		x execute
+		quit $$$OK
+	}
+	if $g(zpipe)'="" {
+		write "<H5>"_$$$aText("Executing the command OS","")_" "_zpipe_"</H5>"
+		do ##class(apptools.core.net).zpipe(zpipe)
 		quit $$$OK
 	}
 	if what="trm" {

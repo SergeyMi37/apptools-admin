@@ -1,9 +1,9 @@
 Include apptools.core
 
+/// Fork from https://github.com/intersystems-ru/cache-udl
 /// Export different types of modules in different subfolders in UDL (plain) format
 /// test.dfi -> /dfi/test.dfi
 /// testpkg.test.cls -> /cls/testpkg/test.cls
-/// Fork from https://github.com/intersystems-ru/cache-udl
 Class apptools.core.code [ Abstract ]
 {
 
@@ -41,9 +41,6 @@ ClassMethod export(generated = 0, system = 0, percent = 0, mapped = 0, mask = ""
 	#define export(%code, %file) try {s sc = $system.OBJ.ExportUDL(%code, %file,"/diffexport")} catch e {s sc=$$$ERROR($$$GeneralError,"Old version")} ##continue
 								 w:sc "Ok" d:'sc $system.OBJ.DisplayError(sc)
 
-	#define isGenerated(%code) ##class(%RoutineMgr).IsGenerated( %code )
-	#define isPercented(%code) ("%" = $e(%code))
-	#define isMapped(%code) ##class(%RoutineMgr).IsMapped( %code )
 	#define log w !, code, " -> ", $piece(filename,..workdir(),2), " "
 	
 	#define mkdir(%filename) ##continue
@@ -199,16 +196,13 @@ ClassMethod setIgnore(ByRef filtermask)
 	if '##class(%File).Exists(filename) quit
 	s file=##class(%File).%New(filename)
 	s sc=file.Open("R")
-	if 'sc 
-	{
-		if verbose d $System.OBJ.DisplayError(sc) return
+	if 'sc {
+		write $System.Status.GetErrorText(sc) return
 	}
-
-	While 'file.AtEnd
-	{
+	While 'file.AtEnd	{
 		s filtermask($I(filtermask))=file.ReadLine()
 	}
-quit
+ quit
 }
 
 /// gl[obal] n[ame] - storage for settings
@@ -257,7 +251,7 @@ ClassMethod compile()
 /// etc
 ClassMethod filename(code)
 {
-	#define log(%dir,%sc) w !, "mkdir ", %dir, " ", sc
+	#define log(%dir,%sc) w:$G(%write) !, "mkdir ", %dir, " ", sc
 
 	s wd = ..workdir()
 
@@ -266,10 +260,10 @@ ClassMethod filename(code)
 		$$$log(wd,sc)
 	}
 
-	s ext = $p( code, ".", * ), ext = $zcvt( ext, "l" )
+	set ext = $p( code, ".", * ), ext = $zcvt( ext, "l" )
 	#; for each type - different directory
-
-	s:ext'="" wd = ##class(%File).NormalizeDirectory( ext, wd )
+	
+	set:ext'="" wd = ##class(%File).NormalizeDirectory( ext, wd )
 
 	#; directory must exist before any call (%File).NormalizeFilename( , wd)
 	if '##class(%File).DirectoryExists( wd ) {
@@ -277,17 +271,20 @@ ClassMethod filename(code)
 		$$$log(wd,sc)
 	}
 
-	s filename = ##class(%File).NormalizeFilename( code, wd )
+	set filename = ##class(%File).NormalizeFilename( code, wd )
 	#; lowercase file extension
-	s $p(filename,".",*)=ext
-	//B:code="DPRep.Rest.JSON.cls" "L"
-	#; for *.cls Package.Subpackage.ClassName.cls -> Folder/Subfolder/ClassName.cls
-	if ext ="cls" {
-		s dirs = $piece( code, ".",1, *-2 ), dirs = $translate( dirs, ".", "/" )
-		s relpath = dirs _ "/" _ $piece( code, ".", *-1, * ) ;
-		s filename = ##class(%File).NormalizeFilename( relpath, wd )
+	if ext="gbl" set ext="xml"
+	set $p(filename,".",*)=ext
+	if ext ="cls"||(ext ="inc") {
+		set dirs = $piece( code, ".",1, *-2 )
+		if dirs'="" {
+			set dirs = $translate( dirs, ".", "/" )
+			set relpath = dirs _ "/" _ $piece( code, ".", *-1, * ) ;
+			;if $p(relpath,".",*)="GBL" set $p(relpath,".",*)="xml"
+			set filename = ##class(%File).NormalizeFilename( relpath, wd )
+		}
 	}
-	Q filename
+	Quit filename
 }
 
 /// import from workdir all files with ts newer than code ts in db
@@ -374,6 +371,181 @@ ClassMethod codets(codename, ext)
 		}
 	}
 	Q $p( ts, "." ) ;remove ms
+}
+
+/// Get All Resources
+/// do ##class(apptools.core.code).GetResources(,.GN)
+ClassMethod GetResources(ns = {$namespace}, ByRef item, flags = "000000") As %Status
+{
+	new $namespace
+	set $namespace=ns
+	/*
+The items to export.
+Each of the items must have a type determined by an extension selected from the following list of basic types, additional types are supported under the abstract routine interface so this list is not exhaustive.
+
+CLS - Classes
+CSP - Cache Server Pages
+CSR - Cache Rule files
+MAC - Macro routines
+INT - Non-macro routines
+BAS - Basic routines
+INC - Include files
+GBL - Globals
+PRJ - Studio projects
+OBJ - Compiled object code
+PKG - Package definitions
+If exporting multiple items, separate them with commas, pass the items("item")="" as an array. 
+You can also use ? or * wild cards and if you wish to exclude items pass ' before the item name which also supports wild card, e.g. "User.*.cls,'User.T*.cls".
+set st=$SYSTEM.OBJ.Export(.items, FileName)
+	*/
+	#; CLS classes
+	Set rs = ##class(%ResultSet).%New("%Dictionary.ClassDefinition:Summary")
+	set ext= "cls"
+	If rs.Execute() {
+		While rs.%Next(){
+			Set code = rs.Name _ ".cls", isSystem = rs.System
+			If ( '$Extract(flags,2) && isSystem ) Continue
+			If ( '$Extract(flags,1) && $$$isGenerated( code ) ) Continue
+			If ( '$Extract(flags,3) && $$$isPercented( code ) ) Continue
+			If ( '$Extract(flags,4) && $$$isMapped( code ) ) Continue
+			Set item(ext,code)=""
+		} 
+	}
+	#; routines MAC, INC  ; INT ?
+	set rs = ##class(%ResultSet).%New("%Routine:RoutineList")
+	if rs.Execute() {
+    	while rs.%Next() {
+	 		set code = rs.Name
+	 		If ( '$e(flags,1) && $$$isGenerated( code ) ) Continue
+	 		If ( '$e(flags,3) && $$$isPercented( code ) ) Continue
+			If ( '$e(flags,4) && $$$isMapped( code ) ) Continue
+			set ext = $p( code, ".", * ),ext = $zcvt( ext, "l" )
+			if ext="int" continue
+			set item(ext,code)=""
+	    } 
+	}
+	
+	#; dfi
+	If $Extract(flags,5) {
+		set ext= "dfi"
+		Set sql = "Select fullName as Name From %DeepSee_UserLibrary.FolderItem"
+	    Set rs = ##class(%SQL.Statement).%ExecDirect( .stm, sql )
+	    While rs.%Next() {
+			Set code = rs.Name
+			If ($Length(code,"$TRASH")>1) Continue
+			Set item(ext,code)=""
+		} 
+	}
+	#; web application
+	set ext="CSPApplication"
+	do ..GetListApps(ns,.list)
+	set app=""
+	for { set app=$o(list(app)) quit:app=""
+		Set item(ext,app)=$lb($G(list(app,"Description")),$G(list(app,"DispatchClass")))
+	}
+	#; GBL
+	set ext= "gbl"
+	do ##class(apptools.core.sys).GlobalList(ns,.glo,$Extract(flags,3),$Extract(flags,4))
+	set i=""
+	for { set i=$o(glo(i)) quit:i=""
+		if $p(i,".")="ZPM" continue
+		if $e(i,1,3)="Ens" continue
+		Set item(ext,i_".GBL")=""
+	}
+}
+
+/// do ##class(apptools.core.code).GetListApps("aaa",.list)
+ClassMethod GetListApps(sourcedb, ByRef list) As %Status
+{
+	new $namespace
+	set $namespace="%SYS"
+	set result=##CLASS(%ResultSet).%New("%DynamicQuery:SQL")
+	set tSC=result.Prepare("select NameLowerCase FROM Security.Applications where NameSpace=?")
+	set:tSC tSC=result.Execute($zconvert(sourcedb,"U"))
+	if '$$$ISOK(tSC) {
+		set text="Application setup error :"_$SYSTEM.Status.GetErrorText(tSC)  write !,text QUIT $$$ERROR(text)
+	}
+	else {
+		while result.Next() {
+			set name=result.Data("NameLowerCase")
+			set tSC=##class(Security.Applications).Get(name,.prop)
+			merge list(name)=prop
+		}
+	}
+}
+
+/// zw ##class(apptools.core.code).SetList($lb(2,3,4), 2, "val")
+ClassMethod SetList(list, pos, val) As %Status
+{
+	set str=$lts(list,$c(0,1,2))
+	set $p(str,$c(0,1,2),pos)=val
+	quit $lfs(str,$c(0,1,2))
+}
+
+/// do ##class(apptools.core.code).ExportOneResource("/backup/repo-iris-test-iris20203/new-pack",,"community.PKG",.app)
+/// byte=1 isGenerated
+/// byte=2 isSystem
+/// byte=3 isPercented
+/// byte=4 isMapped
+/// byte=5 isDFI
+ClassMethod ExportOneResource(dir, flags = "00000", code = "", ByRef item)
+{
+	#define export(%code, %file) try {s sc = $system.OBJ.ExportUDL(%code, %file,"/diffexport")} catch e {s sc=$$$ERROR($$$GeneralError,"Old version")} ##continue
+								 w:sc&($G(%write)) "Ok" d:'sc $system.OBJ.DisplayError(sc)
+	#define log w:$G(%write) !, code, " -> ", $piece(filename,..workdir(),2), " "
+	
+	#define mkdir(%filename) ##continue
+			s path = ##class(%File).GetDirectory( %filename ) ##continue
+			if '##class(%File).DirectoryExists( path ) { ##continue
+				s sc = ##class(%File).CreateDirectoryChain( path ) ##continue
+				w:$G(%write) !, "mkdir ", path, " ", sc ##continue
+			}
+	do ..workdir(dir)
+	write:$G(%write) "#; Exporting to ", dir,!
+	set EXT=$zconvert($p(code,".",*),"U")
+	set mask=$p(code,".",1,*-1)
+	if EXT="PKG"||(EXT="") {
+		#; classes
+		set rs = ##class(%ResultSet).%New("%Dictionary.ClassDefinition:Summary")
+		if rs.Execute() {
+			while rs.%Next(){
+				set code = rs.Name _ ".cls", isSystem = rs.System
+				;w !,code
+				If ( '$Extract(flags,2) && isSystem ) Continue
+				If ( '$Extract(flags,1) && $$$isGenerated( code ) ) Continue
+				If ( '$Extract(flags,3) && $$$isPercented( code ) ) Continue
+				If ( '$Extract(flags,4) && $$$isMapped( code ) ) Continue
+				if mask'="",(("@"_code)'[("@"_mask )) continue
+				set filename = ..filename( code )
+				$$$mkdir( filename )
+				$$$log
+				$$$export( code, filename )
+				set item(code)=""
+			}
+		}
+	}
+	elseif EXT="CLS" {
+		set filename = ..filename(code)
+		$$$mkdir( filename )
+		$$$log
+		$$$export( code, filename )
+		set item(code)=""
+	}
+	elseif EXT="INC" {
+		set filename = ..filename(code)
+		$$$mkdir( filename )
+		$$$log
+		$$$export( code, filename )
+		set item(code)=""
+	}
+	elseif EXT="GBL" {
+		set filename = ..filename(code)
+		$$$mkdir( filename )
+		$$$log
+		set arr(code)=""
+		Write $SYSTEM.OBJ.Export(.arr, filename)
+	}
+	quit $$$OK
 }
 
 }

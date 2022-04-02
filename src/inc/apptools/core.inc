@@ -305,3 +305,6 @@ ROUTINE apptools.core [Type=INC]
 #; black down-pointing double triangle
 #define emojiDoubleTriangle $wc($zhex("23EC")) 
 
+#define isGenerated(%code) ##class(%RoutineMgr).IsGenerated( %code )
+#define isPercented(%code) ("%" = $Extract(%code))
+#define isMapped(%code) ##class(%RoutineMgr).IsMapped( %code )

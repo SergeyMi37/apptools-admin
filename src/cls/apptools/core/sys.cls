@@ -277,7 +277,7 @@ ClassMethod SaveSQL(SQL, gn = "^mtempSQLGN", ext = 0) As %String
 	quit count
 }
 
-/// Create intexes of the talitsa based on the values of the specified fields
+/// Create intexes of the tables based on the values of the specified fields
 /// w ##class(apptools.core.sys).IndBuild(gn,ListFields)
 ClassMethod IndBuild(gn, ByRef ListFields, empty = 0, clean = 0) As %Status
 {
@@ -359,8 +359,50 @@ ClassMethod IndGetRows(gn, ByRef FieldsValue, ByRef out) As %Status
 	quit st
 }
 
+/// do ##class(apptools.core.sys).SetTableHeader("gn","Head1","Head222","Head3333")
+ClassMethod SetTableHeader(gn = "^mtempSQLGN", arg...) As %String
+{
+	set @gn@(-3,"timestamp")=$lb($$$AppDT($h))
+	if $d(arg(1))>9 {
+		for i=1:1 quit:'$d(arg(1,i),data)  do SetCol(i,data)
+	}
+	else {
+		for i=1:1 quit:'$d(arg(i),data)  do SetCol(i,data)
+	}
+	quit $$$OK
+SetCol(i,data)
+	set @gn@(0)=$g(@gn@(0))_$lb(data)
+	set @gn@(-1,$ZStrip(data,"<>WCP"))=i //Name = Number
+	quit
+}
+
+/// for i=1:1:10 do ##class(apptools.core.sys).SetTableRow("gn",i,"row"_i,"row222-"_i,"row3333-"_i)
+ClassMethod SetTableRow(gn = "^mtempSQLGN", row, arg...) As %String
+{
+	set @gn@(row)=""
+	if $d(arg(1))>9 {
+		for i=1:1 quit:'$d(arg(1,i),data)  do SetRow(row,i,data)
+	}
+	else {
+		for i=1:1 quit:'$d(arg(i),data)  do SetRow(row,i,data)
+	}
+	quit $$$OK
+SetRow(row,i,data)
+	set @gn@(row)=$g(@gn@(row))_$lb(data)
+	quit
+}
+
+/// do ##class(apptools.core.sys).SetTableFooter("gn")
+ClassMethod SetTableFooter(gn = "^mtempSQLGN") As %String
+{
+	set ts=$lg(@gn@(-3,"timestamp"),1)
+	s hr=$h
+	set @gn@(-3,"timestamp")=$lb(ts,$$$AppDT($h),##class(apptools.core.type).GetCountSec($h)-##class(apptools.core.type).GetCountSec(hr))
+	quit $$$OK
+}
+
 /// Is there such a class
-/// w ##class(apptools.core.sys).ClassExist("Spgz.model.spgz")
+/// write ##class(apptools.core.sys).ClassExist("Spgz.model.spgz")
 ClassMethod ClassExist(class) As %String
 {
 	quit:class="" ""
