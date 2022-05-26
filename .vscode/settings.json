@@ -6,7 +6,10 @@
       },
     "objectscript.conn" :{
       "ns": "USER",
-      "username": "_SYSTEM",
+      "active": true,
+      "host": "localhost",
+      "port": 52663,
+      "username":"_SYSTEM",
       "password": "SYS",
       "docker-compose": {
         "service": "iris",
@@ -14,15 +17,14 @@
       },
       "links": {
         "apptools": "http://localhost:${port}/apptools/apptools.core.LogInfo.cls?WHAT=%3F",
-        "Product Info": "http://localhost:${port}/apptoolsresr/a/info",
+        "Product Info": "http://localhost:${port}/apptoolsrest/a/info",
         "Matrix permissions": "http://localhost:${port}/apptools/apptools.Tabs.TabsPanelUikitPermissMatrx.cls?autoload=Matrix",
         "REST Сount production errors": "http://localhost:${port}/apptoolsrest/products/0"
-      },
-      "active": false
+      } 
     },
     "sqltools.connections": [
       {
-        "namespace": "USER",
+        "namespace": "IRISAPP",
         "connectionMethod": "Server and Port",
         "showSystem": false,
         "previewLimit": 50,
