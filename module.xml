@@ -3,7 +3,7 @@
   <Document name="apptools-admin.ZPM">
     <Module>
       <Name>apptools-admin</Name>
-      <Version>1.1.17</Version>
+      <Version>1.1.18`</Version>
       <Description>Application tools for technical support and DBMS administrator. View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files</Description>
       <Packaging>module</Packaging>
   <Keywords>Application tools admin</Keywords>
@@ -15,7 +15,7 @@
 repository:
 https://github.com/SergeyMi37/apptools-admin
 description:
-An example of deploying a solution with databases from the archive. (Can be expanded without source codes).Application tools for technical support and DBMS administrator. View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files.
+Application tools for technical support and DBMS administrator. View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files.
 </Notes>
 </Author>
 	<SourcesRoot>src</SourcesRoot>
@@ -54,6 +54,7 @@ An example of deploying a solution with databases from the archive. (Can be expa
 	    Generated="true"/>  
 <AfterInstallMessage>
  You can load admins panel at:
+&#13; ${webroot}apptoolsrest/a/info
 &#13; ${webroot}apptools/apptools.core.LogInfo.cls
 </AfterInstallMessage>
 </Module>

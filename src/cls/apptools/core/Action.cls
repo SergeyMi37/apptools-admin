@@ -79,10 +79,10 @@ ClassMethod OnPage(param) As %Status
 		$$$jsstart
  		write "alert('"_$$$aText("The appMethod parameter is empty","")_"');"
  		$$$jsstop
- 		zw jsobj
+ 		;zw jsobj
  		m a=%request.Data
- 		zw a
- 		w
+ 		;zw a
+ 		;w
 		quit $$$OK
 	}
 	elseif appMethod="ShowJson" {
