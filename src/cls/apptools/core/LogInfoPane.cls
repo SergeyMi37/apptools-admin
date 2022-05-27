@@ -414,8 +414,8 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
   		set selected=$select(NSpace=$p(listNs,",",ns):"selected",1:"")
   		set selectNS=selectNS_" <OPTION "_selected_" VALUE="""_$p(listNs,",",ns)_""">"_$p(listNs,",",ns)_"</OPTION>"
 	}
-	set listDSN=##class(apptools.core.sys).getSQLConnection(.listDSN)
 	set selectNS=selectNS_"</SELECT>"
+	set listDSN=##class(apptools.core.sys).getSQLConnection(.listDSN)
 	set selectDSN="<SELECT title="""_$$$aText("DSN ODBC/JDBC","")_""" name=""selectDSN"" id=""selectDSN"" ><OPTION></OPTION> "
 	for ns=1:1:$l(listDSN,",") { continue:$p(listDSN,",",ns)=""
 		continue:$p(listDSN,",",ns)["%"
@@ -1517,11 +1517,11 @@ ClassMethod AddProdQuery(SDNum, csp = "csp")
 {
 	&html< <tr style='vertical-align: middle;' >
 	<td> 
-	 | <a uk-icon="m-dashboard" target="ensprod"#($Namespace)# href='#("/"_csp_"/"_$zconvert($Namespace,"L")_"/EnsPortal.ProductionConfig.zen?$NAMESPACE="_$Namespace)#' > #($$$aText("Production",""))#</a> 
-	 | <a uk-icon='m-assignment-late' target="ensproderr"#($Namespace)# href='#("/"_csp_"/"_$zconvert($Namespace,"L")_"/EnsPortal.EventLog.zen?$NAMESPACE="_$Namespace)#' > #($$$aText("Production Errors",""))#</a> 
-	 | <a uk-icon='m-assignment' target="ensqueues"#($Namespace)# href='#("/"_csp_"/"_$zconvert($Namespace,"L")_"/EnsPortal.Queues.zen?$NAMESPACE="_$Namespace)#' > #($$$aText("Production Queues",""))#</a> 
-	 | <a uk-icon='m-chevron-right' target="query"#($Namespace)# href='#("/csp/sys/exp/%25CSP.UI.Portal.SQL.Home.zen?$NAMESPACE="_$Namespace)#' > #($$$aText("Query",""))# </a> 
-	 | <a uk-icon='m-expand-less' target="globals"#($Namespace)# href='#("/csp/sys/exp/%25CSP.UI.Portal.GlobalList.zen?$NAMESPACE="_$Namespace)#' > #($$$aText("Globals",""))# </a> 
+	 | <a uk-icon="m-dashboard" target="_blank" href='#("/"_csp_"/"_$zconvert($Namespace,"L")_"/EnsPortal.ProductionConfig.zen?$NAMESPACE="_$Namespace)#' > #($$$aText("Production",""))#</a> 
+	 | <a uk-icon='m-assignment-late' target="_blank" href='#("/"_csp_"/"_$zconvert($Namespace,"L")_"/EnsPortal.EventLog.zen?$NAMESPACE="_$Namespace)#' > #($$$aText("Production Errors",""))#</a> 
+	 | <a uk-icon='m-assignment' target="_blank" href='#("/"_csp_"/"_$zconvert($Namespace,"L")_"/EnsPortal.Queues.zen?$NAMESPACE="_$Namespace)#' > #($$$aText("Production Queues",""))#</a> 
+	 | <a uk-icon='m-chevron-right' target="_blank" href='#("/csp/sys/exp/%25CSP.UI.Portal.SQL.Home.zen?$NAMESPACE="_$Namespace)#' > #($$$aText("Query",""))# </a> 
+	 | <a uk-icon='m-expand-less' target="_blank" href='#("/csp/sys/exp/%25CSP.UI.Portal.GlobalList.zen?$NAMESPACE="_$Namespace)#' > #($$$aText("Globals",""))# </a> 
 	#($s(##class(apptools.core.sys).ClassExist("WebTerminal.Engine"):" | "_$$$addAppLog($$$aText("WebTerminal",""),$$$aText("Load WebTerminal",""),"trm",""),1:""))#
 	 | 
 	</td></tr>>
@@ -1587,6 +1587,7 @@ ClassMethod GetHelp(help)
 	%SYS> -  %CSP.Util.AutoPage).DrawAutoLogout()  
 	;	If %request.URL '[ "UtilSqlQuery.csp" && ( %request.URL '[ "/apptools.") && ( %request.URL '[ "/App.") { ##; MSW
 	*/
+	quit $$$OK
 }
 
 }

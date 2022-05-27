@@ -158,6 +158,51 @@ ClassMethod GetAllApps(opt) As %Status
 	s opt(key,"TabMenu","Mode")=0 ;1 - for each new search bar to make new tab, 0-tab is always the same
 }
 
+/// Get a list of top-level menus to go to the product panel
+/// set elem(1)="Productions",elem(2)="EventLogs" do ##class(apptools.lte.adminTabs).GetAppsProducts(.opt,2,.elem)
+ClassMethod GetAppsProducts(ByRef opt, number = 2, ByRef elem) As %Status
+{
+	quit:$roles'["%All" $$$OK
+	set nslist=##class(apptools.core.sys).ListNS(.info,"NotPre,Ens")
+	set NS=""
+	for { set NS=$o(info(NS)) quit:NS=""
+		do ##class(apptools.lte.adminTabs).GetUrlProd(NS,.urls)
+		for i=1:1 { quit:'$d(elem(i))
+			set id=NS_"-"_elem(i)
+			set key="menu-top-"_id
+			do ..GetAppsOpenWinPanel(.opt,key, $g(urls(elem(i))), id ,$lb(number+i-1,elem(i)))
+		}
+	}
+	quit $$$OK
+}
+
+/// Set opt panel
+/// do ##class(apptools.lte.adminTabs).GetAppsProductPanel(.opt,key, url, id,LeftMenuName)
+ClassMethod GetAppsOpenWinPanel(ByRef opt, key, url, id, LeftMenuName, csp = "csp") As %String
+{
+	set opt(key)=id
+	set opt(key,"id")=id
+	set opt(key,"TabName")=id
+	set opt(key,"ClassName")=..%ClassName(1)
+	set opt(key,"Method")="OpenNewWin"
+	set opt(key,"InFrameUrl")=url
+	set opt(key,"MenuTop")=LeftMenuName
+	quit $$$OK
+}
+
+/// Get URL to go to the product panel
+/// write ##class(apptools.lte.adminTabs).GetUrlProd("APP")
+ClassMethod GetUrlProd(NS, ByRef urls, csp = "csp") As %String
+{
+	set ns=$zconvert(NS,"L")
+	set urls("Productions")="/"_csp_"/"_ns_"/EnsPortal.ProductionConfig.zen?$NAMESPACE="_NS
+	set urls("EventLogs")="/"_csp_"/"_ns_"/EnsPortal.EventLog.zen?$NAMESPACE="_NS
+	set urls("Queues")="/"_csp_"/"_ns_"/EnsPortal.Queues.zen?$NAMESPACE="_NS
+	set urls("SQL")="/csp/sys/exp/%25CSP.UI.Portal.SQL.Home.zen?$NAMESPACE="_NS
+	set urls("GlobalList")="/csp/sys/exp/%25CSP.UI.Portal.GlobalList.zen?$NAMESPACE="_NS
+	quit urls("Productions")
+}
+
 /// the rendering top menu 
 ClassMethod DrawMenuTop(Par) As %String
 {
@@ -317,11 +362,12 @@ ClassMethod ShowTabApps(Par, opt) As %Status
 		if Searchstr="" q $$$OK
 		;s tr=$tr(##class(apptools.MSW.type).Transliteration(Searchstr)," №`()\/*;'"":%","_N---")
 		;s tr=$tr($zts,".,") 
-		set tr=$e($tr(Searchstr," №`()\/*;'"":%?$@&.,",""),1,10)_$i(@..#GNStore@("jobs",$j))
+		set tr=$e($tr(Searchstr," №`()\/*;'"":%?$@&.,",""),1,20) 
+		if '$e($g(opt(Par,"TabMenu","Mode")),2) set tr=tr_$i(@..#GNStore@("jobs",$j))
 		set key=tr ;Searchstr
 		MERGE opt(key)=opt(Par)
 		set opt(key)=$GET(opt(key))_tr ;Searchstr
-		if $g(opt(Par,"TabMenu","Mode"))=1 { ;mode add a new tab 
+		if $e($g(opt(Par,"TabMenu","Mode")),1)=1 { ;mode add a new tab 
 			set opt(key,"id")=opt(key,"id")_tr
 		} else { ;mode add a new replace the old 
 			set tabId="tab-"_opt(Par,"id")
@@ -460,6 +506,29 @@ ClassMethod ShowInIFrame(key = "") As %Status
 </div>
 </form>
 >
+ quit $$$OK
+}
+
+/// Open New Windows
+/// Par - code menu item from the GetAllApps ..
+ClassMethod OpenNewWin(key = "") As %Status
+{
+ if $g(key("appPar"))'="" set key=key("appPar")
+ do ..GetAllApps(.opt) 
+ if $g(opt(key,"Disable")) write ..GetSupportInfo() quit $$$OK
+ set NSpace=$zu(5)
+ set pref=$g(opt(key,"id"))
+ set url=$g(opt(key,"InFrameUrl"))
+ 
+ zw opt
+ 
+ if url'="" {
+	w "<a target='_blank' id=123 href='"_url_"'>Open new windows "_pref_"</a>"
+	$$$jsstart
+  	write "window.open('"_url_"', '_blank'); //"_$$$NL
+  	write "$('#tabMenu-"_pref_",#tab-"_pref_"').remove(); //"_$$$NL
+	$$$jsstop
+ }
  quit $$$OK
 }
 

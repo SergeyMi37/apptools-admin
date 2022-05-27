@@ -38,8 +38,9 @@ ClassMethod SaveAndStop() As %Status
 
 /// Remove autostart from all products; stop all products in Namespaces before restarting the OS
 /// d ##class(apptools.core.Production).StopAll()
-ClassMethod StopAll() As %Status
+ClassMethod StopAll(prompt = 1) As %Status
 {
+ if prompt write !,"Stop all products, are you sure? [yes]" read yes quit:yes'="yes"
  d ..EnsAction("auto0")
  d ..EnsAction("stop")
  w !!,"ok"

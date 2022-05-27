@@ -8,10 +8,10 @@ Class apptools.lte.info Extends apptools.lte.adminTabs [ ClassType = "", Depends
 Parameter HeaderText = "Info";
 
 /// Global Name Store Referens files
-Parameter GNStore = "^apptools.info";
+Parameter GNStore = "^%apptools.Info";
 
 /// Roles
-Parameter AppRoles = "ui_info";
+Parameter AppRoles = "ui_Info";
 
 /// Default query to productions logs
 Parameter DefaultQuery = "Select * from Ens_Util.Log where Type='2' and TimeLogged>? order by id desc";
@@ -50,6 +50,7 @@ ClassMethod GetAllApps(opt) As %Status
 		set opt(key,"Method")="ShowTabSample"
 		set opt(key,"TabMenu","Close")=1 ;0 = the tab cannot be deleted
 		set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
+		set opt(key,"Active")=1 ;active menu item
 
 		set key="Options"
 		set opt(key,"Menu")=sideMenu
@@ -62,21 +63,52 @@ ClassMethod GetAllApps(opt) As %Status
 		set opt(key,"Method")="ShowTabSample"
 		set opt(key,"TabMenu","Close")=1 ;0 = the tab cannot be deleted
 		set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
-		set opt(key,"Active")=1 ;active menu item
+		set opt(key,"Active")=0 ;active menu item
 
-		/*
-		set key="Namespaces"
+	 do ##class(apptools.lte.resources).GetZpmNamespaces(.List,"fileserver",.firstnamespace)
+	  if $D(List("fileserver")) {
+		set ns=$G(firstnamespace) ;$O(List("fileserver",""))
+		set key="File"
 		set opt(key,"Menu")=sideMenu
-		set opt(key)=key
+		set opt(key)="File-server"
+		set opt(key,"Namespace")=ns
 		set opt(key,"id")=key
-		set opt(key,"TabName")=key
+		set opt(key,"TabName")="File-server"
 		set opt(key,"ClassName")=..%ClassName(1)
 		set opt(key,"Role")="%All"
-		set opt(key,"Namespace")="%SYS"
-		set opt(key,"Method")="ShowTabSample"
-		set opt(key,"TabMenu","Close")=1 ;0 = the tab cannot be deleted
+		;set opt(key,"MethodUrlNewWin")="/fileserver/files"
+		set opt(key,"Method")="ShowInIFrame" 
+		set opt(key,"InFrameUrl")="/fileserver/files"
 		set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
+		set opt(key,"Active")=0 ;active menu item
+     }	
 
+	set sideMenuName="Namespaces",
+		sideMenuNumer=3,
+		sideMenuOpen=0,        //3 =1 open menu
+		sideMenuIcon="fa-solid fa-cube" ;"fa-cog"  //4  icon   https://fontawesome.com/icons?d=gallery&p=2&m=free
+		set sideMenu=$lb(sideMenuNumer,sideMenuName,sideMenuOpen,sideMenuIcon) 
+		set nslist=##class(apptools.core.sys).ListNS(.info)
+		for i=1:1:$l(nslist,",") {
+			set ns=$p(nslist,",",i)
+			if ns=""||(ns="%ALL") continue
+			if (ns="%SYS") set ns="-SYS"
+			set key="NS"_ns
+			set opt(key,"Menu")=sideMenu
+			set opt(key)=ns
+			set opt(key,"id")="NS"_ns
+			set opt(key,"ClassMetod")="NSFirstHead" ;class name is the same for all namespaces
+			set opt(key,"TabName")=$s(ns="-SYS":"%SYS",1:ns)
+			set opt(key,"ClassName")=..%ClassName(1)
+			set opt(key,"Role")="%All"
+			set opt(key,"Namespace")="%SYS"
+			set opt(key,"Method")="ShowTabSample"
+			set opt(key,"TabMenu","Close")=1 ;0 = the tab cannot be deleted
+			;set opt(key,"Active")=1 ;active menu item
+			set opt(key,"aw-icon")="fa-solid fa-angle-right" ;"fa-solid fa-angle-up"  ; https://fontawesome.com/icons?d
+		}
+		
+		/*
 		set key="Databases"
 		set opt(key,"Menu")=sideMenu
 		set opt(key)=key
@@ -118,30 +150,6 @@ ClassMethod GetAllApps(opt) As %Status
 			set opt(key,"Method")="ShowTabSample"
 			set opt(key,"aw-icon")="fa-table"   ;https://fontawesome.com/icons?d=gallery&p=2&m=free
 	
-	set sideMenuName="PackagesManager",
-		sideMenuNumer=3,
-		sideMenuOpen=0,        //3 =1 open menu
-		sideMenuIcon="fa-cog"  //4  icon   https://fontawesome.com/icons?d=gallery&p=2&m=free
-		set sideMenu=$lb(sideMenuNumer,sideMenuName,sideMenuOpen,sideMenuIcon) 
-		set nslist=##class(apptools.core.sys).ListNS(.info)
-		for i=1:1:$l(nslist,",") {
-			set ns=$p(nslist,",",i)
-			if ns=""||(ns="%ALL") continue
-			if (ns="%SYS") set ns="-SYS"
-			set key="NS"_ns
-			set opt(key,"Menu")=sideMenu
-			set opt(key)=ns
-			set opt(key,"id")="NS"_ns
-			set opt(key,"ClassMetod")="NSpaceFirstHead" ;class name is the same for all namespaces
-			set opt(key,"TabName")=$s(ns="-SYS":"%SYS",1:ns)
-			set opt(key,"ClassName")=..%ClassName(1)
-			set opt(key,"Role")="%All"
-			set opt(key,"Namespace")="%SYS"
-			set opt(key,"Method")="ShowTabSample"
-			set opt(key,"TabMenu","Close")=1 ;0 = the tab cannot be deleted
-			;set opt(key,"Active")=1 ;active menu item
-			set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d
-		}
 	;top menu
 		s LeftMenuName="Support",LeftMenuNumer=1
 		s key="menu-top-support"
@@ -152,6 +160,15 @@ ClassMethod GetAllApps(opt) As %Status
 		s opt(key,"Method")="ShowTabAbout"
 		s opt(key,"TabMenu","Close")=1
 		s opt(key,"MenuTop")=$lb(LeftMenuNumer,LeftMenuName)
+	do ..GetAppsOpenWinPanel(.opt,"menu-top-zapm", "/apptoolsrest/a/zapm", "zapm", $lb(LeftMenuNumer,LeftMenuName))
+	do ..GetAppsOpenWinPanel(.opt,"menu-top-zinfo", "/apptoolsrest/a/info", "info", $lb(LeftMenuNumer,LeftMenuName))
+	
+	set elem(1)="Productions",
+		elem(2)="EventLogs",
+		elem(3)="Queues",
+		elem(4)="SQL",
+		elem(5)="GlobalList"  
+	do ..GetAppsProducts(.opt,(LeftMenuNumer+1),.elem)
 	
 	set topMenuName="Account",
 		topMenuNumer=99
@@ -175,16 +192,29 @@ ClassMethod GetAllApps(opt) As %Status
 	s key="Search"
 	s opt(key)="Search"
 	s opt(key,"id")="Search-"
-	s opt(key,"TabName")="Search"_"-"
+	s opt(key,"TabName")=""
 	s opt(key,"ClassName")=..%ClassName(1)
 	s opt(key,"Method")="ShowTabSearch"
-	s opt(key,"TabMenu","Mode")=0 ;1 - for each new search bar to make new tab, 0-tab is always the same
+	s opt(key,"TabMenu","Mode")=11 ;1 - for each new search bar to make new tab, 0-tab is always the same, 11-not increment
 	
 	do ..CheckRoleMenu(.opt)
 	quit $$$OK
 }
 
-ClassMethod NSpaceFirstHead(Par = "") As %Status
+ClassMethod OptionsFirstHead(Par = "") As %Status
+{
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set %ui=1
+	set onclick=$$$blockui("Load...")_
+		$$$onclick(divId_"MainForm",divId_"MainContent",$namespace,..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
+	write $$$appText(divId_"WorkDirPacket","title='The work directory for packet and publish'","/backup/temp/")
+	
+	quit $$$OK
+}
+
+ClassMethod NSFirstHead(Par = "") As %Status
 {
 	do ##class(apptools.core.Form).BlockUI(0)
 	set key=Par("key")
@@ -195,27 +225,26 @@ ClassMethod NSpaceFirstHead(Par = "") As %Status
 	set onclick=$$$blockui("Load...")_
 		$$$onclick(divId_"MainForm",divId_"MainContent",ns,..%ClassName(1),"NSpaceResult","&key="_key_"&divId="_divId_"&mode=*")
 
-	do ##class(%ZAPM.ext.zpm).GetListModule(ns,.List,0)
-	set pk="",
-		gn="^||tmpPK",
-		zpmname=""
-	write $$$appButton(divId_"appButtonResult1"_ns,"title='Create new zPacket' onclick="""_$replace(onclick,"*","new&ns="_ns_"&zpmname="_zpmname)_"""","Create ZPM")
-	write $$$appButton(divId_"appButtonResult2"_ns,"title='Install zpm into current namespace' onclick="""_$replace(onclick,"*","install&ns="_ns_"&zpmname="_zpmname)_"""","Install ZPM")
-	write $$$appButton(divId_"appButtonResult3"_ns,"title='Install zpm into the newly created namespace' onclick="""_$replace(onclick,"*","installnew&ns="_ns_"&zpmname="_zpmname)_"""","Install ZPM in new namespace")
-	
-	do ##class(apptools.core.sys).SetTableHeader(gn,"Name","Version","Description") ;,"Description")
-	for i=1:1 { set pk=$o(List(pk)) quit:pk=""
-		if pk="apptools-admin",$zconvert($G(^%apptools.Setting("HomeNamespace")),"L")'=$zconvert(ns,"L") continue
-		set data=$G(List(pk,"L")),
-			repo=""
-		if $G(List(pk,"R"))'="" set repo=$lg($G(List(pk,"R")),3)
-		set zpmname=pk
-		set editbutton=$$$appButton(divId_"appButtonResult4"_pk,"title='Edit Packet' onclick="""_$replace(onclick,"*","edit&ns="_ns_"&zpmname="_zpmname)_"""",pk)
-		do ##class(apptools.core.sys).SetTableRow(gn,i,editbutton,$lg(data,1),$lg(data,2)) ;,$lg(data,2))
+	write $$$appButton(divId_"appButtonExe","title='Execute query' onclick="""_$replace(onclick,"*","exe&ns="_ns)_"""","Execute")
+	write $$$appButton(divId_"appButtonHelp","title='View Help' onclick="""_$replace(onclick,"*","help&ns="_ns)_"""","Help")
+	write $$$appButton(divId_"appButtonHist","title='History' onclick="""_$replace(onclick,"*","history&ns="_ns)_"""","history")
+	;write $$$appText(divId_"MaxNode","size=8 title='Count MaxNode'","10000")
+	;write $$$appText(divId_"Next","size=2 title='Direct'","1")
+	;write " "_$$$appText(divId_"exportXLS","title='exportXLS'","")
+	set id=divId_"selectDSN"
+	set listDSN=##class(apptools.core.sys).getSQLConnection(.listDSN)
+	set selectDSN="<SELECT title="""_$$$aText("DSN ODBC/JDBC","")_""" name="""_id_""" id="""_id_""" ><OPTION></OPTION> "
+	for ns=1:1:$l(listDSN,",") { continue:$p(listDSN,",",ns)=""
+		continue:$p(listDSN,",",ns)["%"
+  		;set selected=$select(DSN=$p(listDSN,",",ns):"selected",1:"")
+  		set selectDSN=selectDSN_" <OPTION "_$g(selected)_" VALUE="""_$p(listDSN,",",ns)_""">"_$p(listDSN,",",ns)_"</OPTION>"
 	}
+	set selectDSN=selectDSN_"</SELECT>"
+	write " "_selectDSN
 
-	do ##class(apptools.core.LogInfoPane).DrawSQL("result "_gn,10000,"","Installed ZPM:")
-	$$$SetHeightContent(divId,0)
+	write "<br>"_$$$appTextarea(divId_"what","rows=3 cols=80 title='Enter command'","")
+
+	$$$SetHeightContent(divId,250)
 	quit $$$OK
 }
 
@@ -224,58 +253,118 @@ ClassMethod NSpaceResult(Par = "") As %Status
 	do ##class(apptools.core.Form).BlockUI(0)
 	set key=Par("key")
 	set divId=Par("divId")
-	set ns=Par("ns")
+	set NSpace=Par("ns")
 	set mode=Par("mode")
+	set sqldef=..#DefaultQuery
+	set %DSN=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"selectDSN")
+	set what=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"what")
+	set MaxNode=10000 ;##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"MaxNode")
+	set exportXLS=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"exportXLS")
+	set Next=1 ;##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"Next")
+	set Filtr=""
+	do ##class(apptools.core.LogInfoPane).AddHistory(what,NSpace,%DSN,MaxNode,Next,Filtr)
 	set onclick=$$$blockui("Load...")_
-		$$$onclick(divId_"MainForm",divId_"MainContent",ns,..%ClassName(1),"NSpaceResult","&key="_key_"&divId="_divId_"&moderes=*")
+		$$$onclick(divId_"MainForm",divId_"MainContent",NSpace,..%ClassName(1),"NSpaceResult","&key="_key_"&divId="_divId_"&moderes=*")
 	;zw Par
-	if mode="new"||(mode="edit")||(mode="editpro") {
-		set zpmname=Par("zpmname")
-		set head=$s(mode="new":"Create new packet",mode="edit":"Edit "_zpmname_" packet",mode="editpro":"Edit prototype "_zpmname_" packet",1:"")
-		set GN=..#GNStore
-		write "<h5>"_head_"</h5>"
-		do ##class(apptools.lte.resources).UiMatrixResources(key,divId,ns,mode,zpmname,GN)
+	if ($e(what,1)="^"),what'="^" {
+		set gn=""
+		if $e(what)="^" { set gn=what }
 	}
-	elseif mode["install" {
-		;open modal window for find zpm 
-		set head=$s(mode="install":"Install selected packages",1:"install selected packages into new database")
-		write "<h5>"_head_"</h5>"
-		do ##class(apptools.lte.resources).UiMatrixRepo(key, divId, ns, mode, zpmname)
-		
+	
+	if what="?"||(mode="help") {
+		do ##class(apptools.core.LogInfoPane).GetHelp(.%help)
+		// ExecuteArray = code for ison when outputting arrays
+		set gn="%help",what="",Message=$$$aText("help command","")
+		set ExecuteDraw="##class(apptools.core.LogInfoPane).DrawHelp(.%AppLogInfoVal,%AppLogInfoCol,%AppLogInfoHead,.%AppLogInfoTemp,"""_NSpace_""","""_%DSN_""")"
 	}
-	quit $$$OK
-}
+	elseif (mode="history") {
+		set gn=$$$HISTORYGN,what="",Message="History"
+	}
+	#; queries and query results
+	elseif ",query,result,select,call,delete,insert,s,q,r,begin,"[(","_$zconvert($p(what," ",1),"L")_",") {
+			set sql=what
+			if sql["p.party_id( )" s sql=$replace(sql,"p.party_id( )","p.party_id(+)")
+	}
+	#; SQL table query 
+	elseif $e($zconvert($p(what," ",1),"L"),1,3)="log" {
+		#; Delete the protocol table
+		if $g(exp)="-" Do ##class(apptools.core.Log).%KillExtent() set msg=" "_$$$aText("Cleaned the protocol","")
+		set (what,sql)="select * FROM apptools.core.Log order by id desc"
+	}
+	#; Run class methods
+	elseif $p($zconvert(what,"L")," ",1)="xec" {
+		set execute=$e(what,5,*)
+	}
 
-ClassMethod OptionsFirstHead(Par = "") As %Status
-{
-	do ##class(apptools.core.Form).BlockUI(0)
-	set key=Par("key")
-	set divId=Par("divId")
-	set %ui=1
-	set dirrepo="/backup/temp/"
-	set onclick=$$$blockui("Load...")_
-		$$$onclick(divId_"MainForm",divId_"MainContent",$namespace,..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
-	write $$$appText(divId_"WorkDirPacket","title='The work directory for packet and publish' size=80 ",dirrepo)
-	write $$$appButton(divId_"appButtonResult1","onclick="""_$tr(onclick,"*",1)_"""","Save")
-	quit $$$OK
-}
-
-/// Search result
-ClassMethod OptionResult(Par = "") As %Status
-{
-	do ##class(apptools.core.Form).BlockUI(0)
-	set key=Par("key")
-	set divId=Par("divId")
-	set mode=Par("mode")
-	;Geting elements from form and prepare array Par
-	set dirrepo=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"WorkDirPacket")	
-	set st=$$$OK
-	if mode=1 {
-		write ..ButtonAgain(divId,key)
-		if dirrepo="" w $$$appError($$$aText("work directory is empty","")) quit $$$OK
-		write $$$appMsg(dirrepo_" saved")
-	} 
-	write "<br>"
+	
+	// Execute	-------------------------------------
+	if $g(execute)'="" {
+		write "<H5>"_$$$aText("Executing the command","")_" "_execute_"</H5>"
+		if ##class(apptools.core.LogInfoPane).GetCodeExtensionNamespace(execute,.code) {
+			set execute=code
+		}
+		xecute execute
+		quit $$$OK
+	}
+	if $g(zpipe)'="" {
+		write "<H5>"_$$$aText("Executing the command OS","")_" "_zpipe_"</H5>"
+		do ##class(apptools.core.net).zpipe(zpipe)
+		quit $$$OK
+	}
+	if what="trm" {
+		write "WebTerminal"
+		if ##class(apptools.core.sys).ClassExist("WebTerminal.Engine") {
+			write !,"<iframe style='width:95%; height:70%' id='terminal"_NSpace_"' src='/terminal/?ns="_NSpace_"&clean=1' ></iframe>"
+		}
+		quit $$$OK
+	}
+	
+	set obj=""
+	#; arbitrary query
+	if $g(sql)'="" {
+		if %DSN'="" {
+			set gnTemp=$na(@"^tmpLogInfo"@($j))  ;$$$TEMPORYGN@($j))
+			KILL @gnTemp
+			if $G(listDSN(DSN))'="" {
+				set st=##class(apptools.core.sys).SaveGateway(sql,$G(listDSN(DSN)),%request.Get("User"),%request.Get("Password"),gnTemp,MaxNode) 
+			}
+			else {
+				//do ##class(%SYS.System).WriteToConsoleLog("job "_$j_" sql "_$tr(sql,$c(13,10)," "),,0)
+				KILL %objlasterror
+				set st=##class(apptools.core.sys).SqlToDSN(sql,DSN,gnTemp,MaxNode)
+				if 'st write "<font color=red>"_$System.Status.GetErrorText(st)_"</font>"
+				Set sc = $g(%objlasterror, $$$OK)
+				if 'sc write "<font color=red>"_$System.Status.GetErrorText(sc)_"</font>"
+			}
+			if $d(@gnTemp) {
+				set st=##class(apptools.core.LogInfoPane).DrawSQL("result "_gnTemp,MaxNode,NSpace,"DSN: "_DSN_", Query: <br>"_$g(sql)_"<br>"_gnTemp,$g(ExecuteDraw),$lb(exportXLS,exportXLSfile,exportXLSfileEmail))
+			}
+		}
+		else {
+			if exportXLS=1 { ;Running in the background
+				job ##class(apptools.core.LogInfoPane).DrawSQL(sql,MaxNode,NSpace,"NameSpace: "_NSpace_" "_$g(msg),$g(ExecuteDraw),$lb(exportXLS,exportXLSfile,exportXLSfileEmail))::1
+				if $T W $$$aText("The request will be executed in the background","") s st=1
+			} else {
+				set st=##class(apptools.core.LogInfoPane).DrawSQL(sql,MaxNode,NSpace,"Namespace: "_NSpace_" "_$g(msg),$g(ExecuteDraw),$lb(exportXLS,exportXLSfile,exportXLSfileEmail))
+			}
+		}
+		if $$$ISERR(st) write "<br>Error :"_##class(%CSP.Page).EscapeHTML(sql_"; "_$SYSTEM.OBJ.DisplayError(st))_"<br>"
+	}
+	#; If the output of Global
+	elseif $G(gn)'="" {
+		set a=$lb(gn,MaxNode,NSpace,Next,$g(Message),$g(exp),Filtr,$g(ExecuteDraw),exportXLS,exportXLSfile,exportXLSfileEmail)
+		;d ##class(apptools.core.LogInfoPane).DrawGN(a) ;debug 
+		if exportXLS=1 { ;Running in the background
+			job ##class(apptools.core.LogInfoPane).DrawGN(a)::1
+			if $T W $$$aText("The request will be executed in the background","") s st=1
+		} else {
+			set st=##class(apptools.core.LogInfoPane).DrawGN(a)
+		}
+	}
+	elseif (what'="") {
+		&html<<center><b>#($$$aText("Commands not defined",""))#</b></center>>
+	}
+	write "<br><br>"
 	quit $$$OK
 }
 
@@ -287,23 +376,97 @@ ClassMethod ProductsFirstHead(Par = "") As %Status
 	set %ui=1
 	set onclick=$$$blockui("Load...")_
 		$$$onclick(divId_"MainForm",divId_"MainContent",$namespace,..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
-	set nspaces=##class(apptools.core.sys).ListNS(.info,"NotPre,Ens")
-	set sqldef=..#DefaultQuery
-	set sql2=$replace(sqldef,"*","count(*)")
-	set sql2=$replace(sql2,"?","'"_$zd($h-1,3)_" 21:00'")
-	do ##class(apptools.lte.info).FindAllErr(sql2,nspaces,.result,.index)
-	set cnt=""
-	for { set cnt=$o(index(cnt),-1) quit:cnt=""
-		set qu=""
-		for { set qu=$o(index(cnt,qu)) quit:qu=""
-			set ns=""
-			for { set ns=$o(index(cnt,qu,ns)) quit:ns=""
-				write $$$appButton(divId_"appButtonResult"_ns,"title='Count Errors = "_cnt_", Query = "_qu_"' onclick="""_$replace(onclick,"*",ns_"&cnt="_cnt_"&qu="_qu)_"""",ns_"_"_cnt_"_"_qu)
+	set DateTime=$ZDT($NOW()-1,3,1,3)_"T00:00:00"
+	write $$$appDateTime(divId_"DateTime","title='The work directory for packet and publish'",DateTime)
+	write " "_$$$appButton(divId_"appButtonResult1","title='Refresh' onclick="""_$replace(onclick,"*","1")_"""","Refresh")
+
+	$$$SetHeightContent(divId,0) ;250
+	q $$$OK
+}
+
+/// Search result 
+ClassMethod ProductsResult(Par = "") As %Status
+{
+	set %ui=1
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	set mode=Par("mode")
+	set DateTime=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"DateTime")
+	if DateTime="" set DateTime=$ZDT($NOW()-1,3,1,3)_"T12:00"
+	if mode=1 {
+		set nspaces=##class(apptools.core.sys).ListNS(.info,"NotPre,Ens")	
+		if '$d(info) write "not productions" quit $$$OK
+		set sqldef=..#DefaultQuery
+		set sql2=$replace(sqldef,"*","count(*)")
+		set sql2=$replace(sql2,"?","'"_DateTime_"'")
+		w sql2
+		do ##class(apptools.lte.info).FindAllErr(sql2,nspaces,.result,.index)
+		set NS="",ln="lockname"
+		do ##class(apptools.core.sys).SetTableHeader(ln,"NameSpace","Productions Errors","Querys")
+		for { set NS=$o(result(NS)) quit:NS=""
+			set cnt=$g(cnt)+1
+			;if $g(result(NS,"ProdUrl"))="" continue
+			set prodname=$g(result(NS,"ProdUrl"))
+			set gns=..GetGN(NS)
+			KILL @gns
+			set @gns=$lb(DateTime,sqldef,sql2)
+			MERGE @gns@("result")=result(NS)
+			set onclick="AppRpc('','MainHidden','"_NS_":apptools.lte.info:ShowTab:&appPar=Search&Searchstr=Err-"_NS_"','/apptoolsrest/post-json');"
+			if $g(result(NS,"NoRun"))'="" {
+				set prodname=$g(result(NS,"NoRun")),ErrMsg=" no running products"
+				set color="blue"
 			}
+			else {
+				set color="green"
+				if $g(result(NS,"Count")) set color="red"
+				set ErrMsg="Errors: "_$g(result(NS,"Count"))
+			}
+			set ErrMsg="<a href=# onclick="""_onclick_"""><b><font color="_color_">"_ErrMsg_"</font></b></a>"
+			do ##class(apptools.core.sys).SetTableRow(ln,cnt,prodname,ErrMsg,$g(result(NS,"QueryUrl")))
+		}
+		do ##class(apptools.core.sys).SetTableFooter(ln)
+		do ##class(apptools.core.LogInfoPane).DrawSQL("result "_ln,10000,"")
+	}
+	elseif mode=2 {
+		do ##class(apptools.lte.info).FindAllErr(,mode,.result,.index)
+		write $G(result(mode,"ProdUrl"))_" Errors="_(+cnt)_" "_$G(result(mode,"QueryUrl"))_" Query="_(+qu)_"<br>"
+		if cnt {
+			set exec="##class(apptools.core.Production).AddTraceUrl(.%AppLogInfoVal, %AppLogInfoCol, %AppLogInfoHead, .%AppLogInfoTemp)"
+			set sqldef=..#DefaultQuery
+			set sql2=$replace(sqldef,"?","'"_$zd($h-1,3)_" 21:00'")
+			set st=##class(apptools.core.LogInfoPane).DrawSQL(sql2,$g(Max,10000),$Namespace," Ensemble Errors ",$g(exec))
+			w st
 		}
 	}
-	$$$SetHeightContent(divId,250)
-	q $$$OK
+	write ..ButtonAgain(divId,key) ;,key_" - "_mode)
+	quit $$$OK
+}
+
+ClassMethod GetGN(arg) As %Status
+{
+	quit $na(@..#GNStore@(+$h,$username,arg))
+}
+
+ClassMethod ShowTabSearch(key = "") As %Status
+{
+ set divId="Search-"_$G(key("appPar"))
+ write "<div id='"_divId_"MainContent'>"
+ if $G(key("appPar"))["Err-" {
+	set NS=$p($G(key("appPar")),"Err-",2,*)
+	zn NS 
+	set gns=..GetGN(NS)
+	set $lb(DateTime,sqldef,sql2)=@gns
+	;MERGE result(NS)=@gns@("result")
+	set sql=$replace(sql2,"count(*)","ConfigName,Job,MessageId,SessionId,SourceClass,SourceMethod,Text,TimeLogged")
+	do ##class(apptools.core.LogInfoPane).DrawSQL(sql,1000,"")
+
+ }
+ else {
+ }
+ write "</div>"
+ $$$jsstart w $$$NL write "$('#"_divId_"MainContent').height($(window).height()-"_250_");"_$$$NL $$$jsstop w $$$NL
+ q $$$OK
 }
 
 ///  do ##class(apptools.lte.info).FindAllErr(,,.result)
@@ -316,58 +479,50 @@ ClassMethod FindAllErr(sqldef = {..#DefaultQuery}, nspaces = "", result, index) 
 		$$$NspGoto(curNs,$p(nspaces,",",i))
 		set NS=$p(nspaces,",",i)
 		if '$D(@GN@(NS)) continue ; there is no namespace in the system, skip
-		;w "<li>",NS
 		set PN=""
 		set p="" for { set p=$o(@GN@(NS,"Ens",p)) quit:p=""
 			if $lg($g(@GN@(NS,"Ens",p)),1)[$$$EnsProductStatusRun s PN=p quit
 		}
-		set onclicknone="$('.taberrors').css('display','none'); "
 		set url="<b><a target='ensprod2"_($Namespace)_"' href='/csp/"_$zconvert($Namespace,"L")_"/EnsPortal.ProductionConfig.zen?$NAMESPACE="_$Namespace_"' >"_NS_"</a></b>"
-		if PN="" s result(NS,"NoRun")="<li>"_url_" no running products" continue
+		if PN="" set result(NS,"NoRun")=url continue
 		if $Namespace'=NS s result(NS,"Err")="<br><font color=red>Go to error "_url_"</font>" continue
 		
 		set gn="tmpErrEns"
+		set sqldef=..GetSQLErrors4Prod(NS,sqldef)
 		do ##class(apptools.core.sys).SaveSQL(sqldef,gn)
 		set (ec,cnt,result(NS,"Count"))=+$lg($g(@gn@(1)),1)
-		    ;if NS="MVK" zw @gn
 		set result(NS,"ProdUrl")=url
 		
 		;Query
-		set serv="",total=0
-		for { s serv=$o(^Ens.Queue(serv)) q:serv=""
-			s total=$g(total)+$g(^Ens.Queue(serv,0,"count"))
+		set serv="",totalC=0,totalA=0
+		set query="EnsPortal.Queues:EnumerateQueues",
+			gn="qu"
+		KILL @gn
+		do ##class(apptools.core.sys).SaveQueryTab(query,gn)
+		for ii=1:1 { quit:'$d(@gn@(ii))
+			set Count=##class(apptools.core.sys).GetValue(gn,ii,"Count")
+			set Active=##class(apptools.core.sys).GetValue(gn,ii,"Active")
+			set totalA=totalA+Active
+			set totalC=totalC+Count
 		}
-		set result(NS,"Query")=total
+		set color="green",
+			serv=ii-1
+		if totalA||(totalC) {
+			set color="red" 
+		}
+		set result(NS,"Query")=totalA+totalC
 		set url="/csp/"_$zconvert(NS,"L")_"/EnsPortal.Queues.zen?$NAMESPACE="_NS
-		set result(NS,"QueryUrl")="<a target="_$zts_" href="_url_" > Query "_total_" </a>"
-		set index(+cnt,total,NS)=""		
+		set result(NS,"QueryUrl")="<a target=_blank href="_url_" ><b><font color="_color_" style='cursor:hand'> Querys: "_totalC_" Active: "_totalA_" </font></b></a>"
+		set index(+cnt,totalA,NS)=""		
 		$$$NspReturn(curNs)
 	}
 	quit $$$OK
 }
 
-/// Search result 
-ClassMethod ProductsResult(Par = "") As %Status
+ClassMethod GetSQLErrors4Prod(NS, sqldef) As %Status
 {
-	set %ui=1
-	do ##class(apptools.core.Form).BlockUI(0)
-	set key=Par("key")
-	set divId=Par("divId")
-	set mode=Par("mode")
-	set cnt=Par("cnt")
-	set qu=Par("qu")
-	zn mode
-	do ##class(apptools.lte.info).FindAllErr(,mode,.result,.index)
-	write $G(result(mode,"ProdUrl"))_" Errors="_(+cnt)_" "_$G(result(mode,"QueryUrl"))_" Query="_(+qu)_"<br>"
-	if cnt {
-		set exec="##class(apptools.core.Production).AddTraceUrl(.%AppLogInfoVal, %AppLogInfoCol, %AppLogInfoHead, .%AppLogInfoTemp)"
-		set sqldef=..#DefaultQuery
-		set sql2=$replace(sqldef,"?","'"_$zd($h-1,3)_" 21:00'")
-		set st=##class(apptools.core.LogInfoPane).DrawSQL(sql2,$g(Max,10000),$Namespace," Ensemble Errors ",$g(exec))
-		w st
-	}
-	write ..ButtonAgain(divId,key) ;,key_" - "_mode)
-	quit $$$OK
+	;Let it be for now
+	quit sqldef
 }
 
 /// download form template search users and roles

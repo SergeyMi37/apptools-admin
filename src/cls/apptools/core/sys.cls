@@ -246,6 +246,28 @@ ClassMethod SaveQuery(query = "%SYSTEM.License:Counts", gn = "^%apptools.Task", 
 	q $$$OK
 }
 
+/// %SYS>d ##class(apptools.core.sys).SaveQueryTab("%SYSTEM.License:Counts")
+ClassMethod SaveQueryTab(query = "%SYSTEM.License:Counts", gn = "^||q")
+{
+	set hr=$h,ts=$$$AppDT(hr)
+	Set rset=##class(%Library.ResultSet).%New($p(query," ",1))
+	If rset="" quit %objlasterror
+	if $p(query," ",3)'=""	{Set status=rset.Execute($p(query," ",2),$p(query," ",3))}
+	elseif $p(query," ",2)'=""	{Set status=rset.Execute($p(query," ",2))}
+	else { Set status=rset.Execute()}
+	If $$$ISERR(status) quit status
+	Set colcnt=rset.GetColumnCount()
+	For i=1:1:colcnt set @gn@(0,i)=rset.GetColumnName(i),@gn@(-1,rset.GetColumnName(i))=i
+	while rset.Next() {	if $I(row)
+		set str=""
+	   	For i=1:1:colcnt set str=str_$lb(rset.GetData(i))
+	   	set @gn@(row)=str
+	}
+	set @gn@(-3,"query")=$lb(query)
+	set @gn@(-3,"timestamp")=$lb(ts,$$$AppDT($h),##class(apptools.core.type).GetCountSec($h)-##class(apptools.core.type).GetCountSec(hr))
+	q $$$OK
+}
+
 /// /*! \brief Procedure query executing and storing reports in the global
 /// <br>\ingroup query
 /// <br>\param ext=1 add saving column and row positions
@@ -262,15 +284,20 @@ ClassMethod SaveSQL(SQL, gn = "^mtempSQLGN", ext = 0) As %String
 	set (count)=0
 	kill @gn
 	set ColCount=myQuery.GetColumnCount()
-	For i=1:1:ColCount {	s @gn@(0)=$g(@gn@(0))_$lb(myQuery.GetColumnName(i))	
-		s @gn@(-1,$ZStrip(myQuery.GetColumnName(i),"<>WCP"))=i //Name = Number
+	set list=""
+	For i=1:1:ColCount {	
+		set list=list_$lb(myQuery.GetColumnName(i))	
+		set @gn@(-1,$ZStrip(myQuery.GetColumnName(i),"<>WCP"))=i //Name = Number
 	}
+	set @gn@(0)=list
 	while (myQuery.Next())	{
 		set count=count+1
-		if ext s @gn@(-2,$ZStrip(myQuery.Get("Name"),"<>WCP"))=count  ; w "<li>"_myQuery.Get("Name")_" "_count_" "_$zr
+		if ext set @gn@(-2,$ZStrip(myQuery.Get("Name"),"<>WCP"))=count  ; w "<li>"_myQuery.Get("Name")_" "_count_" "_$zr
+		set list=""
 		for ii=1:1:ColCount {
-			s @gn@(count)=$g(@gn@(count))_$lb(myQuery.GetData(ii))
-			}
+			set list=list_$lb(myQuery.GetData(ii))
+		}
+		set @gn@(count)=list
 	}
 	set @gn@(-3,"sql")=$lb(SQL)
 	set @gn@(-3,"timestamp")=$lb(ts,$$$AppDT($h),##class(apptools.core.type).GetCountSec($h)-##class(apptools.core.type).GetCountSec(hr))

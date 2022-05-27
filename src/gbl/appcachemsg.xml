@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="IRIS" version="26" zv="IRIS for UNIX (Red Hat Enterprise Linux for x86-64) 2020.3 (Build 304U)" ts="2021-08-12 21:35:06">
+<Export generator="IRIS" version="26" zv="IRIS for UNIX (Red Hat Enterprise Linux for x86-64) 2021.2 (Build 651U)" ts="2022-05-27 14:27:57">
 <Global>
 <Node><Sub>^%AppCacheMsg</Sub>
 <Node><Sub>AppTools</Sub>
@@ -741,6 +741,9 @@
 <Node><Sub>177948320</Sub>
 <Data>View and edit global with the basic settings panel</Data>
 </Node>
+<Node><Sub>198446227</Sub>
+<Data>Executing the command OS</Data>
+</Node>
 <Node><Sub>230775901</Sub>
 <Data>Data</Data>
 </Node>
@@ -851,6 +854,9 @@
 </Node>
 <Node><Sub>996497702</Sub>
 <Data>Save access rights</Data>
+</Node>
+<Node><Sub>1005429058</Sub>
+<Data>Packet</Data>
 </Node>
 <Node><Sub>1011490657</Sub>
 <Data>September</Data>
@@ -1014,6 +1020,9 @@
 <Node><Sub>1892796145</Sub>
 <Data>NameSpace</Data>
 </Node>
+<Node><Sub>1903186202</Sub>
+<Data>switch string is empty</Data>
+</Node>
 <Node><Sub>1903347132</Sub>
 <Data>an object in the format</Data>
 </Node>
@@ -1037,6 +1046,12 @@
 </Node>
 <Node><Sub>1980167520</Sub>
 <Data>View array</Data>
+</Node>
+<Node><Sub>1999238621</Sub>
+<Data>Publish</Data>
+</Node>
+<Node><Sub>2005136455</Sub>
+<Data>Save Resources</Data>
 </Node>
 <Node><Sub>2013136520</Sub>
 <Data>Mode debugging</Data>
@@ -1127,6 +1142,9 @@
 </Node>
 <Node><Sub>2656703054</Sub>
 <Data>SampleTabsApplication</Data>
+</Node>
+<Node><Sub>2678641012</Sub>
+<Data>Matrix of Resources</Data>
 </Node>
 <Node><Sub>2699698566</Sub>
 <Data>Globals</Data>
@@ -1305,6 +1323,9 @@
 <Node><Sub>3467896543</Sub>
 <Data>Object with id = %1 Does not exist</Data>
 </Node>
+<Node><Sub>3477783961</Sub>
+<Data>Matrix of Resources for </Data>
+</Node>
 <Node><Sub>3479635508</Sub>
 <Data>Global Product</Data>
 </Node>
@@ -1398,6 +1419,9 @@
 <Node><Sub>3933278751</Sub>
 <Data>may</Data>
 </Node>
+<Node><Sub>3941793984</Sub>
+<Data>Resources for </Data>
+</Node>
 <Node><Sub>3948683721</Sub>
 <Data>Search string must be at least 3 characters</Data>
 </Node>
@@ -1445,6 +1469,9 @@
 </Node>
 <Node><Sub>4157704578</Sub>
 <Data>Hello</Data>
+</Node>
+<Node><Sub>4177688455</Sub>
+<Data>work directory is empty</Data>
 </Node>
 <Node><Sub>4195973385</Sub>
 <Data>show the list globalaw in the USER area</Data>

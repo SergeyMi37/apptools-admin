@@ -43,11 +43,14 @@ ClassMethod SendMail(server, port, ssl, UseSTARTTLS, timezone, username, psw, fr
  set:UseSTARTTLS smtp.UseSTARTTLS=1
  set smtp.timezone=timezone
  if username'="" {
+	;set username="mihaylenko_sv@mosvodokanal.ru",psw="S307^asu2rp" w !,username," ",psw
 	set auth=##class(%Net.Authenticator).%New()
 	set auth.UserName=username
 	set auth.Password=psw
 	set smtp.authenticator=auth
+	
  }
+ try {set smtp.IgnoreFailedAuth = 1 } catch e {} //after version 2021.2
  set smtp.timezone=$g(timezone,"0300")  ;Timezone by Grinwitch  +3 russia
  set mail=##class(%Net.MailMessage).%New() 
  set mail.From=$G(from)        ##; From 
