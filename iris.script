@@ -2,9 +2,6 @@
 
 zn "%SYS"
 Do ##class(Security.Users).UnExpireUserPasswords("*")
-zpm "install zpm"
-zpm "install zapm"
-zapm "newdb iris-message-viewer"
 zn "USER"
 zpm "load /opt/irisapp/ -v":1:1
 

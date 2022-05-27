@@ -9,7 +9,7 @@
   <Keywords>Application tools admin</Keywords>
 <Author>
 <Person>Mikhaylenko Sergey</Person>
-<CopyrightDate>2021</CopyrightDate>
+<CopyrightDate>2022</CopyrightDate>
 <License>MIT</License>
 <Notes>
 repository:
@@ -20,7 +20,7 @@ Application tools for technical support and DBMS administrator. View and edit ar
 </Author>
 	<SourcesRoot>src</SourcesRoot>
 	<Invokes>
-	    <Invoke Class="apptools.core.Installer" Method="AddFavorites" Phase="Activate" When="After" ></Invoke>
+	<Invoke Class="apptools.core.Installer" Method="AddFavorites" Phase="Activate" When="After" ></Invoke>
         </Invokes>
 	<Resource Name="apptools.core.PKG"/>
 	<Resource Name="apptools.core.INC"/>

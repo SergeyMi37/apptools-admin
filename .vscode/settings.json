@@ -24,7 +24,7 @@
     },
     "sqltools.connections": [
       {
-        "namespace": "IRISAPP",
+        "namespace": "USER",
         "connectionMethod": "Server and Port",
         "showSystem": false,
         "previewLimit": 50,
