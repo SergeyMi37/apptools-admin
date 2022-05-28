@@ -6,7 +6,8 @@
 ![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/hammer-min.png)
 ## apptools-admin
 [![OEX](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/apptools-admin) 
-[![Demo](https://img.shields.io/badge/Demo%20on-GCR-black)](https://apptools.demo.community.intersystems.com/apptools/apptools.core.LogInfo.cls)
+[![Demo](https://img.shields.io/badge/Demo%20on-Cloud%20Run%20Deploy-F4A460)](https://apptools.demo.community.intersystems.com/apptools/apptools.core.LogInfo.cls)
+
 [![Habr](https://img.shields.io/badge/Available%20article%20on-Intersystems%20Community-orange)](https://community.intersystems.com/post/intersystems-solution-technical-support-and-dbms-interoperability-administration)
 [![Habr](https://img.shields.io/badge/Есть%20статья%20на-Хабре-blue)](https://habr.com/en/post/436042/)
 
@@ -18,14 +19,27 @@
 
 [![license](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+Platform for creating applications for administration.
+
 Application tools for technical support and DBMS administrator. View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files. A few simple graphs on the protocols of the system.
 This solution can be installed in earlier versions of Caché and Ensemble (tested 2016.1+). This can be done by importing xml.
 
-This project is not only a set of [tools for the administrator](#PanelAdmin), but a platform for the rapid creation of a prototype of any solution.
-For example, Photo Album, Music Player, and Personal Books Library all come together in a user-friendly treasure chest design.
-
 ## What's new
-A service has been added to the project to support informing via telegram messenger and email about the status of products and systems
+
+An application has been implemented for monitoring and [administering the products]() of the entire instance at once.
+
+
+
+## Applications based on this platform
+
+### Informing support projects using telegram messenger bots
+
+### Web application photo album, music player and personal e-book library.
+
+### Application of products forming a database of exchange rates of the Central Bank of the Russian Federation.
+
+### Module for exporting IRIS requests to excel file using python openpyxl library.
+
 
 ## Installation with ZPM
 

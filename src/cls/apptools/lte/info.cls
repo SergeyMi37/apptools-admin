@@ -220,10 +220,11 @@ ClassMethod NSFirstHead(Par = "") As %Status
 	set key=Par("key")
 	set divId=Par("divId")
 	set %ui=1
-	set ns=$p(key,"NS",2,*)
-	;write key_" "_divId_" "_ns
+	set (NS,ns)=$p(key,"NS",2,*)
+	if $e(ns,1)="-" set NS="%"_$e(ns,2,*)
+	zn NS
 	set onclick=$$$blockui("Load...")_
-		$$$onclick(divId_"MainForm",divId_"MainContent",ns,..%ClassName(1),"NSpaceResult","&key="_key_"&divId="_divId_"&mode=*")
+		$$$onclick(divId_"MainForm",divId_"MainContent",NS,..%ClassName(1),"NSpaceResult","&key="_key_"&divId="_divId_"&mode=*")
 
 	write $$$appButton(divId_"appButtonExe","title='Execute query' onclick="""_$replace(onclick,"*","exe&ns="_ns)_"""","Execute")
 	write $$$appButton(divId_"appButtonHelp","title='View Help' onclick="""_$replace(onclick,"*","help&ns="_ns)_"""","Help")
@@ -254,6 +255,7 @@ ClassMethod NSpaceResult(Par = "") As %Status
 	set key=Par("key")
 	set divId=Par("divId")
 	set NSpace=Par("ns")
+	if $e(NSpace,1)="-" set NSpace="%"_$e(NSpace,2,*)
 	set mode=Par("mode")
 	set sqldef=..#DefaultQuery
 	set %DSN=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"selectDSN")
@@ -395,7 +397,7 @@ ClassMethod ProductsResult(Par = "") As %Status
 	set DateTime=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"DateTime")
 	if DateTime="" set DateTime=$ZDT($NOW()-1,3,1,3)_"T12:00"
 	if mode=1 {
-		set nspaces=##class(apptools.core.sys).ListNS(.info,"NotPre,Ens")	
+		set nspaces=##class(apptools.core.sys).ListNS(.info,"NotPre,Ens") ;^%apptools.core.Productions
 		if '$d(info) write "not productions" quit $$$OK
 		set sqldef=..#DefaultQuery
 		set sql2=$replace(sqldef,"*","count(*)")
@@ -677,4 +679,3 @@ AElFTkSuQmCC
 }
 
 }
-
