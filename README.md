@@ -18,9 +18,9 @@
 
 [![license](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Platform for creating applications for administration.
+## Platform for creating applications for administration and tools for technical support and DBMS administrator.
 
-Application tools for technical support and DBMS administrator. View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files. A few simple graphs on the protocols of the system.
+View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files. A few simple graphs on the protocols of the system.
 This solution can be installed in earlier versions of Caché and Ensemble (tested 2016.1+). This can be done by importing xml.
 
 ## What's new
@@ -40,6 +40,8 @@ An application has been implemented for monitoring and [ administering the produ
 * Application of products forming a database of [exchange rates of the Central Bank of the Russian Federation.](https://cbrf.demo.community.intersystems.com/apptoolsrest/a/rate&class=appmsw.cbrf.rateinfo&namespace=USER#)
 
 * An example of a backup [ task with preliminary deletion of old files.](https://github.com/SergeyMi37/apptools-task)
+
+* User interface for selecting IRIS resources and creating a zpm package. [UI for basic commands from module generation, loading, installation, uninstallation](https://zpm-ui.demo.community.intersystems.com/apptoolsrest/a/zapm) to publishing to the registry.
 ---
 ## Installation with ZPM
 
