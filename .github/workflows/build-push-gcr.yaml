@@ -8,9 +8,9 @@ on:
 
 env:
   # Change this section according to your needs
-  IMAGE_NAME:   apptools
-  SERVICE:      apptools
-  DOMAIN_NAME:  apptools.demo.community.intersystems.com
+  IMAGE_NAME:   appadmin
+  SERVICE:      appadmin
+  DOMAIN_NAME:  appadmin.demo.community.intersystems.com
 # Leave this section untouched
   PROJECT_ID:   iris-community-demos
   CLUSTER_NAME: demo
