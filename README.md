@@ -25,7 +25,7 @@ This solution can be installed in earlier versions of Caché and Ensemble (teste
 
 ## What's new
 
-An application has been implemented for monitoring and [administering the products](https://appadmin.demo.community.intersystems.com/apptoolsrest/a/info) of the entire instance at once.
+An application has been implemented for monitoring and [ administering the products ](https://appadmin.demo.community.intersystems.com/apptoolsrest/a/info) of the entire instance at once.
 
 ![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_info2.png)
 
@@ -39,6 +39,7 @@ An application has been implemented for monitoring and [administering the produc
 
 * Application of products forming a database of [exchange rates of the Central Bank of the Russian Federation.](https://cbrf.demo.community.intersystems.com/apptoolsrest/a/rate&class=appmsw.cbrf.rateinfo&namespace=USER#)
 
+* An example of a backup [ task with preliminary deletion of old files.](https://github.com/SergeyMi37/apptools-task)
 ---
 ## Installation with ZPM
 
