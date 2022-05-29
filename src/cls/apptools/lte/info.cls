@@ -207,9 +207,12 @@ ClassMethod OptionsFirstHead(Par = "") As %Status
 	set key=Par("key")
 	set divId=Par("divId")
 	set %ui=1
+	set sqldef=..#DefaultQuery
+	set GNset=$na(@..#GNStore@("settings"))
+	if $D(@GNset@("sqldef"),sql) set sqldef=sql
 	set onclick=$$$blockui("Load...")_
 		$$$onclick(divId_"MainForm",divId_"MainContent",$namespace,..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
-	write $$$appText(divId_"WorkDirPacket","title='The work directory for packet and publish'","/backup/temp/")
+	write $$$appText(divId_"WorkDirPacket","title='Default prompt for error messages in products'",sqldef)
 	
 	quit $$$OK
 }
@@ -447,7 +450,7 @@ ClassMethod ProductsResult(Par = "") As %Status
 
 ClassMethod GetGN(arg) As %Status
 {
-	quit $na(@..#GNStore@(+$h,$username,arg))
+	quit $na(@..#GNStore@("sessions",+$h,$username,arg))
 }
 
 ClassMethod ShowTabSearch(key = "") As %Status

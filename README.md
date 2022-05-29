@@ -19,26 +19,26 @@
 
 [![license](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Platform for creating applications for administration.
+## Platform for creating applications for administration.
 
 Application tools for technical support and DBMS administrator. View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files. A few simple graphs on the protocols of the system.
 This solution can be installed in earlier versions of Caché and Ensemble (tested 2016.1+). This can be done by importing xml.
 
 ## What's new
 
-An application has been implemented for monitoring and [administering the products]() of the entire instance at once.
-
+An application has been implemented for monitoring and [administering the products](https://apptools.demo.community.intersystems.com/apptoolsrest/a/info) of the entire instance at once.
 
 
 ## Applications based on this platform
 
-### Informing support projects using telegram messenger bots
+### Module for exporting IRIS requests [to excel file using python openpyxl library.](https://appmsw-sql2xlsx.demo.community.intersystems.com/apptoolsrest/a/rate&class=appmsw.python.demo#)
 
-### Web application photo album, music player and personal e-book library.
+### Informing support projects using telegram messenger bots.
+[Notification via telegram](https://github.com/SergeyMi37/appmsw-telealerts)
 
-### Application of products forming a database of exchange rates of the Central Bank of the Russian Federation.
+### Web application [photo album, music player and personal e-book library.](https://github.com/SergeyMi37/apptools-infochest)
 
-### Module for exporting IRIS requests to excel file using python openpyxl library.
+### Application of products forming a database of [exchange rates of the Central Bank of the Russian Federation.](https://cbrf.demo.community.intersystems.com/apptoolsrest/a/rate&class=appmsw.cbrf.rateinfo&namespace=USER#)
 
 
 ## Installation with ZPM
