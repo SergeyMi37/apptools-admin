@@ -39,7 +39,7 @@ An application has been implemented for monitoring and [administering the produc
 
 * Application of products forming a database of [exchange rates of the Central Bank of the Russian Federation.](https://cbrf.demo.community.intersystems.com/apptoolsrest/a/rate&class=appmsw.cbrf.rateinfo&namespace=USER#)
 
-— — —
+---
 ## Installation with ZPM
 
 If ZPM the current instance is not installed, then in one line you can install the latest version of ZPM.
