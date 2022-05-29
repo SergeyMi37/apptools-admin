@@ -28,16 +28,17 @@ This solution can be installed in earlier versions of Caché and Ensemble (teste
 
 An application has been implemented for monitoring and [administering the products](https://appadmin.demo.community.intersystems.com/apptoolsrest/a/info) of the entire instance at once.
 
+![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_info2.png)
+
 ## Applications based on this platform
 
-1.Module for exporting IRIS requests [to excel file using python openpyxl library.](https://appmsw-sql2xlsx.demo.community.intersystems.com/apptoolsrest/a/rate&class=appmsw.python.demo#)
+* Module for exporting IRIS requests [to excel file using python openpyxl library.](https://app*msw-sql2xlsx.demo.community.intersystems.com/apptoolsrest/a/rate&class=appmsw.python.demo#)
 
-2.Informing support projects using telegram messenger bots.
-[Notification via telegram](https://github.com/SergeyMi37/appmsw-telealerts)
+* Informing support projects using telegram messenger bots. [Notification via telegram](https://github.com/SergeyMi37/appmsw-telealerts)
 
-3.Web application [photo album, music player and personal e-book library.](https://github.com/SergeyMi37/apptools-infochest)
+* Web application [photo album, music player and personal e-book library.](https://github.com/SergeyMi37/apptools-infochest)
 
-4.Application of products forming a database of [exchange rates of the Central Bank of the Russian Federation.](https://cbrf.demo.community.intersystems.com/apptoolsrest/a/rate&class=appmsw.cbrf.rateinfo&namespace=USER#)
+* Application of products forming a database of [exchange rates of the Central Bank of the Russian Federation.](https://cbrf.demo.community.intersystems.com/apptoolsrest/a/rate&class=appmsw.cbrf.rateinfo&namespace=USER#)
 
 
 ## Installation with ZPM
