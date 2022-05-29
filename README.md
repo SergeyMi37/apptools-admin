@@ -3,7 +3,8 @@
 
 [![Docker-ports](https://img.shields.io/badge/dynamic/yaml?color=blue&label=docker-compose&prefix=ports%20-%20&query=%24.services.iris.ports&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsergeymi37%2Fapptools-admin%2Fmaster%2Fdocker-compose.yml)](https://raw.githubusercontent.com/sergeymi37/apptools-admin/master/docker-compose.yml)
 
-![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/hammer-min.png)
+<!- ![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/hammer-min.png) -->
+
 ## apptools-admin
 [![OEX](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/apptools-admin) 
 [![Demo](https://img.shields.io/badge/Demo%20on-Cloud%20Run%20Deploy-F4A460)](https://apptools.demo.community.intersystems.com/apptools/apptools.core.LogInfo.cls)
@@ -40,7 +41,7 @@ An application has been implemented for monitoring and [administering the produc
 
 * Application of products forming a database of [exchange rates of the Central Bank of the Russian Federation.](https://cbrf.demo.community.intersystems.com/apptoolsrest/a/rate&class=appmsw.cbrf.rateinfo&namespace=USER#)
 
-
+— — —
 ## Installation with ZPM
 
 If ZPM the current instance is not installed, then in one line you can install the latest version of ZPM.
