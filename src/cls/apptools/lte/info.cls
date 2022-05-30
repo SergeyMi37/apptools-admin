@@ -382,7 +382,9 @@ ClassMethod ProductsFirstHead(Par = "") As %Status
 	set onclick=$$$blockui("Load...")_
 		$$$onclick(divId_"MainForm",divId_"MainContent",$namespace,..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
 	set DateTime=$ZDT($NOW()-1,3,1,3)_"T00:00:00"
-	write $$$appDateTime(divId_"DateTime","title='The work directory for packet and publish'",DateTime)
+	write " "_$$$appDateTime(divId_"DateTime","title='The work directory for packet and publish'",DateTime)
+	write " "_$$$appCheck(divId_"OnlyRunning","checked title='Only Running'",1)
+	write " "_$$$appCheck(divId_"OnlyError","checked title='Only Error'",1)
 	write " "_$$$appButton(divId_"appButtonResult1","title='Refresh' onclick="""_$replace(onclick,"*","1")_"""","Refresh")
 
 	$$$SetHeightContent(divId,0) ;250
@@ -398,6 +400,8 @@ ClassMethod ProductsResult(Par = "") As %Status
 	set divId=Par("divId")
 	set mode=Par("mode")
 	set DateTime=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"DateTime")
+	set OnlyError=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"OnlyError")
+	set OnlyRunning=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"OnlyRunning")
 	if DateTime="" set DateTime=$ZDT($NOW()-1,3,1,3)_"T12:00"
 	if mode=1 {
 		set nspaces=##class(apptools.core.sys).ListNS(.info,"NotPre,Ens") ;^%apptools.core.Productions
@@ -413,6 +417,7 @@ ClassMethod ProductsResult(Par = "") As %Status
 			set cnt=$g(cnt)+1
 			;if $g(result(NS,"ProdUrl"))="" continue
 			set prodname=$g(result(NS,"ProdUrl"))
+			if OnlyRunning, $g(result(NS,"NoRun"))'="" continue
 			set gns=..GetGN(NS)
 			KILL @gns
 			set @gns=$lb(DateTime,sqldef,sql2)
@@ -424,7 +429,11 @@ ClassMethod ProductsResult(Par = "") As %Status
 			}
 			else {
 				set color="green"
-				if $g(result(NS,"Count")) set color="red"
+				if $g(result(NS,"Count")) {
+					set color="red"
+				}
+				else { if OnlyError continue 
+				}
 				set ErrMsg="Errors: "_$g(result(NS,"Count"))
 			}
 			set ErrMsg="<a href=# onclick="""_onclick_"""><b><font color="_color_">"_ErrMsg_"</font></b></a>"
@@ -682,3 +691,4 @@ AElFTkSuQmCC
 }
 
 }
+
