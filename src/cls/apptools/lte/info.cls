@@ -82,6 +82,21 @@ ClassMethod GetAllApps(opt) As %Status
 		set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
 		set opt(key,"Active")=0 ;active menu item
      }	
+     do ##class(apptools.lte.resources).GetZpmNamespaces(.List,"appmsw-files-download",.firstnamespace)
+	 if $D(List("appmsw-files-download")) {
+		set key="FilesDownload"
+		set opt(key,"Menu")=sideMenu
+		set opt(key)="Files-Download"
+		set opt(key,"Namespace")=$G(firstnamespace)
+		set opt(key,"id")=key
+		set opt(key,"TabName")="Files-Download"
+		set opt(key,"ClassName")="appmsw.filesdownload"
+		;set opt(key,"Role")="%All"
+		;set opt(key,"MethodUrlNewWin")="/fileserver/files"
+		set opt(key,"Method")="ShowTabLte" 
+		set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
+		set opt(key,"Active")=0 ;active menu item
+     }	
 
 	set sideMenuName="Namespaces",
 		sideMenuNumer=3,
@@ -260,8 +275,8 @@ ClassMethod NSFirstHead(Par = "") As %Status
 		$$$onclick(divId_"MainForm",divId_"MainContent",NS,..%ClassName(1),"NSpaceResult","&key="_key_"&divId="_divId_"&mode=*")
 
 	write $$$appButton(divId_"appButtonExe","title='Execute query' onclick="""_$replace(onclick,"*","exe&ns="_ns)_"""","Execute")
-	write $$$appButton(divId_"appButtonHelp","title='View Help' onclick="""_$replace(onclick,"*","help&ns="_ns)_"""","Help")
-	write $$$appButton(divId_"appButtonHist","title='History' onclick="""_$replace(onclick,"*","history&ns="_ns)_"""","history")
+	write $$$appButton(divId_"appButtonXls","title='Execute query and export XLSX' onclick="""_$replace(onclick,"*","xlsx&ns="_ns)_"""","XLSX")
+	write $$$appButton(divId_"appButtonZip","title='Execute query, export XLSX and packed to ZIP' onclick="""_$replace(onclick,"*","zip&ns="_ns)_"""","ZIP")
 	;write $$$appText(divId_"MaxNode","size=8 title='Count MaxNode'","10000")
 	;write $$$appText(divId_"Next","size=2 title='Direct'","1")
 	;write " "_$$$appText(divId_"exportXLS","title='exportXLS'","")
@@ -275,6 +290,9 @@ ClassMethod NSFirstHead(Par = "") As %Status
 	}
 	set selectDSN=selectDSN_"</SELECT>"
 	write " "_selectDSN
+	write " "_$$$appButton(divId_"appButtonHelp","title='View Help' onclick="""_$replace(onclick,"*","help&ns="_ns)_"""","Help")
+	write " "_$$$appButton(divId_"appButtonHist","title='History' onclick="""_$replace(onclick,"*","history&ns="_ns)_"""","history")
+	write " "_$$$appButton(divId_"appButtonClear","title='Clear' onclick="""_$replace(onclick,"*","clear&ns="_ns)_"""","Clear")
 
 	write "<br>"_$$$appTextarea(divId_"what","rows=3 cols=80 title='Enter command'","")
 
