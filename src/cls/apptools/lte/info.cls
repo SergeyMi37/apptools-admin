@@ -209,11 +209,41 @@ ClassMethod OptionsFirstHead(Par = "") As %Status
 	set %ui=1
 	set sqldef=..#DefaultQuery
 	set GNset=$na(@..#GNStore@("settings"))
+	
 	if $D(@GNset@("sqldef"),sql) set sqldef=sql
+	set WorkDirDflt="/tmp"
+	if $D(@GNset@("WorkDirDflt"),wdir) set WorkDirDflt=wdir
+	
 	set onclick=$$$blockui("Load...")_
 		$$$onclick(divId_"MainForm",divId_"MainContent",$namespace,..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
-	write $$$appText(divId_"WorkDirPacket","title='Default prompt for error messages in products'",sqldef)
-	
+	write $$$appText(divId_"WorkDirDflt","size=88 title='Default work directory'",WorkDirDflt)
+	write $$$appButton(divId_"appButtonSett1","title='Setting default work directory' onclick="""_$replace(onclick,"*","setdir")_"""","Save")
+	write "<br><br>"
+	write $$$appText(divId_"QueryDflt","size=88 title='Default prompt for error messages in products'",$zconvert(sqldef,"O","HTML"))
+	write $$$appButton(divId_"appButtonSett2","title='Setting default query' onclick="""_$replace(onclick,"*","setsql")_"""","Save")
+	quit $$$OK
+}
+
+ClassMethod OptionsResult(Par = "") As %Status
+{
+	do ##class(apptools.core.Form).BlockUI(0)
+	set key=Par("key")
+	set divId=Par("divId")
+	;set NSpace=Par("ns")
+	;if $e(NSpace,1)="-" set NSpace="%"_$e(NSpace,2,*)
+	set mode=Par("mode")
+	set GNset=$na(@..#GNStore@("settings"))
+
+	if mode="setdir" {
+		set WorkDirDflt=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"WorkDirDflt")
+		set @GNset@("WorkDirDflt")=WorkDirDflt
+		write $$$appMsg("Saved")
+	}
+	elseif mode="setsql" {
+		set QueryDflt=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"QueryDflt")
+		set @GNset@("sqldef")=QueryDflt
+		write $$$appMsg("Saved")
+	}
 	quit $$$OK
 }
 
@@ -261,7 +291,7 @@ ClassMethod NSpaceResult(Par = "") As %Status
 	if $e(NSpace,1)="-" set NSpace="%"_$e(NSpace,2,*)
 	set mode=Par("mode")
 	set sqldef=..#DefaultQuery
-	set %DSN=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"selectDSN")
+	set (DSN,%DSN)=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"selectDSN")
 	set what=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"what")
 	set MaxNode=10000 ;##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"MaxNode")
 	set exportXLS=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"exportXLS")
@@ -387,7 +417,7 @@ ClassMethod ProductsFirstHead(Par = "") As %Status
 	write " "_$$$appCheck(divId_"OnlyError","checked title='Only Error'",1)
 	write " "_$$$appButton(divId_"appButtonResult1","title='Refresh' onclick="""_$replace(onclick,"*","1")_"""","Refresh")
 
-	$$$SetHeightContent(divId,0) ;250
+	$$$SetHeightContent(divId,0)
 	q $$$OK
 }
 
