@@ -42,7 +42,7 @@ ClassMethod GetAllApps(opt) As %Status
 		set key="Products"
 		set opt(key,"Menu")=sideMenu
 		set opt(key)=key
-		set opt(key,"id")=key
+		set opt(key,"id")=key ; Methods must be implemented: ProductsFirstHead   ProductsResult
 		set opt(key,"TabName")=key
 		set opt(key,"ClassName")=..%ClassName(1)
 		set opt(key,"Role")="%All"
@@ -55,7 +55,7 @@ ClassMethod GetAllApps(opt) As %Status
 		set key="Options"
 		set opt(key,"Menu")=sideMenu
 		set opt(key)=key
-		set opt(key,"id")=key
+		set opt(key,"id")=key ; Methods must be implemented: OptionsFirstHead   OptionsResult
 		set opt(key,"TabName")=key
 		set opt(key,"ClassName")=..%ClassName(1)
 		set opt(key,"Role")="%All"

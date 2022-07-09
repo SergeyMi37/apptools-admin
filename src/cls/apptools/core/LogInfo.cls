@@ -87,9 +87,11 @@ ClassMethod GetInputXLSTagsVal(exportXLS, exportXLSfile, exportXLSfileEmail, SDN
 /// w ##class(apptools.core.LogInfo).SendEmail("mihaylenko_sv@server-post.ru", "Test", "Test message", "c:\temp\2019-01-16_32309.xls")
 ClassMethod SendEmail(supportemail = "", subj = "", msg = "", file = "") As %Status
 {
-		set subj=$$$aText("Server","")_" : "_$zu(110)_", "_subj
-		set text="<html><head></head><body color=greay><h4>"_$$$aText("Hello","")_"!</h4><br><br>"_$g(msg)
-		set text=text_"</body></html>"
+		
+		set text="<html><head></head><body color=greay><h4>"_subj_"</h4><br><br>"_$g(msg)
+		set subj=subj_" "_$$$aText("Server","")_" : "_$zu(110)
+		set text="<html><head></head><body color=greay><br>"_$g(msg)
+		set text=text_"<h8><br><br>"_$$$aText("Server","")_" : "_$zu(110)_"</h8></body></html>"
 		// support
 		if supportemail="" set supportemail=$$$EMAILSUPPORT		
 		set email=supportemail //only 

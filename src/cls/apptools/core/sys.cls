@@ -355,7 +355,9 @@ ClassMethod IndBuild(gn, ByRef ListFields, empty = 0, clean = 0) As %Status
 }
 
 /// Get table rows by field value
+/// s ggInc="^||tempRespInc" KILL @ggInc
 /// set Fields(2)="109-19" write ##class(apptools.core.sys).IndGetRows(gn,.Fields,.out)
+/// MERGE @ggInc=out(2) set st=##class(apptools.core.LogInfoPane).DrawSQL("r "_gn,100,$zu(5),$g(title),$g(ExecuteDraw),,,ggInc)
 ClassMethod IndGetRows(gn, ByRef FieldsValue, ByRef out) As %Status
 {
 	set i=""

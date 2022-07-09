@@ -88,7 +88,12 @@ ClassMethod OnPage(par = "") As %Status [ ServerOnly = 1 ]
 /// To global link
 ClassMethod GetGN() As %String
 {
-	quit $na(^CacheTemp.App.tmpDownloadCSP(+$h)) ;global should be available from any region
+	set gn="^CacheTemp.App.tmpDownloadCSP"
+	set i=""
+	for { set i=$o(@gn@(i)) quit:i=""
+		if i'=(+$h) kill @gn@(i) 
+	}
+	quit $na(@gn@(+$h)) ;global should be available from any region
 }
 
 /// Remove the ID for download

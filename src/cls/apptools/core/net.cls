@@ -9,21 +9,21 @@ Class apptools.core.net [ Abstract, DependsOn = apptools.core.msg ]
 ClassMethod SendFilesToEmail(subj, text, files, zip = 1, email = "") As %Status
 {
 	;send files to email
-	s f="" for { s f=$o(files(f)) q:f=""
-		s path=$p(f,$$$slash,1,*-1)
-		s file=$p(f,$$$slash,*)
+	set f="" for { s f=$o(files(f)) quit:f=""
+		set path=$p(f,$$$slash,1,*-1)
+		set file=$p(f,$$$slash,*)
 		if zip {
-			s sc=##class(apptools.core.files).zipFile(path,file,file_".zip",path)
+			set sc=##class(apptools.core.files).zipFile(path,file,file_".zip",path)
 			if sc {s file=file_".zip" 
 			}
-			i 'sc s $$$AppL("MSW","SendFilesToEmail-ErrZip")=$System.Status.GetErrorText(sc) 
+			if 'sc s $$$AppL("MSW","SendFilesToEmail-ErrZip")=$System.Status.GetErrorText(sc) 
 		}
-		s filez($i(fil),"path")=path_$$$slash
-		s filez(fil)=file
+		set filez($i(fil),"path")=path_$$$slash
+		set filez(fil)=file
 	}	
-	s sc=##class(apptools.core.LogInfo).SendEmail(email, subj, text, .filez)
-	i 'sc s $$$AppL("MSW","SendFilesToEmail-ErrSend")=$System.Status.GetErrorText(sc) 
-	q sc
+	set sc=##class(apptools.core.LogInfo).SendEmail(email, subj, text, .filez)
+	if 'sc s $$$AppL("MSW","SendFilesToEmail-ErrSend")=$System.Status.GetErrorText(sc) 
+	quit sc
 }
 
 /// To send email

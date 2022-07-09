@@ -3,7 +3,7 @@
   <Document name="apptools-admin.ZPM">
     <Module>
       <Name>apptools-admin</Name>
-      <Version>1.1.18</Version>
+      <Version>1.1.19</Version>
       <Description>Application tools for technical support and DBMS administrator. View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files</Description>
       <Packaging>module</Packaging>
   <Keywords>Application tools admin</Keywords>
@@ -55,7 +55,6 @@ Application tools for technical support and DBMS administrator. View and edit ar
 <AfterInstallMessage>
  You can load admins panel at:
 &#13; ${webroot}apptoolsrest/a/info
-&#13; ${webroot}apptools/apptools.core.LogInfo.cls
 </AfterInstallMessage>
 </Module>
 </Document>

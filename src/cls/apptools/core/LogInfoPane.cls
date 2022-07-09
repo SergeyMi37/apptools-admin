@@ -1241,6 +1241,8 @@ ClassMethod DrawSQL(SQL As %String = "", MaxNode = {$$$MAXSHOW}, NSpace = "", ms
 	}
 	elseif ($zconvert($e(SQL,1),"L")="r") {
 		set resGN=$p(SQL," ",2,99)
+		do ##class(apptools.core.sys).GetTabInfo(resGN,.info)
+		set InfoAllRows=$s($g(info("rows")):" Total lines: "_$g(info("rows")),1:"")
 		if '$d(@resGN) {
 			set msg=SQL_" "_$$$aText("Link does not exist",""),ColCount=0
 		}
@@ -1271,7 +1273,7 @@ ClassMethod DrawSQL(SQL As %String = "", MaxNode = {$$$MAXSHOW}, NSpace = "", ms
 	<h7>#($s(msg'="":msg,1:"Query: "_SQL))#</h7>
 	<table style="border-radius: 10px; border: 1px solid #72a7cf" cellpadding="2" cellspacing="0" class="DetailTable" bgcolor="#c4d6d6" width="90%">
 	<thead>
-		<tr class='trs #(hoverClass)#' >
+		<tr class='trs #(hoverClass)#' title='#($GET(InfoAllRows))#'>
 		>
 	if 'Mode write "<th width=""1%"">#</th>"
 	
@@ -1321,7 +1323,7 @@ ClassMethod DrawSQL(SQL As %String = "", MaxNode = {$$$MAXSHOW}, NSpace = "", ms
 	&html<</tbody></table>>
 	if msg=" " {}
 	else {
-		Write !,$$$aText("Number of records found","")_" :"_+$g(count)
+		Write !,$$$aText("Number of records found","")_" :"_+$g(count)_$g(InfoAllRows) ;" from "_$g(info("rows"))
 		if Execute'="" {
 			Write !,$$$aText("Contextual changes or allotments","")_" :"_+$g(countEx)
 		}

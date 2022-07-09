@@ -115,7 +115,11 @@ ClassMethod globals2xlsx(gn)
 	quit $G(stat)
 }
 
-ClassMethod gn2xlsx(gn, format = "", file As %String, title = "", patternxlsx = "")
+/// set gn="^||tmp",format="n,s150,,,,,,,,d," 
+/// set format("freeze")="B5" ;freeze
+/// d ##class(apptools.core.sys).SaveSQL("select * from apptools_core.Log order by id desc",gn)
+/// d ##class(apptools.python.xlsx).gn2xlsx(gn,format,"/backup/temp/test*.xlsx","Test")
+ClassMethod gn2xlsx(gn, format = "", file As %String, title = "", patternxlsx = "", sheetname = "")
 {
 	set st=$$$OK
 
@@ -138,30 +142,48 @@ ClassMethod gn2xlsx(gn, format = "", file As %String, title = "", patternxlsx = 
 	else {		
 		set wb = openpyxl.Workbook()
 	}
-	;set sheetname="Report"
-	set sheetname=$qs(gn,1)
+	set sheetname=$select(sheetname'="":sheetname,$qs(gn,1)'="":$qs(gn,1),1:"Report")
 	
 	#; grab the active worksheet
 	set ws = wb.active
-	set ws.title = sheetname_$g(a)
+	set ws.title = sheetname
 	set pybuiltins = $system.Python.Import("builtins")
 	set pycols = pybuiltins.list()
+	
 	;do pycols.append(" ")
 	;do ws.append(pycols)
-	set ws."__getitem__"("A1").value=title
+	;;set ws."__getitem__"("A1").value=title
+
+	set argsfont = {"color":"000000", "bold":true, "italic":false, "size":18}
+	set font = openpyxl.styles.Font(argsfont...)	
+	set cell = ws.cell(1,1)
+   	set cell.font = font
+   	set cell.value = title
+
 
 	set pycols = pybuiltins.list()
 	set (count)=0
 	set ColCount=$ll(@gn@(0))
+	set argsfill = {"start_color":"D3D3D3", "end_color":"D3D3D3", "fill_type":"solid"}
+    set fill = openpyxl.styles.PatternFill(argsfill...)	
+	set argsfont = {"color":"000000", "bold":true, "italic":false, "size":11}
+	set font = openpyxl.styles.Font(argsfont...)	
 	for i=1:1:ColCount {	
-		do pycols.append($lg(@gn@(0),i))
+		;do pycols.append($lg(@gn@(0),i))
 		set col=$C(i+64)
 		if i<27 {
-			set width=$s($P(format,",",i)="d":17,$P(format,",",i)="n":10,1:30)
+			set type=$e($P(format,",",i),1)
+			set width=+$e($P(format,",",i),2,*)
+			if 'width set width=$select(type="d":20,type="n":10,1:30)
 			set ws."column_dimensions"."__getitem__"(col).width = width
+			;cell = ws.cell(column=col, row=freezerow)
+			set cell = ws.cell(2,i)
+			set cell.fill = fill        	
+        	set cell.font = font
+        	set cell.value = $lg(@gn@(0),i)
 		}
 	}
-	do ws.append(pycols)
+	;do ws.append(pycols)
 
 	for row=1:1 {
 		quit:'$d(@gn@(row),data)
@@ -179,10 +201,21 @@ ClassMethod gn2xlsx(gn, format = "", file As %String, title = "", patternxlsx = 
 		}
 		do ws.append(pyrows)
 	}
-   ;}
+	if $g(format("freeze"))'="" {
+		; set builtins = $system.Python.Import("builtins") zwrite builtins.type(ws)  zwrite builtins.dir(wb)
+		set ws."freeze_panes" = pybuiltins.str(format("freeze")) ;format("freeze")
+		;set ws."freeze_panes" = "B2" ;format("freeze")
+	}
+	else {
+		set ws."freeze_panes" = pybuiltins.str("B2") ;default
+	}
+
+	
+    if file["*" set file=$replace(file,"*","-"_$zd($h,3)_"_"_$tr($zt($p($h,",",2),1),":"))
 	write !,"Save into "_file_" rows: "_count
 	do wb.save(file)
-	q $GET(count)
+
+	quit $GET(file)
 }
 
 /// do ##class(apptools.python.xlsx).InstallPy("openpyxl")
