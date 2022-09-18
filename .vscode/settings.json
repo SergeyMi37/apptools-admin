@@ -6,7 +6,7 @@
       },
     "objectscript.conn" :{
       "ns": "USER",
-      "active": true,
+      "active": false,
       "host": "localhost",
       "port": 52443,
       "username": "_SYSTEM",

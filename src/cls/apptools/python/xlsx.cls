@@ -37,7 +37,7 @@ ClassMethod sql2xlsx(sql, format = "", file As %String = "d:\_proj\python\sample
 	for i=1:1:ColCount {	
 		do pycols.append(myQuery.GetColumnName(i))
 		set col=$C(i+64)
-		if i<27 set ws."column_dimensions"."__getitem__"(col).width = "20"
+		;if i<27 set ws."column_dimensions"."__getitem__"(col).width = "20"
 	}
 	do ws.append(pycols)
 
@@ -175,7 +175,7 @@ ClassMethod gn2xlsx(gn, format = "", file As %String, title = "", patternxlsx = 
 			set type=$e($P(format,",",i),1)
 			set width=+$e($P(format,",",i),2,*)
 			if 'width set width=$select(type="d":20,type="n":10,1:30)
-			set ws."column_dimensions"."__getitem__"(col).width = width
+			;set ws."column_dimensions"."__getitem__"(col).width = width
 			;cell = ws.cell(column=col, row=freezerow)
 			set cell = ws.cell(2,i)
 			set cell.fill = fill        	
