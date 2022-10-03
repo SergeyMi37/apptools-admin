@@ -48,6 +48,29 @@ ClassMethod Drawcanvas(pInstance = "") As %Status [ PublicList = (nsp, what, fie
 errors
  	write !,$ze
  	quit $$$OK
+ 	/*!
+
+const labels = Utils.months({count: 7});
+const data = {
+  labels: labels,
+  datasets: [{
+    label: 'My First Dataset',
+    data: [65, 59, 80, 81, 56, 55, 40],
+    fill: false,
+    borderColor: 'rgb(75, 192, 192)',
+    tension: 0.1
+  }]
+};
+ 	
+ 	
+ * Chart.js
+ * http://chartjs.org/
+ * Version: 2.7.3
+ *
+ * Copyright 2018 Chart.js Contributors
+ * Released under the MIT license
+ * https://github.com/chartjs/Chart.js/blob/master/LICENSE.md
+ */
 }
 
 /// d ##class(apptools.Chart.ChartPanel).ColorRGBa(32,0.2)

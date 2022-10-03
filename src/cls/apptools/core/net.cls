@@ -134,6 +134,7 @@ ClassMethod GetHttp(aURL = "", aDATA, TempDir = "", tmpGN = "", user = "", pass 
 	} else {
 		s:(port="") port=80
 	}
+	 do ..SetProxy(.HttpRequest)
 	;w !,server,!,location,!,port,!,params
 	set HttpRequest.Port=port
 
@@ -212,7 +213,7 @@ ClassMethod PostHttp(ServerPort, method, user, pass, ByRef body, ByRef out) As %
 		;set ht.Port = 443
 		set ht.SSLConfiguration=..CheckSSLCertificate("DefaultSSL")
 	}
-	
+	do ..SetProxy(.ht)
 	Do ht.EntityBody.Write($g(body))
 	if $d(body)>1 s i="" f  s i=$o(body(i)) q:i=""  Do ht.EntityBody.Write(body(i))
 	
@@ -349,6 +350,7 @@ ClassMethod GetJsonURL(url As %String, ByRef object) As %Status
 	 	Set req.Https=1
 		Set req.SSLConfiguration=SSLConfig
 	}
+  	do ..SetProxy(.req)
 	set server=$p(url,"/",3)
 	if server[":" {
 		Set req.Port=$p(server,":",2)
@@ -432,6 +434,7 @@ ClassMethod loadzpm() As %Status
   set ht.Port = 443
   set ht.Https=1
   set ht.SSLConfiguration=name
+  do ..UseProxy(.ht)
   set st=ht.Get(comp("path"))
   quit:'st $System.Status.GetErrorText(st) 
   set xml=##class(%File).TempFilename("xml")
@@ -441,7 +444,26 @@ ClassMethod loadzpm() As %Status
   do ht.%Close()
   do $system.OBJ.Load(xml,"ck")
   do ##class(%File).Delete(xml)
-  quit 1
+  quit $$$OK
+}
+
+/// do ##class(apptools.core.net).SetProxy(.r)
+ClassMethod SetProxy(tRequest) As %Status
+{
+    set proxy=$System.Util.GetEnviron("https_proxy")
+    if proxy'="" {
+      Do ##class(%Net.URLParser).Parse(proxy,.pr)
+      if (tRequest.Https) {
+        set tRequest.ProxyHTTPS=1
+        set tRequest.ProxyTunnel=1
+      }
+      set tRequest.ProxyPort=pr("port")
+      set tRequest.ProxyServer=pr("host")
+      if pr("username")'="",pr("password")'="" {
+        set tRequest.ProxyAuthorization="Basic "_$system.Encryption.Base64Encode(pr("username")_":"_pr("password"))
+      }
+    }
+    quit $$$OK
 }
 
 /// Code from Robert Cemper https://github.com/rcemper/Zpipe
@@ -468,6 +490,13 @@ cls ;
  close dev 
  if $ze'["<ENDOFFILE>" w $ze,!
  quit $t
+}
+
+/// install ZPM with proxy. You can call this, or copy the line
+/// modified Sergey Mikhaylenko
+ClassMethod InstallZPMproxy()
+{
+    s r=##class(%Net.HttpRequest).%New(),proxy=$System.Util.GetEnviron("https_proxy") Do ##class(%Net.URLParser).Parse(proxy,.pr) s:$d(pr) r.ProxyHTTPS=1,r.ProxyTunnel=1,r.ProxyPort=pr("port"),r.ProxyServer=pr("host") s:pr("username")'=""&&(pr("password")'="") r.ProxyAuthorization="Basic "_$system.Encryption.Base64Encode(pr("username")_":"_pr("password")) set r.Server="pm.community.intersystems.com",r.SSLConfiguration="ISC.FeatureTracker.SSL.Config" d r.Get("/packages/zpm/latest/installer"),$system.OBJ.LoadStream(r.HttpResponse.Data,"c")
 }
 
 }

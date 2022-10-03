@@ -48,13 +48,33 @@ ClassMethod GetMonth(h) As %String
 }
 
 /// Translate YYYY-MM-DD HH:MM:SS in $HOROLOG
-/// w ##class(apptools.core.type).GetHorYYYYMMDD("2018-07-06 08:14:47")
+/// write ##class(apptools.core.type).GetHorYYYYMMDD("2018-07-06 08:14:47")
+/// write ##class(apptools.core.type).GetHorYYYYMMDD("06.07.2018 08:14:47")
 ClassMethod GetHorYYYYMMDD(dt) As %String
 {
 	try{ 
-		s d=$zdh($p(dt," "),3)
-		s c=$zth($p(dt," ",2),1)
+		s d=$p(dt," ")
+		set:d["." d=$p(d,".",3)_"-"_$p(d,".",2)_"-"_$p(d,".",1)
+		s d=$zdh($p(d," "),3)
+		;s c=$zth($p(dt," ",2),1)
+		set c=$s($p(dt," ",2)="":0,1:$zth($p(dt," ",2),1))
 		s res=d_","_c
+	}
+	catch e { s res="" }
+	q $g(res)
+}
+
+/// Translate DD.MM.YYYY in $HOROLOG
+/// write ##class(apptools.core.type).GetHorDDMMYYYY("06.07.2018 08:14:47")
+/// write ##class(apptools.core.type).GetHorDDMMYYYY("2018-07-06 08:14:47")
+ClassMethod GetHorDDMMYYYY(dt) As %String
+{
+	try{ 
+		set c=$s($p(dt," ",2)="":0,1:$zth($p(dt," ",2),1))
+		set d=$p(dt," ")
+		set:d["." dt=$p(d,".",3)_"-"_$p(d,".",2)_"-"_$p(d,".",1)
+		set d=$zdh($p(dt," "),3)
+		set res=d_","_c
 	}
 	catch e { s res="" }
 	q $g(res)

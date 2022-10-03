@@ -65,38 +65,15 @@ ClassMethod GetAllApps(opt) As %Status
 		set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
 		set opt(key,"Active")=0 ;active menu item
 
-	 do ##class(apptools.lte.resources).GetZpmNamespaces(.List,"fileserver",.firstnamespace)
-	  if $D(List("fileserver")) {
-		set ns=$G(firstnamespace) ;$O(List("fileserver",""))
-		set key="File"
-		set opt(key,"Menu")=sideMenu
-		set opt(key)="File-server"
-		set opt(key,"Namespace")=ns
-		set opt(key,"id")=key
-		set opt(key,"TabName")="File-server"
+		set key="FilesServ"
+		set opt(key)="FilesServ"
+		set opt(key,"id")="FS"
+		set opt(key,"TabName")=opt(key)
 		set opt(key,"ClassName")=..%ClassName(1)
-		set opt(key,"Role")="%All"
-		;set opt(key,"MethodUrlNewWin")="/fileserver/files"
-		set opt(key,"Method")="ShowInIFrame" 
-		set opt(key,"InFrameUrl")="/fileserver/files"
-		set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
-		set opt(key,"Active")=0 ;active menu item
-     }	
-     do ##class(apptools.lte.resources).GetZpmNamespaces(.List,"appmsw-files-download",.firstnamespace)
-	 if $D(List("appmsw-files-download")) {
-		set key="FilesDownload"
+		set opt(key,"Method")="ShowTabSample"
+		set opt(key,"TabMenu","Close")=1
 		set opt(key,"Menu")=sideMenu
-		set opt(key)="Files-Download"
-		set opt(key,"Namespace")=$G(firstnamespace)
-		set opt(key,"id")=key
-		set opt(key,"TabName")="Files-Download"
-		set opt(key,"ClassName")="appmsw.filesdownload"
-		;set opt(key,"Role")="%All"
-		;set opt(key,"MethodUrlNewWin")="/fileserver/files"
-		set opt(key,"Method")="ShowTabLte" 
 		set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
-		set opt(key,"Active")=0 ;active menu item
-     }	
 
 	set sideMenuName="Namespaces",
 		sideMenuNumer=3,
@@ -214,6 +191,13 @@ ClassMethod GetAllApps(opt) As %Status
 	
 	do ..CheckRoleMenu(.opt)
 	quit $$$OK
+}
+
+/// fileserver
+/// do ##class(apptools.lte.fileserver).AddRecord($namespace, $username, guidPacket, filename, "desc", "proj")
+ClassMethod FSFirstHead(Par = "") As %Status
+{
+	do ##class(apptools.lte.fileserver).FirstHead(.Par)
 }
 
 ClassMethod OptionsFirstHead(Par = "") As %Status

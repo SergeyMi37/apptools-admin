@@ -36,8 +36,8 @@ ClassMethod sql2xlsx(sql, format = "", file As %String = "d:\_proj\python\sample
 	set ColCount=myQuery.GetColumnCount()
 	for i=1:1:ColCount {	
 		do pycols.append(myQuery.GetColumnName(i))
-		set col=$C(i+64)
-		;if i<27 set ws."column_dimensions"."__getitem__"(col).width = "20"
+		set col=openpyxl.utils."get_column_letter"(i)
+		set ws."column_dimensions"."__getitem__"(col).width = "20"
 	}
 	do ws.append(pycols)
 
@@ -49,7 +49,10 @@ ClassMethod sql2xlsx(sql, format = "", file As %String = "d:\_proj\python\sample
 			if $P(format,",",ii)="d" { //date
 				set val=..ToPyDate(val)
 			}
-			if $P(format,",",ii)="n" { //number
+			elseif $P(format,",",ii)="dt" { //datetime
+				set val=..ToPyDateTime(val)
+			}
+			elseif $P(format,",",ii)="n" { //number
 				set val=+val
 			}
 			do pyrows.append(val)
@@ -115,11 +118,21 @@ ClassMethod globals2xlsx(gn)
 	quit $G(stat)
 }
 
+/// d ##class(apptools.python.xlsx).testgn2xlsx()
+ClassMethod testgn2xlsx() As %Status
+{
+ set gn="^||tmp",format="n,s150,,,,,,,,d," 
+ set format("freeze")="B3" ;freeze
+ do ##class(apptools.core.sys).SaveSQL("select * from apptools_core.Log order by id desc",gn)
+ set exec="##class(apptools.python.xlsx).MarkRed(.%AppLogInfoVal, %AppLogInfoCol, %AppLogInfoHead, .%AppLogInfoTemp)"
+ do ##class(apptools.python.xlsx).gn2xlsx(gn,.format,"/backup/temp/test*.xlsx","Test",,,,exec)
+}
+
 /// set gn="^||tmp",format="n,s150,,,,,,,,d," 
 /// set format("freeze")="B5" ;freeze
 /// d ##class(apptools.core.sys).SaveSQL("select * from apptools_core.Log order by id desc",gn)
-/// d ##class(apptools.python.xlsx).gn2xlsx(gn,format,"/backup/temp/test*.xlsx","Test")
-ClassMethod gn2xlsx(gn, format = "", file As %String, title = "", patternxlsx = "", sheetname = "")
+/// d ##class(apptools.python.xlsx).gn2xlsx(gn,.format,"/backup/temp/test*.xlsx","Test")
+ClassMethod gn2xlsx(gn, ByRef format = "", file As %String, title = "", patternxlsx = "", sheetname = "", ByRef info, Execute = "") As %Status
 {
 	set st=$$$OK
 
@@ -167,39 +180,109 @@ ClassMethod gn2xlsx(gn, format = "", file As %String, title = "", patternxlsx = 
 	set argsfill = {"start_color":"D3D3D3", "end_color":"D3D3D3", "fill_type":"solid"}
     set fill = openpyxl.styles.PatternFill(argsfill...)	
 	set argsfont = {"color":"000000", "bold":true, "italic":false, "size":11}
-	set font = openpyxl.styles.Font(argsfont...)	
+	set font = openpyxl.styles.Font(argsfont...)
+	set argside1 = {"style":"dotted","color":"000000"}
+	set argside2 = {"style":"thin","color":"000000"}
+	;set side1 = openpyxl.styles.Side(argside1...)
+	set side2 = openpyxl.styles.Side(argside2...)
+	set argbord = {"left":"","right":"","top":"","bottom":""}
+	set argbord.left=side2
+	set argbord.right=side2
+	set argbord.top=side2
+	set argbord.bottom=side2
+	set Bord = openpyxl.styles.Border(argbord...)
+	;set argalignment = {"horizontal":"center","vertical":"center","text_rotation":45} wrapText=True
+	set argalignment = {"horizontal":"center","vertical":"center","wrapText":true}
+	set Alig = openpyxl.styles.Alignment(argalignment...)	
+	set %AppLogInfoHead=1 //Processing title
+	if Execute'="" set %AppLogInfoTemp=openpyxl
 	for i=1:1:ColCount {	
-		;do pycols.append($lg(@gn@(0),i))
-		set col=$C(i+64)
-		if i<27 {
-			set type=$e($P(format,",",i),1)
-			set width=+$e($P(format,",",i),2,*)
-			if 'width set width=$select(type="d":20,type="n":10,1:30)
-			;set ws."column_dimensions"."__getitem__"(col).width = width
-			;cell = ws.cell(column=col, row=freezerow)
-			set cell = ws.cell(2,i)
-			set cell.fill = fill        	
-        	set cell.font = font
-        	set cell.value = $lg(@gn@(0),i)
+		set %AppLogInfoCol=i
+		set col=openpyxl.utils."get_column_letter"(i)
+		set type=$e($P(format,",",i),1)
+		set width=+$e($P(format,",",i),2,*)
+		if 'width set width=$select(type="d":20,type="n":10,1:30)
+		set ws."column_dimensions"."__getitem__"(col).width = width
+		;sheet.row_dimensions[1].height = 30
+		set ws."row_dimensions"."__getitem__"(2).height = 40
+		;cell = ws.cell(column=col, row=freezerow)
+		set cell = ws.cell(2,i)
+		set cell.fill = fill        	
+    	set cell.font = font
+    	set cell.value = $lg(@gn@(0),i)
+    	set cell.alignment = Alig
+    	set cell.border = Bord
+		if Execute'="" {
+			set %AppLogInfoVal=cell
+			try {
+				xecute "set %AppLogInfoVal2="_Execute
+				if %AppLogInfoVal'=%AppLogInfoVal2 set countEx=$g(countEx)+1
+				set %AppLogInfoVal=%AppLogInfoVal2
+			}
+			catch e {
+				set %AppLogInfoVal.value=$ze
+				}
 		}
+
 	}
 	;do ws.append(pycols)
-
+	set %AppLogInfoHead=0 //We process lines
 	for row=1:1 {
 		quit:'$d(@gn@(row),data)
 		set count=count+1
-		set pyrows = pybuiltins.list()
+		;set pyrows = pybuiltins.list()
 		for ii=1:1:ColCount {
+			set %AppLogInfoCol=ii
 			set val=..CleanCtrl($lg(data,ii))
-			if $P(format,",",ii)="d",val'="" { //date
+			;if $P(format,",",ii)="d",val'="" { //date
+			;	set val=..ToPyDate(val)
+			;}
+			;if $P(format,",",ii)="n" { //number
+			;	set val=+val
+			;}
+			
+			if $P(format,",",ii)="d" { //date
 				set val=..ToPyDate(val)
 			}
-			if $P(format,",",ii)="n" { //number
+			elseif $P(format,",",ii)="dt" { //datetime
+				set val=..ToPyDateTime(val)
+			}
+			elseif $P(format,",",ii)="n" { //number
 				set val=+val
 			}
-			do pyrows.append(val)
+			
+			set cell = ws.cell(row+2,ii)
+			set cell.value=val
+			;set ws.cell(row+2,ii).value=val
+			;do pyrows.append(val)
+			if Execute'="" {
+				set %AppLogInfoVal=cell
+				try {
+					xecute "set %AppLogInfoVal2="_Execute
+					if %AppLogInfoVal'=%AppLogInfoVal2 set countEx=$g(countEx)+1
+					set %AppLogInfoVal=%AppLogInfoVal2
+				}
+				catch e {
+					set %AppLogInfoVal.value=$ze
+				}
+			}
+
 		}
-		do ws.append(pyrows)
+		;do ws.append(pyrows)
+	}
+	if $DATA(format("last-line")) {
+		set backgcolor=$g(format("last-line","backgcolor"),"D3D3D3")
+		set argsfill = {"start_color":"D3D3D3", "end_color":"D3D3D3", "fill_type":"solid"}
+		set argsfill."start_color"=backgcolor
+		set argsfill."end_color"=backgcolor
+		set fill = openpyxl.styles.PatternFill(argsfill...)	
+		for i=1:1:ColCount {	
+			set cell = ws.cell(row+1,i)
+			set cell.fill = fill        	
+        	set cell.font = font
+        	set cell.alignment = Alig
+        	set cell.border = Bord
+		}
 	}
 	if $g(format("freeze"))'="" {
 		; set builtins = $system.Python.Import("builtins") zwrite builtins.type(ws)  zwrite builtins.dir(wb)
@@ -209,13 +292,39 @@ ClassMethod gn2xlsx(gn, format = "", file As %String, title = "", patternxlsx = 
 	else {
 		set ws."freeze_panes" = pybuiltins.str("B2") ;default
 	}
+	set info("infilename")=file
+	merge info("format")=format
+	set outfile=file
+    if file["*" set outfile=$replace(file,"*","-"_$zd($h,3)_"_"_$tr($zt($p($h,",",2),1),":"))
+	write !,"Save into "_outfile_" rows: "_count
+	set info("rows")=count
+	do wb.save(outfile)
+	set info("outfilename")=outfile
+	quit $$$OK
+}
 
-	
-    if file["*" set file=$replace(file,"*","-"_$zd($h,3)_"_"_$tr($zt($p($h,",",2),1),":"))
-	write !,"Save into "_file_" rows: "_count
-	do wb.save(file)
-
-	quit $GET(file)
+/// Example coloring 4 column values if 0 is contained
+///  set exec="##class(apptools.python.xlsx).MarkRed(.%AppLogInfoVal, %AppLogInfoCol, %AppLogInfoHead, .%AppLogInfoTemp)"
+ClassMethod MarkRed(Val, Col, Head, openpyxl)
+{
+	s res=Val
+	if $g(Head) {
+		;i $g(Val)="ColomName" s Temp("ColomName ",Col)=""
+	}
+	else {
+		if Col=4 {
+			if res.value["0" {
+				;set argsfill = {"start_color":"D3D3D3", "end_color":"D3D3D3", "fill_type":"solid"}
+    			;set fill = openpyxl.styles.PatternFill(argsfill...)	
+				set argsfont = {"color":"DC143C", "bold":true, "italic":false, "size":11} ;color Crimson
+				set font = openpyxl.styles.Font(argsfont...)
+				;set res.value=$FN(res.value,"",2)
+				;set res.fill=fill
+				set res.font=font
+			}
+		}
+	}
+	q res
 }
 
 /// do ##class(apptools.python.xlsx).InstallPy("openpyxl")
@@ -232,18 +341,110 @@ ClassMethod InstallPy(lib)
     quit $$$OK
 }
 
-/// Date YYYY-MM-DD to Python dt.datetime
-ClassMethod ToPyDate(val, ByRef dt)
+/// Date YYYY-MM-DD HH:MM:SS to Python dt.datetime
+ClassMethod ToPyDateTime(val, ByRef dt)
 {
+	quit:'val val
+	if val["." set val=$p(val,".",3)_"-"_$p(val,".",2)_"-"_$p(val,".",1) // format YYYY-MM-DD
 	if val'["-" set val=$zd(+val,3) // $h format
 	set dt = ##class(%SYS.Python).Import("datetime")
 	set val=dt.datetime(+$p(val,"-",1), +$p(val,"-",2), +$p($p(val,"-",3)," "),+$p($p(val,":",1)," ",2),+$p($p(val,":",2)," ",2),+$p($p(val,":",3)," ",2))
 	quit val
 }
 
+/// Date YYYY-MM-DD to Python dt.date
+ClassMethod ToPyDate(val, ByRef dt)
+{
+	quit:'val val
+	if val["." set val=$p(val,".",3)_"-"_$p(val,".",2)_"-"_$p(val,".",1) // format YYYY-MM-DD
+	if val'["-" set val=$zd(+val,3) // $h format
+	set dt = ##class(%SYS.Python).Import("datetime")
+	set val=dt.date(+$p(val,"-",1), +$p(val,"-",2), +$p($p(val,"-",3)," "))
+	quit val
+}
+
 ClassMethod CleanCtrl(val)
 {
 	quit $zstrip(val,"*C")
+}
+
+/// d ##class(apptools.python.xlsx).testxlsx2gn()
+ClassMethod testxlsx2gn() As %Status
+{
+  set gn="^tmpXlsXread"
+  set info("fields-name-rowcol")="3,1"
+  set st=##class(apptools.python.xlsx).xlsx2gn("/backup/temp/2022-07-18_182506_=16348=MBK_Otcet_dlz_peredaci_potrebn.xlsx",gn,.info)
+  if 'st write $System.Status.GetErrorText(st) quit
+  zw @gn
+}
+
+/// d ##class(apptools.python.xlsx).xlsx2gn("/backup/temp/test.xlsx","^||tmp",.info)
+ClassMethod xlsx2gn(filename As %String, gn, ByRef info) As %Status
+{
+	set st=$$$OK
+	try {
+        set openpyxl = ##class(%SYS.Python).Import("openpyxl") 
+    } catch err {
+        do ..InstallPy("openpyxl")
+        set openpyxl = ##class(%SYS.Python).Import("openpyxl")
+    }
+
+	if filename'="" {
+	try {
+			set wb = openpyxl."load_workbook"(filename)
+			set st=..xlsx2gnrun(gn,.wb,.info)
+		} catch err {
+			set st = $$$ERROR($$$GeneralError,"Error open filename "_filename)
+		}
+
+	}
+	else {		
+		quit $$$ERROR($$$GeneralError,"Is empty filename")
+	}
+	quit st
+}
+
+ClassMethod xlsx2gnrun(gn, wb, ByRef info) As %Status
+{
+	set st=$$$OK
+	set startrow=1
+	set startcol=1
+	set pybuiltins = $system.Python.Import("builtins")
+	set sheet = wb.active
+	set maxcols=sheet."max_column"
+	set maxrows=sheet."max_row"
+	kill @gn
+	try {
+		if $DATA(info("fields-name-rowcol"),rowcol) {
+			set row=$p(rowcol,",")
+			set col=$p(rowcol,",",2)
+			set list=""
+			for ii=col:1:maxcols {
+				set cell = sheet.cell(+row,+ii)
+				set value=pybuiltins.str(cell.value)
+				set list=list_$lb(value)
+				if value="" set value=" "
+				set @gn@(-1,value)=ii
+			}
+			set @gn@(0)=list
+			set startrow=row+1
+			set startcol=col
+		}
+		for i=startrow:1:maxrows {
+			set list=""
+			for ii=startcol:1:maxcols {
+				set cell = sheet.cell(i,ii)
+				set value=pybuiltins.str(cell.value)
+				set list=list_$lb(value)
+			}
+			set @gn@(i)=list
+		}
+	}
+	catch ex { 
+		Set st = $g(%objlasterror, $$$OK)
+   		Set st = $$$ADDSC(st, ex.AsStatus())
+	}
+	quit st
 }
 
 }

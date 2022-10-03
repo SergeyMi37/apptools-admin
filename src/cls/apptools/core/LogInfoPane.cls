@@ -49,6 +49,12 @@ ClassMethod AddJsScripts(mode)
 	}
 }
 
+/// write ##class(apptools.core.LogInfoPane).GetCopyToClipboard(text,id="g2",color="Lightgreen")
+ClassMethod GetCopyToClipboard(text, id = "g2", color = "Lightgreen")
+{
+ 	quit "<span title='Click to Clipboard' style='color:"_color_"; cursor:hand' id="_id_" onclick=""copyToClipboard('"_id_"'); "" >"_text_"</span>"
+}
+
 /// add javascript
 /// /// /*! \example do ##class(apptools.core.LogInfoPane).AddJScopyToClipboard()*/
 ClassMethod AddJScopyToClipboard()
@@ -441,6 +447,7 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 		<tr>
 			<td>
 				#(selectNS)# #(selectDSN)# 
+				 | <a name='Gateways' href='#("/csp/sys/mgr/UtilSqlGateways.csp"_"")#' id='Gateways'>Gateways</a>
 				 | <a name='Hist' href='#("apptools.core.LogInfo.cls?NSP="_$Namespace_"&Next=-1&WHAT="_$zconvert($$$HISTORYGN,"O","URL")_"")#' id='Hist'>#($$$aText("History",""))#</a>
 				 | <a target='Explore' name='Explore' href='#("apptools.Form.Exp.cls?NSP="_$Namespace)#' id='Explorer'>#($$$aText("Selection Classes",""))#</a>
 				 | <a target='ExploreTab' name='ExploreTab' href='#("apptools.Form.Exp.cls?panel=AccordionExp&NSP="_$Namespace)#'  id='ExplorerTab'>#($$$aText("Explorer tables",""))#</a>

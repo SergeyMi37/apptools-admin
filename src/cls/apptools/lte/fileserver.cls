@@ -26,6 +26,12 @@ Property Filename As %String(MAXLEN = "");
 /// PathFilename
 Property PathFilename As %String(MAXLEN = "");
 
+/// Application
+Property App As %String(MAXLEN = "");
+
+/// Size
+Property Size As %String(MAXLEN = "");
+
 /// Description
 Property Description As %String(MAXLEN = "");
 
@@ -36,6 +42,10 @@ Property TimeStamp As %TimeStamp [ InitialExpression = {$zdt($h, 3, 1)} ];
 Property ClientIPAddress As %String(MAXLEN = 32) [ InitialExpression = {..GetClientAddress()} ];
 
 Index idxNamespace On Namespace [ Type = bitmap ];
+
+Index idxSize On Size [ Type = bitmap ];
+
+Index idxApp On App [ Type = bitmap ];
 
 Index idxUserName On UserName [ Type = bitmap ];
 
@@ -60,8 +70,8 @@ ClassMethod GetClientAddress()
 }
 
 /// select * from apptools_lte.fileserver
-/// Example do ##class(apptools.lte.fileserver).AddRecord($namespace, $username, "everything", "INFO", "actions")
-ClassMethod AddRecord(Namespace As %String = "", UserName As %String = "", Filename As %String = "", PathFilename As %String = "", Description As %String = "")
+/// Example do ##class(apptools.lte.fileserver).AddRecord($namespace, $username, "file.xml", "/backup/temp/file.xml", "Description file","app")
+ClassMethod AddRecord(Namespace As %String = "", UserName As %String = "", Filename As %String = "", PathFilename As %String = "", Description As %String = "", app = "", size = "")
 {
 	new $namespace
 	try {
@@ -72,6 +82,12 @@ ClassMethod AddRecord(Namespace As %String = "", UserName As %String = "", Filen
 		Set record.Filename = Filename
 		Set record.PathFilename = PathFilename
 		Set record.Description = Description
+		Set record.App = app
+		if '$g(size),##class(%File).Exists(PathFilename) {
+			Set file=##class(%File).%New(PathFilename)
+			set size=file.Size
+		}
+		Set record.Size = size
 		;zw record
 		set sc=record.%Save()
 		set:sc sc=record.%Id()
@@ -102,8 +118,9 @@ ClassMethod FirstHead(Par = "") As %Status
 	do ##class(apptools.core.Form).BlockUI(0)
 	set key=Par("key")
 	set divId=Par("divId")
+	set app=$G(Par("app"))
 	set %ui=1
-	set onclick=$$$blockui("Wait...")_";"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainContent",..%ClassName(1),divId_"Result","~key="_key_"~divId="_divId_"~mode=*")
+	set onclick=$$$blockui("Wait...")_";"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainContent",..%ClassName(1),divId_"Result","~key="_key_"~divId="_divId_"~app="_app_"~mode=*")
 	s dataFrom=$zd($h,3) ;##class(apptools.core.type).GetYear($h-30)_"-"_##class(apptools.core.type).GetMonth($h-30)_"-01"
 	s dataTo=$zd($h+1,3) ;##class(apptools.core.type).GetYear($h)_"-12-31"
 	;if $roles["%All" set ButtDel=$$$appButton(divId_"appButtonClenResult"," title='Delete files' onclick="""_$replace(onclick,"*","del")_"""","delete")
@@ -123,19 +140,21 @@ ClassMethod FirstHead(Par = "") As %Status
 		</tr>
 		</table>
 	>
-	$$$SetHeightContent(divId,0)
+	$$$SetHeightContent(divId,250)
 	quit $$$OK
 }
 
 /// Файлы отчета админа
 ClassMethod AFSResult(Par = "") As %Status
 {
+	set app=$g(Par("app"))
 	do ##class(apptools.lte.fileserver).Result(.Par)
 }
 
 /// Файлы
 ClassMethod FSResult(Par = "") As %Status
 {
+	set app=$g(Par("app"))
 	do ##class(apptools.lte.fileserver).Result(.Par)
 }
 
@@ -145,11 +164,18 @@ ClassMethod Result(Par = "") As %Status
 	set key=Par("key")
 	set divId=Par("divId")
 	set mode=Par("mode")
+	set app=$g(Par("app"))
 	set GN=..#GNStore
 	set fromDate=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"fromDate")	
 	set toDate=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"toDate")	
-	set sql="select Filename, PathFilename, TimeStamp, UserName,Namespace from apptools_lte.fileserver where TimeStamp >='"_fromDate_"' and TimeStamp <='"_toDate_"' "
-	if $roles'["%All" set sql=sql_" and UserName='"_$UserName_"'"
+	set sql="select Filename, PathFilename, TimeStamp, UserName, Namespace, App from apptools_lte.fileserver where TimeStamp >='"_fromDate_"' and TimeStamp <='"_toDate_"' "
+	if $roles'["%All" {
+		set sql=sql_" and UserName='"_$UserName_"'"
+	}
+	else {
+		set sql=$replace(sql,", App",", App, Size as SizeByte, PathFilename as Path")
+	}
+	if app'="" set sql=sql_" and App='"_app_"'"
 	set sql=sql_" order by id desc"
 	set %ui=1
 	if mode="find" {
@@ -216,6 +242,12 @@ Storage Default
 </Value>
 <Value name="8">
 <Value>ClientIPAddress</Value>
+</Value>
+<Value name="9">
+<Value>App</Value>
+</Value>
+<Value name="10">
+<Value>Size</Value>
 </Value>
 </Data>
 <DataLocation>^apptools.lte.fileserverD</DataLocation>
