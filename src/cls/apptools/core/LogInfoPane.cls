@@ -1423,7 +1423,7 @@ ClassMethod GetValueObj(obj, in, out)
 /// /*! \brief Parse class description into methods and properties
 /// <br>\ingroup class_definition
 /// \example d ##class(apptools.core.LogInfoPane).GetClassDef("utils.Log","",.out) */
-ClassMethod GetClassDef(aClassName As %String = "", doc, ByRef out, inSuper = 1)
+ClassMethod GetClassDef(aClassName As %String = "", doc, ByRef out, inSuper = 1, mode = "1111")
 {
 	if $g(doc)'="", $isobject(doc) set aClassName=doc.%ClassName(1)
 	set classDefinition=##class(%Dictionary.ClassDefinition).%OpenId(aClassName)
@@ -1442,17 +1442,8 @@ ClassMethod GetClassDef(aClassName As %String = "", doc, ByRef out, inSuper = 1)
 			}
 		}
 	}
-	// description of methods
-	if (classDefinition.Methods.Count()>0) {
-		set key=""
-		while(1) {
-			set methodDefinition=classDefinition.Methods.GetNext(.key)
-			quit:(key="")
-			set out("Methods",methodDefinition.Name,"Description")=methodDefinition.Description
-		} 
-	}
 	// Property descriptions
-	if (classDefinition.Properties.Count()>0) {
+	if $e(mode,1),(classDefinition.Properties.Count()>0) {
 		set key=""
 		while(1) {
 			set propertyDefinition=classDefinition.Properties.GetNext(.key)
@@ -1465,8 +1456,17 @@ ClassMethod GetClassDef(aClassName As %String = "", doc, ByRef out, inSuper = 1)
 			set out("Properties",propertyDefinition.Name,"Parameters")=$$$AppObJs(propertyDefinition.Parameters)
 		}
 	}
+	// description of methods
+	if $e(mode,2),(classDefinition.Methods.Count()>0) {
+		set key=""
+		while(1) {
+			set methodDefinition=classDefinition.Methods.GetNext(.key)
+			quit:(key="")
+			set out("Methods",methodDefinition.Name,"Description")=methodDefinition.Description
+		} 
+	}
 	// Parameter Descriptions
-	if (classDefinition.Parameters.Count()>0) {
+	if $e(mode,3),(classDefinition.Parameters.Count()>0) {
 		set key=""
 		while(1) {
 			set parameterDefinition=classDefinition.Parameters.GetNext(.key)
@@ -1475,7 +1475,16 @@ ClassMethod GetClassDef(aClassName As %String = "", doc, ByRef out, inSuper = 1)
 			set out("Parameters",parameterDefinition.Name,"Default")=parameterDefinition.Default
 		}
 	}
-	q $$$OK
+	// DataLocation 
+	if $e(mode,4),(classDefinition.Storages.Count()>0) {
+		set key=""
+		while(1) {
+			set StorageDefinition=classDefinition.Storages.GetNext(.key)
+			quit:(key="")
+			set out("Storages",StorageDefinition.Name,"Description")=StorageDefinition.Description
+			set out("Storages",StorageDefinition.Name,"DataLocation")=StorageDefinition.DataLocation
+		}
+	}	quit $$$OK
 }
 
 ///  d ##class(apptools.core.LogInfoPane).GetSysinfo()

@@ -146,8 +146,24 @@ ClassMethod SerializeObject(Object, gn = "", mode = "") As %String
 	Return ..WriteJSONFromObject(Object)
 }
 
+/// w ##class(apptools.core.Log).WriteJSONFromSQL("select * FROM %Library.sys_SQLConnection WHERE Connection_Name='postgres'")
+ClassMethod WriteJSONFromSQL(sql As %String) As %Status
+{
+	#dim sc As %Status = $$$OK
+	set provider = ##class(%ZEN.Auxiliary.altJSONSQLProvider).%New()
+	set provider.maxRows = $$$MaxCacheInt
+	set provider.%Format = $$$formatJSONSQL
+	set provider.sql = sql
+	if $isobject($g(%request)) {
+		set provider.pageSize = %request.Get("size", 25)
+		set provider.currPage = %request.Get("page", 1)
+	}
+	set sc = provider.%DrawJSON()
+	return sc
+}
+
 /// w ##class(apptools.core.Log).WriteJSONFromObject(b) ;format As %String = "aeos" ;aceloqtw
-ClassMethod WriteJSONFromObject(obj, format As %String = "tw") As %String [ ProcedureBlock = 0 ]
+ClassMethod WriteJSONFromObject(obj, format As %String = "tw", alt = 1) As %String [ ProcedureBlock = 0 ]
 {
     set tOldIORedirected = ##class(%Device).ReDirectIO()
     set tOldMnemonic = ##class(%Device).GetMnemonicRoutine()
@@ -157,13 +173,14 @@ ClassMethod WriteJSONFromObject(obj, format As %String = "tw") As %String [ Proc
         use $io::("^" _ $ZNAME)
         do ##class(%Device).ReDirectIO(1)
 		if $$$IsNewJSON {
-			set jsobj = ##class(%ZEN.Auxiliary.altJSONProvider).%ObjectToAET(obj,,format)
+			if alt {set jsobj = ##class(%ZEN.Auxiliary.altJSONProvider).%ObjectToAET(obj,,format)}
+			else {set jsobj = ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToAET(obj,,format)}
 			;write jsobj.%ToJSON()
         	set formatter = ##class(%JSON.Formatter).%New()
         	set sc = formatter.Format(jsobj)
 		} else {
-        	;do ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(obj,,,format)
-        	do ##class(%ZEN.Auxiliary.altJSONProvider).%ObjectToJSON(obj,,,format)
+        	if alt {do ##class(%ZEN.Auxiliary.altJSONProvider).%ObjectToJSON(obj,,,format)}
+        	else {do ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(obj,,,format)}
 		}
 
     } catch ex {
