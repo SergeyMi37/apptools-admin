@@ -120,7 +120,7 @@ ClassMethod ExportSQLConnection(targetdir = "", ByRef json, exec = "") As %Statu
 		}
 	}
 	set sql=$replace(sql,"(1=1)","Connection_Name in ("_$e(in,1,*-1)_")")
-	set st=##class(apptools.core.json).ExportClassInstances("%Library.SQLConnection",sql,targetdir_"gateways.json",.json,$g(exec))
+	set st=##class(apptools.core.json).ExportClassInstances("%Library.SQLConnection",sql,tTargetDir_"gateways.json",.json,$g(exec))
 	set xml = ##class(apptools.core.rest).getStatic("apptools.core.jdbc:module")
 	set namezpm="appmsw-gateway-"_$s(numbers=numb:"sql",1:$tr(filename,".","-"))
 	set xml = $replace(xml,"*name",namezpm)
