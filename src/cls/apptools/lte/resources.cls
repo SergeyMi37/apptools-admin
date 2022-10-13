@@ -497,6 +497,24 @@ ClassMethod GetZPMRepo(List, FindMask = "") As %Status
 	quit $$$OK
 }
 
+/// Get List Modules
+/// example d ##class(apptools.lte.resources).GetListModules("zpm",.list)
+ClassMethod GetListModules(StartsWith As %String = "", ByRef pList) [ Internal ]
+{
+	Set tQuery = "select Name,VersionString,Description,ExternalName from %ZPM_PackageManager_Developer.""MODULE"""
+	If StartsWith'="" { Set tRes = ##class(%SQL.Statement).%ExecDirect(,tQuery_ " where name %StartsWith ?",StartsWith) }
+	Else { Set tRes = ##class(%SQL.Statement).%ExecDirect(,tQuery)}
+	If (tRes.%SQLCODE < 0) {
+		Throw ##class(%Exception.SQL).CreateFromSQLCODE(tRes.%SQLCODE,tRes.%Message)
+	}
+	While tRes.%Next(.tSC) {
+		$$$ThrowOnError(tSC)
+		Set pList(tRes.%Get("Name"))=$lb(tRes.%Get("VersionString"),tRes.%Get("Description"),tRes.%Get("ExternalName"))
+		Set:$G(maxlen)<$L(tRes.%Get("Name")) maxlen=$L(tRes.%Get("Name"))
+	}
+	Set:$D(pList) pList=$G(maxlen)
+}
+
 /// Get modules in Namespaces current instance
 /// do ##class(apptools.lte.resources).GetZpmNamespaces(.List)
 ClassMethod GetZpmNamespaces(ByRef out, text = "", ByRef nspace)
@@ -508,7 +526,7 @@ ClassMethod GetZpmNamespaces(ByRef out, text = "", ByRef nspace)
 	For { set ns=$Order(namespace(ns)) Quit:ns=""
 		Set $Namespace=ns
 		Kill list
-		Do ##class(%ZPM.PackageManager).GetListModules("",.list)
+		Do ..GetListModules("",.list)
 		;w !,ns zw list
 		If $D(list) {
 			Set module=""
