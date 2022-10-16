@@ -31,11 +31,17 @@ ClassMethod SQLForPublicRegistry(%appTmp) As %Status
 		if %appClassPropVal["jdbc:sqlserver://" set %appClassPropVal="jdbc:sqlserver://ip address:port;databaseName=default_db"
 		if %appClassPropVal["jdbc:oracle:" set %appClassPropVal="jdbc:oracle:thin:@(DESCRIPTION_...)"
 		if %appClassPropVal["jdbc:mysql://" set %appClassPropVal="jdbc:mysql://ip address:port/databaseName?serverTimezone=UTC"
+		if %appClassPropVal["jdbc:postgresql://" set %appClassPropVal="jdbc:postgresql://postgres:5432/"
 	}
-	if %appClassProp="Name" set %appClassPropVal="Default_Name_SQLConnection"
+	if %appClassProp="Name" set %appClassPropVal="NameConnection"_$$GetDbName()_$i(%appInc)
 	if %appClassProp="pwd" set %appClassPropVal=""
-	if %appClassProp="Usr" set %appClassPropVal="Default_DB_UserName"
-	quit $$$OK
+	if %appClassProp="Usr" set %appClassPropVal="UserName"_$$GetDbName()
+GetDbName()
+	if %appObj.URL["jdbc:sqlserver" quit "MsSQL"
+	if %appObj.URL["jdbc:oracle:" quit "Oracle"
+	if %appObj.URL["jdbc:mysql://" quit "MySQL"
+	if %appObj.URL["jdbc:postgresql://" quit "Postgresql"
+	quit ""
 }
 
 /// Sample Import
@@ -120,7 +126,9 @@ ClassMethod ExportSQLConnection(targetdir = "", ByRef json, exec = "") As %Statu
 		}
 	}
 	set sql=$replace(sql,"(1=1)","Connection_Name in ("_$e(in,1,*-1)_")")
-	set st=##class(apptools.core.json).ExportClassInstances("%Library.SQLConnection",sql,tTargetDir_"gateways.json",.json,$g(exec))
+	KILL %appInc
+	set st=##class(apptools.core.json).ExportClassInstances("%Library.SQLConnection",sql,tTargetDir_"gateways.json",.json,$g(exec),1)
+	
 	set xml = ##class(apptools.core.rest).getStatic("apptools.core.jdbc:module")
 	set namezpm="appmsw-gateway-"_$s(numbers=numb:"sql",1:$tr(filename,".","-"))
 	set xml = $replace(xml,"*name",namezpm)

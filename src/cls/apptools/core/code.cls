@@ -7,14 +7,15 @@ Include apptools.core
 Class apptools.core.code [ Abstract ]
 {
 
-/// 
-/// d ##class(apptools.core.code).exp("/irisrun/repo/chmod777-R/apptools/","apptools.","apptools.M")
-/// d ##class(apptools.core.code).exp("/irisrun/repo/chmod777-R/zapm/","%ZAPM")
+/// Export from docker
+/// d ##class(apptools.core.code).exp("/irisrun/repo/chmod777-R/apptools-admin/src/","apptools.","apptools.M")
+/// d ##class(apptools.core.code).exp("/irisrun/repo/chmod777-R/zapm/src/","%ZAPM")
 ClassMethod exp(dir = "", mask = "", ignoremask = "", ByRef list)
 {
  new $namespace
  d ..workdir(dir)
  if $e(mask,1,8)="apptools" set $namespace=$g(^%apptools.Setting("HomeNamespace"))
+ if $e(mask,1)="%" set $namespace="%SYS"
  d ..export(,,$e(mask,1)="%",,mask,ignoremask,1,.list)
 }
 

@@ -102,10 +102,10 @@ ClassMethod GlobalsNode(node As %String = "", val As %String = "", ByRef count, 
 /// Class  ------------------------------------------------------------------------------------------------
 /// write ##class(apptools.core.json).ExportClassInstances("%Library.SQLConnection","select * FROM %Library.sys_SQLConnection WHERE (1=1)","/tmp/gateways.json")
 /// write ##class(apptools.core.json).ExportClassInstances("Security.Users","select * from Security.Users where Enabled['1'","/tmp/users.json",.js) write ##class(apptools.core.json).Pretty(js)
-ClassMethod ExportClassInstances(class, sql = "", filename = "", ByRef json, exec = "") As %Status
+ClassMethod ExportClassInstances(class, sql = "", filename = "", ByRef json, exec = "", JsonAsString = 0) As %Status
 {
 	set st=$$$OK
-	new %appTemp,%appClass,%appClassProp,%appClassPropVal,%appClassPropType,%appClassSave,%appClassPropSet
+	new %appTemp,%appObj,%appClass,%appClassProp,%appClassPropVal,%appClassPropType,%appClassSave,%appClassPropSet
 	do ##class(apptools.core.LogInfoPane).GetClassDef(class,,.classdef,0,"1001")
 	set stn=$O(classdef("Storages",""))
 	set gn=$GET(classdef("Storages",stn,"DataLocation"))
@@ -133,8 +133,21 @@ ClassMethod ExportClassInstances(class, sql = "", filename = "", ByRef json, exe
 	do json.%Set("Version",$zv)
 	do json.%Set("Namespace",$namespace)
 	do json.%Set("Instances",jsonarray)
-
-	if filename'="" do json.%ToJSON(filename)
+	if filename'="" {
+		if 'JsonAsString {
+			do json.%ToJSON(filename)
+		}
+		else {
+			set str=##class(apptools.core.json).Pretty(json)
+			set stream = ##class(%Stream.TmpCharacter).%New()
+			do stream.Write(str)
+			s File = ##class(%Stream.FileCharacter).%New()
+			s File.TranslateTable="UTF8"
+			s File.Filename=filename
+			s st=File.CopyFromAndSave(stream)
+			quit st
+		}
+	}
 	;write source
 	quit $$$OK
 }
@@ -142,9 +155,10 @@ ClassMethod ExportClassInstances(class, sql = "", filename = "", ByRef json, exe
 ClassMethod GetOneObject(class, id, ByRef cls, ByRef json, exec = "") As %Status
 {
 	s ob=$classmethod(class,"%OpenId",id)
-	quit:'$isobject(ob) 
+	quit:'$isobject(ob) $$$ERROR($$$GeneralError,"Error Object")
 	set prop=""
    	set %appClass=class
+   	set %appObj=ob
 	Set json=##class(%DynamicObject).%New()
 	for i=1:1 { set prop=$order(cls("Properties",prop)) quit:prop=""
 		try {
