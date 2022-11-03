@@ -332,7 +332,7 @@ ClassMethod InstallPy(lib)
 {
     //  depricated  ;set sc = ##class(%SYS.Python).Install("openpyxl")
     set cmd="pip3 install --target /usr/irissys/mgr/python/ "_lib
-    if '$zversion(1)=3 {
+    if $zversion(1)'=3 {
         set tMgrDir = $System.Util.ManagerDirectory()
 		set tBinDir = $System.Util.BinaryDirectory()_"irispip.exe"
 		set cmd=tBinDir_" install --target "_tMgrDir_"python "_lib
