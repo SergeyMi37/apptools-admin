@@ -260,7 +260,7 @@ ClassMethod NSFirstHead(Par = "") As %Status
 
 	write $$$appButton(divId_"appButtonExe","title='Execute query' onclick="""_$replace(onclick,"*","exe&ns="_ns)_"""","Execute")
 	write $$$appButton(divId_"appButtonXls","title='Execute query and export XLSX' onclick="""_$replace(onclick,"*","xlsx&ns="_ns)_"""","XLSX")
-	write $$$appButton(divId_"appButtonZip","title='Execute query, export XLSX and packed to ZIP' onclick="""_$replace(onclick,"*","zip&ns="_ns)_"""","ZIP")
+	;write $$$appButton(divId_"appButtonZip","title='Execute query, export XLSX and packed to ZIP' onclick="""_$replace(onclick,"*","zip&ns="_ns)_"""","ZIP")
 	;write $$$appText(divId_"MaxNode","size=8 title='Count MaxNode'","10000")
 	;write $$$appText(divId_"Next","size=2 title='Direct'","1")
 	;write " "_$$$appText(divId_"exportXLS","title='exportXLS'","")
