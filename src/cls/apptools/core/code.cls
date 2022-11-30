@@ -289,6 +289,7 @@ ClassMethod filename(code)
 			set filename = ##class(%File).NormalizeFilename( relpath, wd )
 		}
 	}
+	if $p(filename,".",*)="INC" set filename=$p(filename,".",1,*-1)_".inc"
 	Quit filename
 }
 

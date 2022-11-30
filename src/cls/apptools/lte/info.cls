@@ -332,11 +332,13 @@ ClassMethod NSpaceResult(Par = "") As %Status
 	elseif $p($zconvert(what,"L")," ",1)="xec" {
 		set execute=$e(what,5,*)
 	}
-
+	elseif $p($zconvert(what,"L")," ",1)="cpipe" {
+		set cpipe=$p(what," ",2,*)
+	}
 	
 	// Execute	-------------------------------------
 	if $g(execute)'="" {
-		write "<H5>"_$$$aText("Executing the command","")_" "_execute_"</H5>"
+		write "<H5 style='color:white'>"_$$$aText("Executing the command","")_" "_execute_"</H5>"
 		if ##class(apptools.core.LogInfoPane).GetCodeExtensionNamespace(execute,.code) {
 			set execute=code
 		}
@@ -344,8 +346,10 @@ ClassMethod NSpaceResult(Par = "") As %Status
 		quit $$$OK
 	}
 	if $g(cpipe)'="" {
-		write "<H5>"_$$$aText("Executing the command OS","")_" "_cpipe_"</H5>"
+		write "<H5 style='color:white'>"_$$$aText("Executing the command OS","")_" "_cpipe_"</H5>"
+		write "<pre>"
 		do ##class(apptools.core.net).cpipe(cpipe)
+		write "</pre>"
 		quit $$$OK
 	}
 	if what="trm" {

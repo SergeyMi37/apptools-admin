@@ -474,7 +474,7 @@ ClassMethod SetProxy(tRequest) As %Status
 
 /// Code from Robert Cemper https://github.com/rcemper/Zpipe
 /// write ##class(apptools.core.net).cpipe("ping -c 3 community.intersystems.com")
-ClassMethod cpipe(command = "", test = 0) As %Status
+ClassMethod cpipe(command = "", test = 0, mode = "") As %Status
 {
  //Zpipe  quit ; CPIPE example to run host console command
  //cmd(command="",test=0) ;
@@ -488,7 +488,7 @@ ClassMethod cpipe(command = "", test = 0) As %Status
  while empty<3 {
     use dev read line 
     set empty=$s($l(line):0,1:$i(empty))
-    use 0 write line,!  ;;; or do any kind of analysis of the line 
+    use 0 write line,! write:mode="web" "<br>"  ;;; or do any kind of analysis of the line 
     }
 
 cls ;
