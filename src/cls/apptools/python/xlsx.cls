@@ -46,13 +46,13 @@ ClassMethod sql2xlsx(sql, format = "", file As %String = "d:\_proj\python\sample
 		set pyrows = pybuiltins.list()
 		for ii=1:1:ColCount {
 			set val=..CleanCtrl(myQuery.GetData(ii))
-			if $P(format,",",ii)="d" { //date
+			if $e($P(format,",",ii),1)="d" { //date
 				set val=..ToPyDate(val)
 			}
-			elseif $P(format,",",ii)="dt" { //datetime
+			elseif $e($P(format,",",ii),1,2)="dt" { //datetime
 				set val=..ToPyDateTime(val)
 			}
-			elseif $P(format,",",ii)="n" { //number
+			elseif $e($P(format,",",ii),1)="n" { //number
 				set val=+val
 			}
 			do pyrows.append(val)
@@ -241,13 +241,13 @@ ClassMethod gn2xlsx(gn, ByRef format = "", file As %String, title = "", patternx
 			;	set val=+val
 			;}
 			
-			if $P(format,",",ii)="d" { //date
+			if $e($P(format,",",ii),1)="d" { //date
 				set val=..ToPyDate(val)
 			}
-			elseif $P(format,",",ii)="dt" { //datetime
+			elseif $e($P(format,",",ii),1,2)="dt" { //datetime
 				set val=..ToPyDateTime(val)
 			}
-			elseif $P(format,",",ii)="n" { //number
+			elseif $e($P(format,",",ii),1)="n" { //number
 				set val=+val
 			}
 			
@@ -357,7 +357,7 @@ ClassMethod ToPyDate(val, ByRef dt)
 {
 	quit:'val val
 	if val["." set val=$p(val,".",3)_"-"_$p(val,".",2)_"-"_$p(val,".",1) // format YYYY-MM-DD
-	if val'["-" set val=$zd(+val,3) // $h format
+	if val'["-" w 111_val_111 set val=$zd(+val,3) // $h format
 	set dt = ##class(%SYS.Python).Import("datetime")
 	set val=dt.date(+$p(val,"-",1), +$p(val,"-",2), +$p($p(val,"-",3)," "))
 	quit val
@@ -373,12 +373,13 @@ ClassMethod testxlsx2gn() As %Status
 {
   set gn="^tmpXlsXread"
   set info("fields-name-rowcol")="3,1"
-  set st=##class(apptools.python.xlsx).xlsx2gn("/backup/temp/2022-07-18_182506_=16348=MBK_Otcet_dlz_peredaci_potrebn.xlsx",gn,.info)
+  set st=##class(apptools.python.xlsx).xlsx2gn("/backup/temp/2022-07-18_182506.xlsx",gn,.info)
   if 'st write $System.Status.GetErrorText(st) quit
   zw @gn
 }
 
 /// d ##class(apptools.python.xlsx).xlsx2gn("/backup/temp/test.xlsx","^||tmp",.info)
+/// set info("fields-name-rowcol")="3,1"
 ClassMethod xlsx2gn(filename As %String, gn, ByRef info) As %Status
 {
 	set st=$$$OK
@@ -391,7 +392,8 @@ ClassMethod xlsx2gn(filename As %String, gn, ByRef info) As %Status
 
 	if filename'="" {
 	try {
-			set wb = openpyxl."load_workbook"(filename)
+			set arg = {"data_only":true}
+			set wb = openpyxl."load_workbook"(filename,arg...) ;data_only=True
 			set st=..xlsx2gnrun(gn,.wb,.info)
 		} catch err {
 			set st = $$$ERROR($$$GeneralError,"Error open filename "_filename)
@@ -422,12 +424,14 @@ ClassMethod xlsx2gnrun(gn, wb, ByRef info) As %Status
 			for ii=col:1:maxcols {
 				set cell = sheet.cell(+row,+ii)
 				set value=pybuiltins.str(cell.value)
+				if $D(info("fields-rename"),rename),$lg(rename,ii)'="" set value=$lg(rename,ii)
 				set list=list_$lb(value)
 				if value="" set value=" "
 				set @gn@(-1,value)=ii
 			}
 			set @gn@(0)=list
 			set startrow=row+1
+			if $p(rowcol,",",3) set startrow=$p(rowcol,",",3)
 			set startcol=col
 		}
 		for i=startrow:1:maxrows {
@@ -437,7 +441,7 @@ ClassMethod xlsx2gnrun(gn, wb, ByRef info) As %Status
 				set value=pybuiltins.str(cell.value)
 				set list=list_$lb(value)
 			}
-			set @gn@(i)=list
+			set @gn@($i(count))=list
 		}
 	}
 	catch ex { 

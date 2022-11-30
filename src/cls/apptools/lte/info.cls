@@ -343,9 +343,9 @@ ClassMethod NSpaceResult(Par = "") As %Status
 		xecute execute
 		quit $$$OK
 	}
-	if $g(zpipe)'="" {
-		write "<H5>"_$$$aText("Executing the command OS","")_" "_zpipe_"</H5>"
-		do ##class(apptools.core.net).zpipe(zpipe)
+	if $g(cpipe)'="" {
+		write "<H5>"_$$$aText("Executing the command OS","")_" "_cpipe_"</H5>"
+		do ##class(apptools.core.net).cpipe(cpipe)
 		quit $$$OK
 	}
 	if what="trm" {
@@ -368,6 +368,7 @@ ClassMethod NSpaceResult(Par = "") As %Status
 			else {
 				//do ##class(%SYS.System).WriteToConsoleLog("job "_$j_" sql "_$tr(sql,$c(13,10)," "),,0)
 				KILL %objlasterror
+				;set st=##class(apptools.core.sys).sql2gn(sql,DSN,gnTemp,MaxNode) ;no journal
 				set st=##class(apptools.core.sys).SqlToDSN(sql,DSN,gnTemp,MaxNode)
 				if 'st write "<font color=red>"_$System.Status.GetErrorText(st)_"</font>"
 				Set sc = $g(%objlasterror, $$$OK)

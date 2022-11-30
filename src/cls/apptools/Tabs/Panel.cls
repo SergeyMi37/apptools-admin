@@ -86,7 +86,7 @@ ClassMethod IsDebugMode(mode = 0) As %Status
 ClassMethod DrawStatus(Par) As %Status
 {
 	;do ##class(apptools.core.Form).BlockUI(0)
-	w $s(%request.Get("debug"):"<font color=red><b>"_$$$aText("Administrator mode","")_"</b></font>",1:"")_" <span class='tip' title='"_$username_"-"_$j_"'>"_$$$aText("User","")_": "_##class(apptools.core.sys).GetFullName($username)_"</span>, "_$tr(##class(apptools.core.type).GetDateTime($h),"T"," ")
+	w $s(%request.Get("debug"):"<font color=red><b>"_$$$aText("Administrator mode","")_"</b></font>",1:"")_" <span class='tip' title='"_$username_"-"_$roles_"'>"_$$$aText("User","")_": "_##class(apptools.core.sys).GetFullName($username)_"</span>, "_$tr(##class(apptools.core.type).GetDateTime($h),"T"," ")
  	$$$jsstart
 	w "$('.tip').tooltip();"
 	$$$jsstop

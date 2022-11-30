@@ -204,7 +204,7 @@ ClassMethod PostHttp(ServerPort, method, user, pass, ByRef body, ByRef out) As %
 		set ht.Password=pass
 	}
 	s ht.ContentType="text/html;  charset=UTF-8"
-	;s ht.ContentType="application/json; charset=UTF-8"
+	if $g(body)["{" s ht.ContentType="application/json; charset=UTF-8"
 	set port=$p(ServerPort,":",2)
 	i $p(ServerPort,":",2)'="" set ht.Port = port
 	
@@ -214,7 +214,13 @@ ClassMethod PostHttp(ServerPort, method, user, pass, ByRef body, ByRef out) As %
 		set ht.SSLConfiguration=..CheckSSLCertificate("DefaultSSL")
 	}
 	do ..SetProxy(.ht)
-	Do ht.EntityBody.Write($g(body))
+	if $g(body)["{" {
+		set json=##class(%Library.DynamicAbstractObject).%FromJSON($g(body))
+		Do ht.EntityBody.Write(json)
+	}
+	elseif $g(body)'="" {
+		Do ht.EntityBody.Write($g(body))
+	}
 	if $d(body)>1 s i="" f  s i=$o(body(i)) q:i=""  Do ht.EntityBody.Write(body(i))
 	
 	s st=ht.Post(method)
@@ -467,8 +473,8 @@ ClassMethod SetProxy(tRequest) As %Status
 }
 
 /// Code from Robert Cemper https://github.com/rcemper/Zpipe
-/// write ##class(apptools.core.net).zpipe("ping -c 3 community.intersystems.com")
-ClassMethod zpipe(command = "", test = 0) As %Status
+/// write ##class(apptools.core.net).cpipe("ping -c 3 community.intersystems.com")
+ClassMethod cpipe(command = "", test = 0) As %Status
 {
  //Zpipe  quit ; CPIPE example to run host console command
  //cmd(command="",test=0) ;

@@ -384,8 +384,8 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 		set execute=$e(what,5,*)
 	}
 	#; Run command OS
-	elseif $p($zconvert(what,"L")," ",1)="zpipe" {
-		set zpipe=$e(what,7,*)
+	elseif $p($zconvert(what,"L")," ",1)="cpipe" {
+		set cpipe=$e(what,7,*)
 	}
 	#; Description of the class or instance of the class
 	elseif $p($zconvert(what,"L")," ",1)="obj" { ;,$zconvert($e(what,1,2),"L")="##"||($zconvert($e(what,1,2),"L")="=#") {
@@ -502,9 +502,9 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 		x execute
 		quit $$$OK
 	}
-	if $g(zpipe)'="" {
-		write "<H5>"_$$$aText("Executing the command OS","")_" "_zpipe_"</H5>"
-		do ##class(apptools.core.net).zpipe(zpipe)
+	if $g(cpipe)'="" {
+		write "<H5>"_$$$aText("Executing the command OS","")_" "_cpipe_"</H5>"
+		do ##class(apptools.core.net).cpipe(cpipe)
 		quit $$$OK
 	}
 	if what="trm" {
@@ -517,10 +517,13 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 	if $p($zconvert(what,"L")," ",1)="post" {
 		set posturl=$p($p(what," ",2,*),$C(13,10),1)
 		set server=$p(posturl,"/",3)
-		if $p(server,"@")'="" set user=$p($p(server,"@"),":"),pass=$p($p(server,"@"),":",2),server=$p(server,"@",2)
+		set user="",pass=""
+		if server["@" set user=$p($p(server,"@"),":"),pass=$p($p(server,"@"),":",2),server=$p(server,"@",2)
 		set postbody=$p($p(what," ",2,*),$C(13,10),2,*)
+		write "<pre><li>url:"_posturl_"<li>server:"_server_"<li>user:"_user_"<li>pass:"_pass_"<li>"_posturl_"<li>"_postbody_"<br>"
+
 		set st=##class(apptools.core.net).PostHttp(server, $p($p(posturl,"/",4,*),"?"),user ,pass ,postbody,.out)
-		write st w "<pre>" zw:$d(out("Data")) out("Data") w "</pre>" quit $$$OK
+		write st zw:$d(out("Data")) out("Data") w "</pre>" quit $$$OK
 	}
 	if $p($zconvert(what,"L")," ",1)="get" {
 		set url=$p($p(what," ",2,*),$C(13,10),1)
@@ -1223,7 +1226,7 @@ ClassMethod CloseXLSfile(fileXLS, ByRef exportXLSfileEmail, ByRef exportXLSfile,
 /// 	s exportXLSfile=$lg(fileXLS,2) - full path to the file where to write the table
 ///  mode=1 - not included number colomn
 /// 
-/// d ##class(App.LogInfoPane).DrawSQL("query %SYS.GlobalQuery:NameSpaceList %SYS %S*",10000,$namespace," ")
+/// d ##class(apptools.core.LogInfoPane).DrawSQL("query %SYS.GlobalQuery:NameSpaceList %SYS %S*",10000,$namespace," ")
 ClassMethod DrawSQL(SQL As %String = "", MaxNode = {$$$MAXSHOW}, NSpace = "", msg = "", Execute = "", fileXLS = "", Mode = "", FiltrRow = "") As %Status
 {
 	set hoverClass="hc"_$tr($zts,",.")

@@ -254,7 +254,7 @@ ClassMethod DrawStatus(Par) As %Status
 	s fio=##class(apptools.core.sys).GetFullName($username)
 	s:fio="" fio=$$$aText("The user","")
 	;w $s(%request.Get("debug"):"<font color=red><b>"_$$$aText("Administrator mode","")_"</b></font>",1:"")_" <span class='tip' title='"_$username_"-"_$j_"-"_$zu(5)_"'>"_$$$aText("User","")_": "_fio_"</span>, "_$tr(##class(apptools.core.type).GetDateTime($h),"T"," ")
-	write "<span class='tip' title='"_fio_"-"_$j_"-"_$zu(5)_"'>"_$username_"</span>"
+	write "<span class='tip' title='"_fio_"-"_$roles_"-"_$zu(5)_"'>"_$username_"</span>"
  	;$$$jsstart
 	;	w "$('.tip').tooltip();"
 	;$$$jsstop

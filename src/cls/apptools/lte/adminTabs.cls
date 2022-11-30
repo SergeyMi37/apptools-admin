@@ -18,14 +18,14 @@ Parameter ToAdmin = "You need to contact <a target=_new href='https://github.com
 Parameter AppRoles;
 
 /// is there a right to work with this form
-ClassMethod IsPermiss(role = "") As %Status
+ClassMethod IsPermiss(role = "", userroles = {$roles}) As %Status
 {
-	if $roles["%All" quit $$$OK
+	if userroles["%All" quit $$$OK
 	set st=""
 	for i=1:1:$L(role,",") { continue:$P(role,",",i)=""
-		if (","_$roles_",")[(","_$P(role,",",i)_",") set st=$$$OK quit
+		if (","_userroles_",")[(","_$P(role,",",i)_",") set st=$$$OK quit
 	}
-	if 'st quit $$$ERROR($$$GeneralError,"Protect st="_st_"="_$roles_"="_role_"=")
+	if 'st quit $$$ERROR($$$GeneralError,"Protect st="_st_"="_userroles_"="_role_"=")
 	quit st
 }
 
@@ -307,7 +307,7 @@ ClassMethod DrawStatus(Par) As %Status
 {
  set fio=##class(apptools.core.sys).GetFullName($username)
  set:fio="" fio=$$$aText("The user","")
- write "<span class='tip' title='"_fio_"-"_$j_"-"_$zu(5)_"'>"_$username_" - "_fio_"</span>"
+ write "<span class='tip' title='"_fio_"-"_$roles_"-"_$zu(5)_"'>"_$username_" - "_fio_"</span>"
  quit $$$OK
 }
 

@@ -136,13 +136,13 @@ ClassMethod GetImgJqUi(code)
 
 /// Export all projects to XML
 /// d ##class(apptools.core.LogInfo).ExportProjects("/backup/iris/source/",.file)
-ClassMethod ExportProjects(Dir, files) As %Status
+ClassMethod ExportProjects(Dir, files, sent = 1, dirgitlab = "") As %Status
 {
 	$$$NspGoto(curNs,"apptools")
-	d ..ExportAppProj(Dir,"apptools",.files)
+	do ..ExportAppProj(Dir,"apptools",.files)
 	$$$NspReturn(curNs)
-	d ##class(apptools.core.net).SendFilesToEmail($zn,Dir,.files)
-	q $$$OK
+	do:sent ##class(apptools.core.net).SendFilesToEmail($zn,Dir,.files)
+	quit $$$OK
 }
 
 /// xec do ##class(apptools.core.LogInfo).ExtSQL()

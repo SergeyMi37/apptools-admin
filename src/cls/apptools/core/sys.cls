@@ -575,6 +575,22 @@ ClassMethod SqlToDSN2(sql, DSN, result, top = 100000) As %Status
 	quit $$$OK
 }
 
+/// write ##class(apptools.core.sys).sql2gn(sql,jdbc,gn)
+ClassMethod sql2gn(sql, jdbc = "", gn, top = 100000, journl = 0) As %Status
+{
+	set st=$$$OK
+	if 'journl do DISABLE^%NOJRN
+	if jdbc'="" {
+		set st=##class(apptools.core.sys).SqlToDSN(sql, jdbc, gn, top)
+	}
+	elseif jdbc="" {
+		set st=##class(apptools.core.sys).SaveSQL(sql,gn) ;todo top
+	}
+	; */d ##class(apptools.core.sys).SaveQuery("SYS.Database:FreeSpace")
+	if 'journl do ENABLE^%NOJRN
+	quit st
+}
+
 /// Get a DSN request
 /// w $System.Status.GetErrorText(##class(apptools.core.sys).SqlToDSN("SELECT * FROM xxmv.xx_t359_pzn","OEBS-Daily","^tmMSWq"))
 ClassMethod SqlToDSN(sql, DSN, result, top = 100000) As %Status
@@ -808,10 +824,11 @@ ClassMethod Export(jdbc = "OEBS", msg, class, NoDel = 0, sql = "", write = 0)
 	d ##class(apptools.core.LogInfoPane).GetClassDef(class,"",.out,0)
 	;zw out
 	q:'$d(out) 1
-	s gn="^||tmpExp"_$p(class,".",*)  ;^||
+	s gn=$na(^tmpExport($p(class,".",*)))
 	kill @gn	
 	s:sql="" sql="select * from "_##class(apptools.core.type).GetTableName(class)
-	s st=##class(apptools.core.sys).SaveSQL(sql,gn)
+	set st=##class(apptools.core.sys).sql2gn(sql,,gn)
+	;s st=##class(apptools.core.sys).SaveSQL(sql,gn)
 	i 'st q st
 	s rowcount=$o(@gn@(""),-1) 
 	w:write !,$$$FormatText($$$aText("On request %1 found %2 records",""),sql,rowcount)_" "_gn_" "_$System.Status.GetErrorText(st)
@@ -821,15 +838,17 @@ ClassMethod Export(jdbc = "OEBS", msg, class, NoDel = 0, sql = "", write = 0)
 	w:write !,tab
 	if 'NoDel { ;do not delete the table
 		s del="delete "_tab
-		s gnDel="^||tmpExpDel"
-		s st=##class(apptools.core.sys).SqlToDSN(del,jdbc,gnDel)
+		s gnDel="^tmpExpDel"
+		set st=##class(apptools.core.sys).sql2gn(del,jdbc,gnDel)
+		;s st=##class(apptools.core.sys).SqlToDSN(del,jdbc,gnDel)
 		;i 'st s err=$System.Status.GetErrorText(st) q st
 		kill @gnDel
 	}
 	i write { ;check the types in oeBS
 		s sqltest="select * from "_tab_" where 1=0"
-		s gnD="^||tmpExpD"
-		s st=##class(apptools.core.sys).SqlToDSN(sqltest,jdbc,gnD)
+		s gnD="^tmpExpD"
+		set st=##class(apptools.core.sys).sql2gn(sqltest,jdbc,gnD)
+		;s st=##class(apptools.core.sys).SqlToDSN(sqltest,jdbc,gnD)
 		zw @gnD
 	}
 	s f="" ;Create an array of unequivocal conformity between oeBS and instrumentation fields
@@ -885,13 +904,19 @@ ClassMethod Export(jdbc = "OEBS", msg, class, NoDel = 0, sql = "", write = 0)
 		;w:row=1 !,ins ;q:row=1
 		i '(coun#chank) {
 			w:write !,ins
-			s st=##class(apptools.core.sys).SqlToDSN("BEGIN "_ins_" COMMIT; END;",jdbc,gnIns)
+			set st=##class(apptools.core.sys).sql2gn("BEGIN "_ins_" COMMIT; END;",jdbc,gnIns)
+			;s st=##class(apptools.core.sys).SqlToDSN("BEGIN "_ins_" COMMIT; END;",jdbc,gnIns)
 			s ins=""
 		}
 	}
 	;q 1
-	i ins'="" w:write !,ins s st=##class(apptools.core.sys).SqlToDSN("BEGIN "_ins_" COMMIT; END;",jdbc,gnIns)
-	s st=##class(apptools.core.sys).SqlToDSN("select count(*) from "_tab,jdbc,gnIns)
+	if ins'="" {
+		w:write !,ins 
+		set st=##class(apptools.core.sys).sql2gn("BEGIN "_ins_" COMMIT; END;",jdbc,gnIns)
+		;s st=##class(apptools.core.sys).SqlToDSN("BEGIN "_ins_" COMMIT; END;",jdbc,gnIns)
+	}
+	set st=##class(apptools.core.sys).sql2gn("select count(*) from "_tab,jdbc,gnIns)
+	;s st=##class(apptools.core.sys).SqlToDSN("select count(*) from "_tab,jdbc,gnIns)
 	i $d(%objlasterror) w:write !,$System.Status.GetErrorText(%objlasterror)
 	s inscount=$lg($g(@gnIns@(1)),1) ;from the first record to take the first field
 	s msg=$$$FormatText($$$aText("Unloaded %1 from %2",""),inscount,rowcount)
@@ -958,9 +983,11 @@ ClassMethod GetDirDB(nspace, ByRef db, ByRef dirlist, IRIS = 1) As %Status
 	zn "%sys"
 	set Status=##Class(Config.Namespaces).Get(nspace,.p)
 	Q:'Status Status
+	kill db,dirlist
 	set db="",dirlist=""
 	for { set db=$o(p(db)) q:db=""
 		if 'IRIS,p(db)["IRIS" continue
+		if p(db)=0 continue
 		set db(p(db))=""
 	}
 	s st=$$$OK
@@ -972,13 +999,13 @@ ClassMethod GetDirDB(nspace, ByRef db, ByRef dirlist, IRIS = 1) As %Status
 		} Else {
 			set err="Database " _ db _ " does not exist" 
 			Set st = $$$ERROR($$$GeneralError,err)
-			q
+			quit
 		}
 	}
 	quit st
 }
 
-/// write $System.Status.GetErrorText(##class(apptools.core.sys).Integrity("APPTOOLS,APP,USER"))
+/// do ##class(apptools.core.sys).Integrity("APPTOOLS,APP,USER")
 ClassMethod Integrity(nspace, dir = "/backup/iris-backup/integrity/", adddir = "") As %Status
 {
 	new $namespace
@@ -988,7 +1015,8 @@ ClassMethod Integrity(nspace, dir = "/backup/iris-backup/integrity/", adddir = "
 	for i=1:1:$L(nspace,",") {
 		s ns=$P(nspace,",",i)
 		continue:ns=""
-		s st=##class(apptools.core.sys).GetDirDB(ns,.d,,0)
+		s st=##class(apptools.core.sys).GetDirDB(ns,.d,.dirlist,0)
+		if 'st write !,$System.Status.GetErrorText(st)
 	}
 	set d=""
 	for { set d=$o(d(d)) q:d=""
@@ -996,9 +1024,11 @@ ClassMethod Integrity(nspace, dir = "/backup/iris-backup/integrity/", adddir = "
 	}
 	if adddir'="" set result=result_adddir
 	set filename=dir_$zd($h,3)_"-"_nspace_".log"
-	write !,filename zw result
-	
-	quit $$Silent^Integrity(filename,result,0)
+	write !,filename,!," -->" zw result
+
+	set st=$$Silent^Integrity(filename,result,0)
+	if 'st write !,$System.Status.GetErrorText(st)
+	quit st
 }
 
 }
