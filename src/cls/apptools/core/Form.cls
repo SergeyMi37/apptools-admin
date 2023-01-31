@@ -346,11 +346,11 @@ ClassMethod SelectFieldYesNo(idSelect = "selectmenu", dfltKey = "") As %Status
 }
 
 /// The output fields of type select
-/// do ##class(apptools.core.Form).SelectField($lb("",0,1),"alert(1);",$lb("","No","Yes"),.gn,,"test","0",50) 
-ClassMethod SelectField(KeyList = "", ONCHANGE = "", ValueList = "", gnRet, order = 1, idSelect = "selectmenu", dfltKey = "", width = 500, NoWrite = 0) As %Status
+/// do ##class(apptools.core.Form).SelectField($lb("",0,1),"alert(1);",$lb("","No","Yes"),.gn,,"test","0",50,1,"title='help!'") 
+ClassMethod SelectField(KeyList = "", ONCHANGE = "", ValueList = "", gnRet, order = 1, idSelect = "selectmenu", dfltKey = "", width = 500, NoWrite = 0, attr = "") As %Status
 {
 	kill gnRet
-	set selectNS="<SELECT id='"_idSelect_"' name='"_idSelect_"' "_$s(NoWrite:"ONCHANGE='"_ONCHANGE_"'",1:"")_">"
+	set selectNS="<SELECT id='"_idSelect_"' name='"_idSelect_"' "_$s(NoWrite:"ONCHANGE='"_ONCHANGE_"'",1:"")_" "_attr_" >"
 	;set selectNS=selectNS_" <OPTION  VALUE=''></OPTION>"
 	set gnRet($i(gnRet))=selectNS
 	for i=1:1:$ll(KeyList) { 

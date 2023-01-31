@@ -35,6 +35,7 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 <Route Url="/products/:mode" Method="GET" Call="getProductions"/>
 <Route Url="/productslist/:ns" Method="GET" Call="getListErrProducts"/>
 <Route Url="/alerts/:count" Method="GET" Call="GetAlerts"/>
+<Route Url="/status-journal/:count" Method="GET" Call="GetJourSysSummary"/>
 
 <Route Url="/proj/:proj/:metrics/:mode" Method="GET" Call="apptools.MVK.Metrics:getProj"/>
 </Routes>
@@ -469,6 +470,56 @@ ClassMethod GetAlertsSys(count = 10, ByRef sys) As %Status
 	}
 	do sys.%ToJSON()
  quit $$$OK
+}
+
+/// do ##class(apptools.core.rest).AddNodeJson(1)
+ClassMethod AddNodeJson(obj, icon = "", text = "") As %Status
+{
+	set arr={}
+	set arr.icon=icon ;"y" ;yellow, green, red, - HR
+	set arr.text=text
+	do obj.array.%Push(arr)
+	quit $$$OK
+}
+
+/// do ##class(apptools.core.rest).GetJourSysSummary(1)
+ClassMethod GetJourSysSummary(par = "10") As %Status
+{
+	new $namespace
+	set $namespace="%SYS"
+	set gn="^||tmp",q="%SYS.Journal.System:Summary"
+  	set st=##class(apptools.core.sys).sql2gn(q,"q",gn)
+  	;w st zw @gn q 1
+  	set div=$wc($zhex("27A1")) ; 27A1 black rightwards arrow   ; 2797 heavy division sign
+	set sys = {}
+	set sys.status="OK"
+	set sys.array = []
+	do ..AddNodeJson(sys,$wc($zhex("2705")),"<b>"_$ZU(110)_", inst: "_$P($ZU(86),"*",2)_"</b> <u>"_$$$NL_$zv_"</u>")
+
+	for i=1:1 { quit:'$d(@gn@(q,0,i))
+		set arr={}
+		do ..AddNodeJson(sys,"g",$GET(@gn@(q,0,i,1))_":   <b>"_$GET(@gn@(q,0,i,2))_"</b>")
+		if i=8 set sys.status=$GET(@gn@(q,0,i,2))
+	}
+	do ##class(apptools.core.files).GetJournalFiles(par,.list,.average)
+	set arr={}
+	set icon="y"
+	if average<4 set icon="r"
+	do ..AddNodeJson(sys,icon,"Average: <u><b>"_average_"</b></u>")
+	do ..AddNodeJson(sys,"-","<pre>")
+
+	set gn="^||gn"
+	d ##class(apptools.core.sys).RunCmd("df -H",gn)
+	for i=1:1 { quit:'$d(@gn@(i),val)
+		if i=1 set fs=$p(val,"Size")
+		set icon="g"
+		set perc=$p($p(val,"% /",1)," ",*)
+		if perc>80 set icon="r"
+		do ..AddNodeJson(sys,icon,$e(val,$l(fs),*))
+	}
+	do ..AddNodeJson(sys,"-","</pre>")
+	do sys.%ToJSON()
+  	quit $$$OK
 }
 
 /// do ##class(apptools.core.rest).GetAlerts(,.json)

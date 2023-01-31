@@ -300,8 +300,16 @@ th {
   padding: 0.5em;
 }
 
+.lte-td-dark {
+  color: black;
+}
+
 .bigbox { 
 height: 20px; width: 20px 
+}
+ 
+.lte-title-dark { 
+color: white; 
 }
  
 </style>
@@ -468,7 +476,7 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 			<td>
 				<span class='ui-icon ui-icon-play' name="show" id="show" onclick="document.forms['loginfo'].submit();" >#($$$aText("Execute",""))#</span>
 				<input type="submit" name="show2" id="show2" value='#($$$aText("Execute",""))#'>
-				<input type="button" name="exe2" id="exe2" value='#($$$aText("ExecutePost",""))#'>
+				<!--<input type="button" name="exe2" id="exe2" value='#($$$aText("ExecutePost",""))#'>-->
 				#(##class(apptools.core.LogInfo).GetInfoImg("help"))# 
 	 			#(##class(apptools.core.LogInfo).ClearFields("NSP,MaxNode,Filtr,Next,WHAT,tWHAT,exportXLS,exportXLSfile,exportXLSfileEmail,selectDSN,SDNum"))# 
 		 		#($$$aText("Upload to file Excel",""))#  
@@ -662,10 +670,10 @@ ClassMethod AddC1310(a)
 /// do ##class(apptools.core.LogInfoPane).DrawGN($lb("^tmp**",1000,$namespace,1),0,.res) zwrite @res ;get list global directory with allocations blocks
 ClassMethod DrawGN(a, print = 1, ByRef result)
 {
-	set $lb(gn, MaxNode, NSpace, Next, Message ,exp, Filtr, ExecuteDraw, exportXLS, exportXLSfile, exportXLSfileEmail)=a
+	set $lb(gn, MaxNode, NSpace, Next, Message ,exp, Filtr, ExecuteDraw, exportXLS, exportXLSfile, exportXLSfileEmail,divId)=a
 		if gn["*" {
 			set mask=$e(gn,2,*)
-			set ExecuteDraw="##class(apptools.core.LogInfoPane).AddRefViewEditGlob(.%AppLogInfoVal, %AppLogInfoCol, %AppLogInfoHead, .%AppLogInfoTemp,"""_$Namespace_""")"
+			set ExecuteDraw="##class(apptools.core.LogInfoPane).AddRefViewEditGlob(.%AppLogInfoVal, %AppLogInfoCol, %AppLogInfoHead, .%AppLogInfoTemp,"""_$Namespace_""","""_$G(divId)_""")"
 		 	set sql="%SYS.GlobalQuery:NameSpaceList "_NSpace_" "_$s(mask="*":"",1:mask)
 		 	set GN="^||tmpGList" k @GN
 		 	do ##class(apptools.core.sys).SaveQuery(sql,GN,0)
@@ -748,7 +756,7 @@ ClassMethod DrawHelp(Val, Col, Head, Temp, nspace, DSN)
 }
 
 /// Generate active links for viewing and editing globals
-ClassMethod AddRefViewEditGlob(Val, Col, Head, Temp, nspace, DSN)
+ClassMethod AddRefViewEditGlob(Val, Col, Head, Temp, nspace, divId = "")
 {
 	set res=Val
 	if $g(Head) {
@@ -759,8 +767,10 @@ ClassMethod AddRefViewEditGlob(Val, Col, Head, Temp, nspace, DSN)
 		if $D(Temp("Name",Col)) {
 			set %globalName=$s($e(Val,1)="%":"%25"_$e(Val,2,*),1:Val)
 			if $g(%globalName)[":" q res
-			set href="apptools.core.LogInfo.cls?NSP="_nspace_"&selectDSN=&WHAT=^"_Val
+			set href="/apptools/apptools.core.LogInfo.cls?NSP="_nspace_"&selectDSN=&WHAT=^"_Val
 			set res=$replace(Val,Val,"<a title='viewGlob' target='viewGlob' href='"_href_"'>"_Val_"</a>")
+			set checkbox=$$$appCheck((divId)_"chk-"_%globalName,"","")
+			set res=$g(checkbox)_res
 		}
 		if $D(Temp("Permission",Col)) {
 			if $g(%globalName)[":" q res
@@ -892,9 +902,9 @@ ExpTestFiltr(%gn,Filtr) set %test=0
 ClassMethod AddHistory(what, NSpace, DSN, MaxNode, Next, Filtr) As %Status
 {
 	if $$$HISTORYGN_",?,trm,log"'[what {
-		s val=$o(@$$$HISTORYGN@(""),-1),lastcmd=""
-		i val'="",$lv($g(@$$$HISTORYGN@(val))) s lastcmd=$lg($g(@$$$HISTORYGN@(val)),1)
-			i $g(lastcmd)'=what { // If the commands are not repeated
+		set val=$o(@$$$HISTORYGN@(""),-1),lastcmd=""
+		if val'="",$lv($g(@$$$HISTORYGN@(val))) s lastcmd=$lg($g(@$$$HISTORYGN@(val)),1)
+		if $g(lastcmd)'=what { // If the commands are not repeated
 			s dt=$$$AppDT($h)
 			set @$$$HISTORYGN@(dt)=$lb(what,NSpace,DSN,MaxNode,Next,Filtr)
 		}
@@ -983,9 +993,10 @@ ClassMethod DrawNodeGN(node As %String = "", val As %String = "", ByRef count, j
 		set node=..AddExecute(Execute,node, 2, NSpace = "",.countEx) 
 		set val=..AddExecute(Execute,val, 3, NSpace = "",.countEx) 
 	}
-	set count2="<span title='Edit' style='"_$$$styleurl_"' onclick=""WinOpen('"_NSpace_"','"_..%ClassName(1)_"','WinOpenEditNode','&node="_$zconvert(gn,"O","URL")_"','EditNode','"_##class(apptools.core.Action).WriteWinOpenREST(%request)_"');"" >"_count_"</span>"
+	set count2=count
+	set:Execute'[".lte.info" count2="<span title='Edit' style='"_$$$styleurl_"' onclick=""WinOpen('"_NSpace_"','"_..%ClassName(1)_"','WinOpenEditNode','&node="_$zconvert(gn,"O","URL")_"','EditNode','"_##class(apptools.core.Action).WriteWinOpenREST(%request)_"');"" >"_count_"</span>"
 	&html<
-	<tr >
+	<tr style='color:black' >
 		<td align="left" >#(count2)#</td>
 		<td align="left" >#(node)#</td>
 		<td align="left" >#(val)#</td>
@@ -1205,16 +1216,19 @@ ClassMethod CloseXLSfile(fileXLS, ByRef exportXLSfileEmail, ByRef exportXLSfile,
 	</body>
 	</html>>
 	use io close exportXLSfile
-	s slash=##class(apptools.core.files).getSlash()
-	s path=$p(exportXLSfile,slash,1,*-1)
-	s sc=##class(apptools.core.files).zipFile(path,$p(exportXLSfile,slash,*),$p(exportXLSfile,slash,*)_".zip",path)
-	if sc s exportXLSfile=exportXLSfile_".zip"
+	set exportXLSfileorig=exportXLSfile
+	set slash=##class(apptools.core.files).getSlash()
+	set path=$p(exportXLSfile,slash,1,*-1)
+	set sc=##class(apptools.core.files).zipFile(path,$p(exportXLSfile,slash,*),$p(exportXLSfile,slash,*)_".zip",path)
+	if sc set exportXLSfile=exportXLSfile_".zip"
 	;i 'sc ;s $$$AppL("APP","CloseXLSfile-zipFile")=$System.Status.GetErrorText(sc) 
 	// Send file to e-mail
-	i exportXLSfileEmail'="" {
-		s sc=##class(apptools.core.LogInfo).SendEmail(exportXLSfileEmail, $$$aText("Send file","")_" "_exportXLSfile, $g(msg)_"<br> "_$$$aText("Namespace","")_" :"_$Namespace_"<br> "_$$$aText("Query","")_": "_SQL, exportXLSfile)
-		i 'sc write $System.Status.GetErrorText(sc) ;s $$$AppL("APP","CloseXLSfile-SendEmail")=$System.Status.GetErrorText(sc) 
-		}
+	if exportXLSfileEmail'="" {
+		set sc=##class(apptools.core.LogInfo).SendEmail(exportXLSfileEmail, $$$aText("Send file","")_" "_exportXLSfile, $g(msg)_"<br> "_$$$aText("Namespace","")_" :"_$Namespace_"<br> "_$$$aText("Query","")_": "_SQL, exportXLSfile)
+		if 'sc write $System.Status.GetErrorText(sc) ;s $$$AppL("APP","CloseXLSfile-SendEmail")=$System.Status.GetErrorText(sc) 
+	}
+	set sta=##class(apptools.lte.fileserver).AddRecord($namespace, $username, $p(exportXLSfileorig,slash,*), exportXLSfileorig, "Export XLS to "_exportXLSfileEmail,"apptools",.size)
+	;if 'sta write $System.Status.GetErrorText(sta) quit sta
 	write !,"<br><h5>"_$$$aText("Query result","")_" ("_(+count)_" "_$$$aText("lines) uploaded to file","")_" "_exportXLSfile_"</h5>"
 	quit
 }
@@ -1318,7 +1332,8 @@ ClassMethod DrawSQL(SQL As %String = "", MaxNode = {$$$MAXSHOW}, NSpace = "", ms
 	&html<	</tr></thead><tbody>	>
 	s %AppLogInfoHead=0 //We process lines
 	if $g(resGN)'="" { set i=0
-		for { set i=$order(@resGN@(i))   quit:i=""
+		for { set i=$order(@resGN@(i))   quit:i=""  
+			if 'i continue
 			if FiltrRow'="",'$D(@FiltrRow@(i)) continue 
 			for ii=1:1:ColCount set GetData(ii)=$s($lv($GET(@resGN@(i),"?")):$lg(@resGN@(i),ii),1:$GET(@resGN@(i,ii)))
 			d qNext(.GetData,i) q:$g(stopWrite)
@@ -1354,7 +1369,7 @@ ClassMethod DrawSQL(SQL As %String = "", MaxNode = {$$$MAXSHOW}, NSpace = "", ms
  // Handling one query string
 qNext(GetData,cou="")
 		set count=count+1
-		write "<tr class='trs "_hoverClass_"' >"
+		write "<tr style='color:black' class='trs "_hoverClass_"' >"
 		if 'Mode write "<th>"_$s(cou="":count,1:cou)_"</th>"
 		if count>MaxNode w "<th style='color:red'>... "_$$$aText("More entries","")_" "_MaxNode_"</th></tr>" s stopWrite=1 QUIT
 		for ii=1:1:ColCount {	
@@ -1554,26 +1569,28 @@ ClassMethod ExportProjects(Dir, files) As %Status
 	q $$$OK
 }
 
-ClassMethod GetHelp(help)
+ClassMethod GetHelp(help, ignor = 0)
 {
 	#define sH(%msg) set help($i(help))=%msg
-	$$$sH($$$aText("Call examples",""))
+	if 'ignor $$$sH($$$aText("Call examples",""))
 	$$$sH(" ")
 	$$$sH(" "_$$$addAppLog("^%apptools.Setting","","^%apptools.Setting","")_" --- "_$$$aText("View and edit global with the basic settings panel",""))
 	for gn=##class(apptools.core.Production).#SettingsGN,$$$PROJGN,$$$GNExtentions {
 		$$$sH(" "_$$$addAppLog(gn,"",gn,"")_" --- "_$$$aText("View and edit global",""))
 	}
-	$$$sH(" ")
-	$$$sH(" "_$$$addAppL("obj ##class(apptools.core.Log).%New()")_" --- "_$$$aText("To obtain information on the class",""))
-	$$$sH(" "_$$$addAppL("obj ##class(apptools.core.Log).%OpenId(2)")_" --- "_$$$aText("To obtain information on class and object",""))
-	$$$sH(" "_$$$addAppL("obj =##class(apptools.core.Log).%OpenId(2)")_" --- "_$$$aText("To obtain information only on the object values",""))
-	$$$sH(" ")
-	; $$$sH(" "_$$$addAppL("xec set obj=##class(apptools.core.Log).%OpenId(2) write ""<pre>"" zw obj w ""</pre>"" ")_"--- "_$$$aText("Execute command : to Show dump of the object ",""))
-	$$$sH(" "_$$$addAppL("xec do ##class(apptools.core.sys).SaveQuery(""%SYSTEM.License:Counts"",""^mtempGN"",0) zwrite ^mtempGN")_"--- "_$$$aText("Run the command : Save the query result in the global ^GN",""))
-	$$$sH(" "_$$$addAppL("result ^mtempGN(""%SYSTEM.License:Counts"",0)")_" --- "_$$$aText("Bring recorded in the global result of the query","")_" ##class(apptools.core.sys).SaveQuery")
-	$$$sH(" ")
-	$$$sH(" "_$$$addAppL("query ##class(%Library.ResultSet).%New(""%SYS.Portal.Users:List"")")_"--- "_$$$aText("Run the query and show the favorites page for the user",""))
-	$$$sH(" "_$$$addAppL("query ##class(%Library.ResultSet).%New(""%SYSTEM.License:Counts"")")_"--- "_$$$aText("Run the query and show license usage",""))
+	if 'ignor {
+	 $$$sH(" ")
+	 $$$sH(" "_$$$addAppL("obj ##class(apptools.core.Log).%New()")_" --- "_$$$aText("To obtain information on the class",""))
+	 $$$sH(" "_$$$addAppL("obj ##class(apptools.core.Log).%OpenId(2)")_" --- "_$$$aText("To obtain information on class and object",""))
+	 $$$sH(" "_$$$addAppL("obj =##class(apptools.core.Log).%OpenId(2)")_" --- "_$$$aText("To obtain information only on the object values",""))
+	 $$$sH(" ")
+	 ; $$$sH(" "_$$$addAppL("xec set obj=##class(apptools.core.Log).%OpenId(2) write ""<pre>"" zw obj w ""</pre>"" ")_"--- "_$$$aText("Execute command : to Show dump of the object ",""))
+	 $$$sH(" "_$$$addAppL("xec do ##class(apptools.core.sys).SaveQuery(""%SYSTEM.License:Counts"",""^mtempGN"",0) zwrite ^mtempGN")_"--- "_$$$aText("Run the command : Save the query result in the global ^GN",""))
+	 $$$sH(" "_$$$addAppL("result ^mtempGN(""%SYSTEM.License:Counts"",0)")_" --- "_$$$aText("Bring recorded in the global result of the query","")_" ##class(apptools.core.sys).SaveQuery")
+	 $$$sH(" ")
+	 $$$sH(" "_$$$addAppL("query ##class(%Library.ResultSet).%New(""%SYS.Portal.Users:List"")")_"--- "_$$$aText("Run the query and show the favorites page for the user",""))
+	 $$$sH(" "_$$$addAppL("query ##class(%Library.ResultSet).%New(""%SYSTEM.License:Counts"")")_"--- "_$$$aText("Run the query and show license usage",""))
+	}
 	$$$sH(" "_$$$addAppL("query %SYSTEM.License:Counts")_"--- "_$$$aText("Run the query and show license usage",""))
 	$$$sH(" "_$$$addAppL("query %SYS.GlobalQuery:NameSpaceList USER")_" --- "_$$$aText("show the list globalaw in the USER area",""))
 	;$$$sH(" "_$$$addAppL("query %SYS.GlobalQuery:Size /opt/isc/ensemble/mgr/USER/")_" --- "_$$$aText("to calculate the size globalaw our database USER",""))
@@ -1593,12 +1610,15 @@ ClassMethod GetHelp(help)
 	if ##class(apptools.core.sys).ClassExist("WebTerminal.Engine") {
 		$$$sH(" "_$$$addAppLog("trm","","trm","")_" --- "_$$$aText("Open the built-in Web Terminal ",""))
 	}
-	$$$sH("--- "_$$$aText("If this macro is to insert in the test program","")_" $$$LogDebug(""Debug info"") "_$$$aText("table apptools.core.Log pojawia new record",""))
-	$$$sH("---  $$$AppL("""_fio_""",""node"")=$$$AppObJs(object) "_$$$aText("will record in global","")_" "_gn_" "_$$$aText("an object in the format","")_" json")
-	
-	$$$sH(" "_$$$addAppL("xec job ##class(apptools.core.files).OneDayJournalCount()::0 if $test write ""Processing""")_" --- "_$$$aText("Attention! The process can be long. Information about globalo default written in ","")_$$$TEMPJRNL)
-	$$$sH(" "_$$$addAppL("xec do ##class(apptools.core.files).Export2CSV()")_" --- "_$$$aText("Display information about globalo of","")_" "_$$$TEMPJRNL_" in "_$$$EMAILXLSPATH_"JrnCount*.csv")
-	$$$sH(" "_$$$addAppL("xec Set tSC = ##class(%SYS.Portal.Users).%AddFavorite(""apptools"",""/apptools/apptools.core.LogInfo.cls?WHAT=%3F"") zwrite tSC")_" --- "_$$$aText("Add a link to AppTools in the management portal",""))
+	if 'ignor {
+		$$$sH("--- "_$$$aText("If this macro is to insert in the test program","")_" $$$LogDebug(""Debug info"") "_$$$aText("table apptools.core.Log pojawia new record",""))
+		$$$sH("---  $$$AppL("""_fio_""",""node"")=$$$AppObJs(object) "_$$$aText("will record in global","")_" "_gn_" "_$$$aText("an object in the format","")_" json")
+		
+		$$$sH(" "_$$$addAppL("xec job ##class(apptools.core.files).OneDayJournalCount()::0 if $test write ""Processing""")_" --- "_$$$aText("Attention! The process can be long. Information about globalo default written in ","")_$$$TEMPJRNL)
+		$$$sH(" "_$$$addAppL("xec do ##class(apptools.core.files).Export2CSV()")_" --- "_$$$aText("Display information about globalo of","")_" "_$$$TEMPJRNL_" in "_$$$EMAILXLSPATH_"JrnCount*.csv")
+		$$$sH(" "_$$$addAppL("xec Set tSC = ##class(%SYS.Portal.Users).%AddFavorite(""apptools"",""/apptools/apptools.core.LogInfo.cls?WHAT=%3F"") zwrite tSC")_" --- "_$$$aText("Add a link to AppTools in the management portal",""))
+	}
+	;	$$$sH(" "_$$$addAppL("xec do 1^%SS")_" --- List system processes")
 	;$$$sH(" "_$$$addAppL("post http://User:pass@localhost:57772/apptoolsrest/jsonrpc"_$c(13,10)_"{""jsonrpc"":""2.0"",""method"":""server.shutdown"",""params"":{""server"":""42""},""id"":1}")_" --- Perform http request with POST method with a JSON body")
 	;$$$sH(" "_$$$addAppL("get https://openexchange.intersystems.com/index.html")_" --- to Perform http request with POST method with a JSON body")
 	$$$sH(" ")

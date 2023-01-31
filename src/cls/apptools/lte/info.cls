@@ -62,7 +62,7 @@ ClassMethod GetAllApps(opt) As %Status
 		set opt(key,"Namespace")="%SYS"
 		set opt(key,"Method")="ShowTabSample"
 		set opt(key,"TabMenu","Close")=1 ;0 = the tab cannot be deleted
-		set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
+		set opt(key,"aw-icon")="fa-cog" ;fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
 		set opt(key,"Active")=0 ;active menu item
 
 		set key="FilesServ"
@@ -246,6 +246,20 @@ ClassMethod OptionsResult(Par = "") As %Status
 	quit $$$OK
 }
 
+ClassMethod GetSelectDSN(divId, DSN = "") As %String
+{
+	set id=divId_"selectDSN"
+	set listDSN=##class(apptools.core.sys).getSQLConnection(.listDSN)
+	set selectDSN="<SELECT title="""_$$$aText("DSN ODBC/JDBC","")_""" name="""_id_""" id="""_id_""" ><OPTION></OPTION> "
+	for ns=1:1:$l(listDSN,",") { continue:$p(listDSN,",",ns)=""
+		continue:$p(listDSN,",",ns)["%"
+  		set selected=$select(DSN=$p(listDSN,",",ns):"selected",1:"")
+  		set selectDSN=selectDSN_" <OPTION "_$g(selected)_" VALUE="""_$p(listDSN,",",ns)_""">"_$p(listDSN,",",ns)_"</OPTION>"
+	}
+	set selectDSN=selectDSN_"</SELECT>"
+	quit selectDSN
+}
+
 ClassMethod NSFirstHead(Par = "") As %Status
 {
 	do ##class(apptools.core.Form).BlockUI(0)
@@ -255,31 +269,51 @@ ClassMethod NSFirstHead(Par = "") As %Status
 	set (NS,ns)=$p(key,"NS",2,*)
 	if $e(ns,1)="-" set NS="%"_$e(ns,2,*)
 	zn NS
+	set refhist=$g(Par("refhist")) 
+	if refhist'="" {
+		set hg=$$$HISTORYGN_"("_$zconvert(refhist,"I","URL")_")"
+		;w hg," ",@hg
+		set hiscmd=$lg(@hg,1)
+		set hisns=$lg(@hg,2)
+		set hisjdbc=$lg(@hg,3)
+		set hismax=$lg(@hg,4)
+		set hisnext=$lg(@hg,5)
+		set hisFiltr=$lg(@hg,6)
+	}
 	set onclick=$$$blockui("Load...")_
 		$$$onclick(divId_"MainForm",divId_"MainContent",NS,..%ClassName(1),"NSpaceResult","&key="_key_"&divId="_divId_"&mode=*")
 
 	write $$$appButton(divId_"appButtonExe","title='Execute query' onclick="""_$replace(onclick,"*","exe&ns="_ns)_"""","Execute")
-	write $$$appButton(divId_"appButtonXls","title='Execute query and export XLSX' onclick="""_$replace(onclick,"*","xlsx&ns="_ns)_"""","XLSX")
+	
+	;do ##class(apptools.core.Form).SelectField($lb("here","xls","xls+email","xlsx","json","xml"),"",$lb("Here","to XLS via ZEN","to XLS via ZEN + EMail","to XLSX via Python","to json","to xml"),.frm,1,divId_"outFormat","0",50,1,"title='Output format'")  
+	do ##class(apptools.core.Form).SelectField($lb("here","xlsx","json","xml"),"",$lb("Here","to XLSX via Python","to json","to xml"),.frm,1,divId_"outFormat","0",50,1,"title='Output format'")  
+	for i=1:1 quit:'$d(frm(i),s)  write s
+	;write $$$appButton(divId_"appButtonXls","title='Execute query and export to XLSX' onclick="""_$replace(onclick,"*","xlsx&ns="_ns)_"""","XLSX")
+	;write $$$appButton(divId_"appButtonXls","title='Execute query and export to JSON' onclick="""_$replace(onclick,"*","json&ns="_ns)_"""","JSON")
 	;write $$$appButton(divId_"appButtonZip","title='Execute query, export XLSX and packed to ZIP' onclick="""_$replace(onclick,"*","zip&ns="_ns)_"""","ZIP")
-	;write $$$appText(divId_"MaxNode","size=8 title='Count MaxNode'","10000")
-	;write $$$appText(divId_"Next","size=2 title='Direct'","1")
 	;write " "_$$$appText(divId_"exportXLS","title='exportXLS'","")
-	set id=divId_"selectDSN"
-	set listDSN=##class(apptools.core.sys).getSQLConnection(.listDSN)
-	set selectDSN="<SELECT title="""_$$$aText("DSN ODBC/JDBC","")_""" name="""_id_""" id="""_id_""" ><OPTION></OPTION> "
-	for ns=1:1:$l(listDSN,",") { continue:$p(listDSN,",",ns)=""
-		continue:$p(listDSN,",",ns)["%"
-  		;set selected=$select(DSN=$p(listDSN,",",ns):"selected",1:"")
-  		set selectDSN=selectDSN_" <OPTION "_$g(selected)_" VALUE="""_$p(listDSN,",",ns)_""">"_$p(listDSN,",",ns)_"</OPTION>"
+	write "&#160; "_..GetSelectDSN(divId,$g(hisjdbc))
+	set js="document.getElementById('"_divId_"what"_"').value='?';"
+	set clear="document.getElementById('"_divId_"selectDSN"_"').value='';"
+	write " "_$$$appButton(divId_"appButtonHelp","title='View Help' onclick="""_js_$replace(onclick,"*","help&ns="_ns)_"""","Help")
+	write " "_$$$appButton(divId_"appButtonHist","title='History' onclick="""_$replace(js,"?",$$$HISTORYGN)_$replace(onclick,"*","history&ns="_ns)_"""","history")
+	write ..ButtonAgain(divId,key,"Clear","NS") ;refresh
+	
+	write " "_$$$appButton(divId_"appButtonExpo","title='Export' onclick="""_$replace($replace(onclick,"*","expo&ns="_ns),"MainForm","FormContentExpo")_"""","Export")
+	if $namespace="%SYS" {
+		write " "_$$$appButton(divId_"appButtonSQLConn","title='Export SQLConnections' onclick="""_$replace(js,"?","")_$replace(onclick,"*","expsqlconn&ns="_ns)_"""","SQL-Conn")
 	}
-	set selectDSN=selectDSN_"</SELECT>"
-	write " "_selectDSN
-	write " "_$$$appButton(divId_"appButtonHelp","title='View Help' onclick="""_$replace(onclick,"*","help&ns="_ns)_"""","Help")
-	write " "_$$$appButton(divId_"appButtonHist","title='History' onclick="""_$replace(onclick,"*","history&ns="_ns)_"""","history")
-	write " "_$$$appButton(divId_"appButtonClear","title='Clear' onclick="""_$replace(onclick,"*","clear&ns="_ns)_"""","Clear")
 
-	write "<br>"_$$$appTextarea(divId_"what","rows=3 cols=80 title='Enter command'","")
+	write "<br>"_$$$appTextarea(divId_"what","rows=3 cols=80 title='Enter command' placeholder='Enter the command and Ctrl-Enter or button EXECUTE' ",$g(hiscmd))_"<br>"
 
+	write $$$appText(divId_"MaxNode","size=8 title='Limit the number of nodes'",$g(hismax,"10000"))_"&#160;"
+	set checked="checked"	if $g(hisnext)="-1" s checked=""
+	write $$$appCheck(divId_"NextCheck",checked_" title='Direct enumeration of global nodes' ","")_"&#160;"
+	write $$$appText(divId_"Filtr","size=70 placeholder='Filter nodes' title='if command argument. %gn - current reference global. For example: %gn[""3)""||(@%gn[""123"")'",$g(hisFiltr))
+
+	$$$jsstart
+	write "$('#"_divId_"what').keydown(function (e) { if (e.ctrlKey && e.keyCode == 13) { $('#"_divId_"appButtonExe').click(); }});"
+	$$$jsstop
 	$$$SetHeightContent(divId,250)
 	quit $$$OK
 }
@@ -295,11 +329,24 @@ ClassMethod NSpaceResult(Par = "") As %Status
 	set sqldef=..#DefaultQuery
 	set (DSN,%DSN)=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"selectDSN")
 	set what=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"what")
-	set MaxNode=10000 ;##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"MaxNode")
+	set MaxNode=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"MaxNode")
 	set exportXLS=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"exportXLS")
-	set Next=1 ;##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"Next")
-	set Filtr=""
+	;set Next=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"Next")
+	set Next=$s($d(Par("%request.Data",divId_"NextCheck")):1,1:-1)
+	set Filtr=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"Filtr")
 	do ##class(apptools.core.LogInfoPane).AddHistory(what,NSpace,%DSN,MaxNode,Next,Filtr)
+	set outFormat=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"outFormat")
+	do ##class(apptools.core.LogInfo).GetInputXLSTagsVal(.exportXLS, .exportXLSfile, .exportXLSfileEmail)
+	if outFormat="xls"||(outFormat="xls+email") {
+		set exportXLS=1
+		if outFormat="xls" set exportXLSfileEmail=""
+	}
+	set obj="",filexlsx=exportXLSfile_"x"
+	set format="",format("freeze")="B4",format("sheetname")=$username
+	//Make URL
+	set ref=%request.CgiEnvs("HTTP_REFERER")
+	set url=$p(ref,"/a/info",1)_"/a/info&namespace="_$namespace_"&autoload=FS"
+
 	set onclick=$$$blockui("Load...")_
 		$$$onclick(divId_"MainForm",divId_"MainContent",NSpace,..%ClassName(1),"NSpaceResult","&key="_key_"&divId="_divId_"&moderes=*")
 	;zw Par
@@ -307,15 +354,61 @@ ClassMethod NSpaceResult(Par = "") As %Status
 		set gn=""
 		if $e(what)="^" { set gn=what }
 	}
-	
+	if (mode="expo") {
+		KILL err
+		set OutFormat=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"OutFormat")
+		set OutFormatGN=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"OutFormatGN")
+		set OutFilter=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"OutFilter")
+		if '(OutFormat="json"||(OutFormat="xml")) write $$$appError("So far, only xml or json output formats are supported") quit $$$OK
+		set filename=$p(exportXLSfile,".",1,*-1)_"."_OutFormat
+		w "Output forman: "_outFormat_", "_OutFormat,", "_OutFormatGN_", "_filename_", "_OutFilter
+	    set count=0,i="",exported=0
+		for { set i=$o(Par("%request.Data",i)) quit:i=""
+			if i[(divId_"chk-") {
+				set gname=$p(i,divId_"chk-",2)
+				set gn="^"_gname
+				set count=count+1
+				do:OutFormat="json" ..ExportGN(gn,filename,OutFormat,OutFilter,.err)	
+				set item(gname_".GBL")=""
+				}
+		}
+		if OutFormatGN'="",OutFormatGN'["*",'count {
+			do:OutFormat="json" ..ExportGN(OutFormatGN,filename,OutFormat,OutFilter,.err)
+			set count=count+1
+			set item($e(OutFormatGN,2,*)_".GBL")=""
+		}
+		if OutFormat="xml" {
+			set st=$SYSTEM.OBJ.Export(.item, filename,,.err)
+			do ##class(apptools.lte.fileserver).AddRecord($namespace, $username, $p(filename,$$$slash,*), filename, "Export to "_OutFormat,"apptools")
+		}
+		if $d(err) { 
+			if $g(err)'="",err'=0 write $$$appError(err)
+			set i=""
+			for { set i=$o(err(i)) quit:i=""
+				write $$$appError($g(err(i)))
+			}
+		}
+		if count {
+			write "<br>Found to export: "_count
+			write "<br>The report will be saved to a file <b>"_$p(filename,$$$slash,*)_"</b> and will be available via the <a target=_blank href='"_url_"'> link </a>"
+			if OutFormat="json" write "<br><br>You can import using the method from the terminal with the possibility of renaming:<br>set change(""Name"")=""read""<br>do ##class(apptools.core.json).ImportGlobals(""/path/filename.json"",.json,.change) "
+		}
+		else {
+			write "<br>No items found to exported"
+		}
+		quit $$$OK
+	}
 	if what="?"||(mode="help") {
-		do ##class(apptools.core.LogInfoPane).GetHelp(.%help)
+		do ##class(apptools.core.LogInfoPane).GetHelp(.%help,1)
 		// ExecuteArray = code for ison when outputting arrays
-		set gn="%help",what="",Message=$$$aText("help command","")
-		set ExecuteDraw="##class(apptools.core.LogInfoPane).DrawHelp(.%AppLogInfoVal,%AppLogInfoCol,%AppLogInfoHead,.%AppLogInfoTemp,"""_NSpace_""","""_%DSN_""")"
+		set gn="%help",what="",Message="<H5 style='color:Lightsteelblue' >"_$$$aText("help command","")_"</h5>"
+		set ExecuteDraw="##class(apptools.lte.info).ViewDrawHelp(.%AppLogInfoVal,%AppLogInfoCol,%AppLogInfoHead,.%AppLogInfoTemp,"""_NSpace_""","""_divId_""")"
+		set exportXLS=0,outFormat=""
 	}
 	elseif (mode="history") {
-		set gn=$$$HISTORYGN,what="",Message="History"
+		set gn=$$$HISTORYGN
+		set ExecuteDraw="##class(apptools.lte.info).ViewDrawHist(.%AppLogInfoVal,%AppLogInfoCol,%AppLogInfoHead,.%AppLogInfoTemp,"""_key_""","""_divId_""")"
+		set exportXLS=0,outFormat="",Next=-1
 	}
 	#; queries and query results
 	elseif ",query,result,select,call,delete,insert,s,q,r,begin,"[(","_$zconvert($p(what," ",1),"L")_",") {
@@ -331,38 +424,47 @@ ClassMethod NSpaceResult(Par = "") As %Status
 	#; Run class methods
 	elseif $p($zconvert(what,"L")," ",1)="xec" {
 		set execute=$e(what,5,*)
-	}
-	elseif $p($zconvert(what,"L")," ",1)="cpipe" {
-		set cpipe=$p(what," ",2,*)
-	}
-	
-	// Execute	-------------------------------------
-	if $g(execute)'="" {
-		write "<H5 style='color:white'>"_$$$aText("Executing the command","")_" "_execute_"</H5>"
+		do drawhead($$$aText("Executing the command",""))
 		if ##class(apptools.core.LogInfoPane).GetCodeExtensionNamespace(execute,.code) {
 			set execute=code
 		}
-		xecute execute
+		try {
+			xecute execute
+		}
+		catch ex {
+		   Set sc = $g(%objlasterror, $$$OK)
+		   Set sc = $$$ADDSC(sc, ex.AsStatus())
+			write "<br>"_$zconvert($System.Status.GetErrorText(sc),"O","HTML")
+		}
 		quit $$$OK
+
 	}
-	if $g(cpipe)'="" {
-		write "<H5 style='color:white'>"_$$$aText("Executing the command OS","")_" "_cpipe_"</H5>"
+	elseif $p($zconvert(what,"L")," ",1)="cpipe" {
+		set cpipe=$p(what," ",2,*)
+		do drawhead($$$aText("Executing the command OS","")_" "_cpipe)
 		write "<pre>"
 		do ##class(apptools.core.net).cpipe(cpipe)
 		write "</pre>"
 		quit $$$OK
 	}
-	if what="trm" {
-		write "WebTerminal"
+	elseif what="trm" {
+		do drawhead("WebTerminal")
 		if ##class(apptools.core.sys).ClassExist("WebTerminal.Engine") {
 			write !,"<iframe style='width:95%; height:70%' id='terminal"_NSpace_"' src='/terminal/?ns="_NSpace_"&clean=1' ></iframe>"
 		}
+		else { write " not installed"
+		}
 		quit $$$OK
 	}
-	
-	set obj=""
+	write "<form id='"_divId_"FormContentExpo'>"
+	write $$$appInputHidden(divId_"OutFormat","",outFormat)
+	write $$$appInputHidden(divId_"OutFormatGN","",gn)
+	write $$$appInputHidden(divId_"OutFilter","",Filtr)
+	// Execute	-------------------------------------
+	;merge aaa=%request ;.GetMimeData ;GetCgiEnv ;Data
 	#; arbitrary query
 	if $g(sql)'="" {
+		;w outFormat
 		if %DSN'="" {
 			set gnTemp=$na(@"^tmpLogInfo"@($j))  ;$$$TEMPORYGN@($j))
 			KILL @gnTemp
@@ -379,13 +481,27 @@ ClassMethod NSpaceResult(Par = "") As %Status
 				if 'sc write "<font color=red>"_$System.Status.GetErrorText(sc)_"</font>"
 			}
 			if $d(@gnTemp) {
-				set st=##class(apptools.core.LogInfoPane).DrawSQL("result "_gnTemp,MaxNode,NSpace,"DSN: "_DSN_", Query: <br>"_$g(sql)_"<br>"_gnTemp,$g(ExecuteDraw),$lb(exportXLS,exportXLSfile,exportXLSfileEmail))
+				if $e(outFormat,1,4)="xlsx" {
+					set title="DSN: "_DSN_", Query: "_$g(sql)
+					set st=##class(apptools.python.xlsx).gn2xlsx(gnTemp,.format,filexlsx,,,,.info)
+					set st=##class(apptools.lte.fileserver).AddRecord($namespace, $username, $p(filexlsx,$$$slash,*), filexlsx, title,"apptools",.size)
+					write "<br>The report will be saved to a file <b>"_$p(filexlsx,$$$slash,*)_"</b> and will be available via the <a target=_blank href='"_url_"'> link </a>"
+				}
+				else {
+					set st=##class(apptools.core.LogInfoPane).DrawSQL("result "_gnTemp,MaxNode,NSpace,"DSN: "_DSN_", Query: <br>"_$g(sql)_"<br>"_gnTemp,$g(ExecuteDraw),$lb(exportXLS,exportXLSfile,exportXLSfileEmail))
+				}
 			}
 		}
 		else {
-			if exportXLS=1 { ;Running in the background
+			if $e(outFormat,1,4)="xlsx" {
+				set title="Export XLSX Query: "_$g(sql)
+				set st=##class(apptools.python.xlsx).sql2xlsx(sql,.format,filexlsx)
+				set st=##class(apptools.lte.fileserver).AddRecord($namespace, $username, $p(filexlsx,$$$slash,*), filexlsx, title,"apptools",.size)
+				write "<br>The report will be saved to a file <b>"_$p(filexlsx,$$$slash,*)_"</b> and will be available via the <a target=_blank href='"_url_"'> link </a>"
+			}
+			elseif exportXLS=1 { ;Running in the background
 				job ##class(apptools.core.LogInfoPane).DrawSQL(sql,MaxNode,NSpace,"NameSpace: "_NSpace_" "_$g(msg),$g(ExecuteDraw),$lb(exportXLS,exportXLSfile,exportXLSfileEmail))::1
-				if $T W $$$aText("The request will be executed in the background","") s st=1
+				if $T Write $$$aText("The request will be executed in the background","") s st=1 write "<br>The report will be saved to a file and will be available via the <a target=_blank href='"_url_"'> link </a>"
 			} else {
 				set st=##class(apptools.core.LogInfoPane).DrawSQL(sql,MaxNode,NSpace,"Namespace: "_NSpace_" "_$g(msg),$g(ExecuteDraw),$lb(exportXLS,exportXLSfile,exportXLSfileEmail))
 			}
@@ -394,20 +510,124 @@ ClassMethod NSpaceResult(Par = "") As %Status
 	}
 	#; If the output of Global
 	elseif $G(gn)'="" {
-		set a=$lb(gn,MaxNode,NSpace,Next,$g(Message),$g(exp),Filtr,$g(ExecuteDraw),exportXLS,exportXLSfile,exportXLSfileEmail)
+		if $g(ExecuteDraw)="" set ExecuteDraw="##class(apptools.lte.info).ViewDrawGlob(.%AppLogInfoVal,%AppLogInfoCol,%AppLogInfoHead,.%AppLogInfoTemp,"""_key_""","""_divId_""")"
+		set a=$lb(gn,MaxNode,NSpace,Next,"<h6 class='lte-title-dark'>"_$g(Message,"View global "_gn)_"</h6>",$g(exp),Filtr,$g(ExecuteDraw),exportXLS,exportXLSfile,exportXLSfileEmail,divId)
+		;set a=$lb(gn,MaxNode,NSpace,Next,$g(Message),$g(exp),Filtr,$g(ExecuteDraw),exportXLS,exportXLSfile,exportXLSfileEmail)
 		;d ##class(apptools.core.LogInfoPane).DrawGN(a) ;debug 
 		if exportXLS=1 { ;Running in the background
 			job ##class(apptools.core.LogInfoPane).DrawGN(a)::1
-			if $T W $$$aText("The request will be executed in the background","") s st=1
+			if $T W $$$aText("The request will be executed in the background","") s st=1 write "<br>The report will be saved to a file and will be available via the <a target=_blank href='"_url_"'> link </a>"
 		} else {
 			set st=##class(apptools.core.LogInfoPane).DrawGN(a)
 		}
 	}
 	elseif (what'="") {
-		&html<<center><b>#($$$aText("Commands not defined",""))#</b></center>>
+		do drawhead(($$$aText("Commands not defined","")))
 	}
-	write "<br><br>"
+	write "</form>"
 	quit $$$OK
+drawhead(msg)
+		&html<<center><b>#(msg)#</b></center>>
+	quit $$$OK
+}
+
+ClassMethod ExportGN(gn, filename, ext, filter = "", err)
+{
+	set filename=$replace(filename,"."_ext,gn_"."_ext)
+	write "<br>"_gn_" "_filename
+	do ##class(apptools.core.json).ExportGlobals(gn,filename,,filter,.err,1)
+	do ##class(apptools.lte.fileserver).AddRecord($namespace, $username, $p(filename,$$$slash,*), filename, gn_" "_filter,"apptools")
+	quit $$$OK
+}
+
+ClassMethod ViewDrawGlob(Val, Col, Head, Temp, key, divId)
+{
+	set res=Val 
+	if Head {
+		 if Col=1 { set %AppCol2="20%"
+		 }
+		 elseif Col=2 {
+			;set res=$$$aText("History Data Time","")
+		 }
+		 elseif Col=3 {
+			;set res=$$$aText("Command History","")
+		 }
+	}
+	else {
+		if Col=1 {	
+			;set res=$p($p(res,"</span"),">",8)
+		}
+		elseif Col=2 {
+		}
+		elseif Col=3 {
+		}
+	}
+	quit res
+}
+
+ClassMethod ViewDrawHist(Val, Col, Head, Temp, key, divId)
+{
+	set res=Val 
+	if Head {
+		 if Col=1 { set res=""
+		 }
+		 elseif Col=2 {
+		 	set %AppCol2="20%"
+			set res=$$$aText("History Data Time","")
+		 }
+		 elseif Col=3 {
+			set res=$$$aText("Command History","")
+		 }
+	}
+	else {
+		if Col=1 {	set res=""
+		}
+		elseif Col=2 {
+			set ref=$p($p(res,">(",2),")",1)
+			if ref="" set ref=$p($p(res,"(",2),")",1)
+			set keys="&refhist="_$zconvert(ref,"O","URL")
+			set onclick = $$$onclick(divId_"MainForm",divId_"MainHeader",$namespace,..%ClassName(1),"NSFirstHead","&key="_key_keys_"&divId="_divId)
+			set res="<a href='#' onclick="""_onclick_""" title='Run again'>"_ref_"</a>"
+		}
+		elseif Col=3 {
+			set res=$p(res,"$lb",2,*)
+		}
+	}
+	quit res
+}
+
+ClassMethod ViewDrawHelp(Val, Col, Head, Temp, nspace, divId)
+{
+	set res=Val
+	if Head {
+		 s %AppCol2="40%"
+		 quit:Col=1 ""  ;
+		 if Col=2 {
+			set res=$$$aText("Command","")
+		 }
+		 if Col=3 {
+			set res=$$$aText("Discription","")
+		 }
+	}
+	else {
+		if Col=1 {
+			set res=""
+		}
+		if Col=2 {
+			set res=$p(Temp,"---",1)
+			set res=$p($p(res,"</a>",1),">",*) ;$zconvert(res,"O","URL")
+			;;set res=$replace(res,$c(34),$c(34)_"/")
+			set onclick="try{document.getElementById('"_divId_"what"_"').value='"_res_"'}catch(e){};"
+			;set keys=$zconvert(res,"O","URL")
+			;set onclick="$('#"_divId_"MainContent"_"').empty();"_
+			;	$$$onclick(divId_"MainForm",divId_"MainHeader",$namespace,..%ClassName(1),"NSFirstHead","&keys="_keys_"&divId="_divId_"&ivId="_divId)
+			set res="<a href='#' onclick="""_onclick_""">"_res_"</a>"
+		}
+		if Col=3 {
+			set res=$p(Temp,"---",2)
+		}
+	}
+	quit res
 }
 
 ClassMethod ProductsFirstHead(Par = "") As %Status

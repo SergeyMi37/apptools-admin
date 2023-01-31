@@ -24,12 +24,12 @@ ClassMethod sql2xlsx(sql, format = "", file As %String = "d:\_proj\python\sample
 	set wb = openpyxl.Workbook()
 	#; grab the active worksheet
 	set ws = wb.active
-	set ws.title = "Report"
+	set ws.title = $select($D(format("sheetname"),ds):ds,1:"sheetname")
 	set pybuiltins = $system.Python.Import("builtins")
 	set pycols = pybuiltins.list()
 	do pycols.append(" ")
 	do ws.append(pycols)
-	set ws."__getitem__"("A2").value=title
+	set ws."__getitem__"("A2").value=$select(title'="":title,$D(format("title"),ds):ds,1:"")
 
 	set pycols = pybuiltins.list()
 	set (count)=0
@@ -60,6 +60,15 @@ ClassMethod sql2xlsx(sql, format = "", file As %String = "d:\_proj\python\sample
 		do ws.append(pyrows)
 	}
    ;}
+   	if $g(format("freeze"))'="" {
+		; set builtins = $system.Python.Import("builtins") zwrite builtins.type(ws)  zwrite builtins.dir(wb)
+		set ws."freeze_panes" = pybuiltins.str(format("freeze")) ;format("freeze")
+		;set ws."freeze_panes" = "B2" ;format("freeze")
+	}
+	else {
+		set ws."freeze_panes" = pybuiltins.str("B2") ;default
+	}
+
 	write !,"Save into "_file_" rows: "_count
 	do wb.save(file)
 	q $GET(count)
@@ -155,7 +164,8 @@ ClassMethod gn2xlsx(gn, ByRef format = "", file As %String, title = "", patternx
 	else {		
 		set wb = openpyxl.Workbook()
 	}
-	set sheetname=$select(sheetname'="":sheetname,$qs(gn,1)'="":$qs(gn,1),1:"Report")
+	
+	set sheetname=$select(sheetname'="":sheetname,$D(format("sheetname"),ds):ds,$qs(gn,1)'="":$qs(gn,1),1:"Report")
 	
 	#; grab the active worksheet
 	set ws = wb.active
@@ -171,7 +181,7 @@ ClassMethod gn2xlsx(gn, ByRef format = "", file As %String, title = "", patternx
 	set font = openpyxl.styles.Font(argsfont...)	
 	set cell = ws.cell(1,1)
    	set cell.font = font
-   	set cell.value = title
+   	set cell.value = $select(title'="":title,$D(format("title"),ds):ds,1:"")
 
 
 	set pycols = pybuiltins.list()

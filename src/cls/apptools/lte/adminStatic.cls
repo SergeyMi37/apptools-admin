@@ -132,7 +132,11 @@ th {
 .bigbox { 
 height: 20px; width: 20px 
 }
- 
+
+.lte-title-dark { 
+color: white; 
+}
+
 </style>
 }
 

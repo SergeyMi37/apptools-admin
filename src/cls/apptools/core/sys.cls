@@ -576,17 +576,20 @@ ClassMethod SqlToDSN2(sql, DSN, result, top = 100000) As %Status
 }
 
 /// write ##class(apptools.core.sys).sql2gn(sql,jdbc,gn)
+/// write ##class(apptools.core.sys).sql2gn("SYS.Database:FreeSpace","q","^||tmp")
 ClassMethod sql2gn(sql, jdbc = "", gn, top = 100000, journl = 0) As %Status
 {
 	set st=$$$OK
 	if 'journl do DISABLE^%NOJRN
-	if jdbc'="" {
+	if jdbc="q" {
+		set st=##class(apptools.core.sys).SaveQuery(sql,gn,0)
+	}
+	elseif jdbc'="" {
 		set st=##class(apptools.core.sys).SqlToDSN(sql, jdbc, gn, top)
 	}
 	elseif jdbc="" {
 		set st=##class(apptools.core.sys).SaveSQL(sql,gn) ;todo top
 	}
-	; */d ##class(apptools.core.sys).SaveQuery("SYS.Database:FreeSpace")
 	if 'journl do ENABLE^%NOJRN
 	quit st
 }

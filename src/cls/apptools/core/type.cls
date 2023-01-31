@@ -67,12 +67,16 @@ ClassMethod GetHorYYYYMMDD(dt) As %String
 /// Translate DD.MM.YYYY in $HOROLOG
 /// write ##class(apptools.core.type).GetHorDDMMYYYY("06.07.2018 08:14:47")
 /// write ##class(apptools.core.type).GetHorDDMMYYYY("2018-07-06 08:14:47")
+/// write ##class(apptools.core.type).GetHorDDMMYYYY("23/05/2023 08:14:47")
 ClassMethod GetHorDDMMYYYY(dt) As %String
 {
 	try{ 
 		set c=$s($p(dt," ",2)="":0,1:$zth($p(dt," ",2),1))
 		set d=$p(dt," ")
-		set:d["." dt=$p(d,".",3)_"-"_$p(d,".",2)_"-"_$p(d,".",1)
+		if d["." {set dt=$p(d,".",3)_"-"_$p(d,".",2)_"-"_$p(d,".",1)
+		}
+		elseif d["/" {set dt=$p(d,"/",3)_"-"_$p(d,"/",2)_"-"_$p(d,"/",1)
+		}
 		set d=$zdh($p(dt," "),3)
 		set res=d_","_c
 	}

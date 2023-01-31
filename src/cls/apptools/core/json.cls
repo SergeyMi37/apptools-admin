@@ -50,7 +50,7 @@ ClassMethod ImportNodeRestore(obj, gn, orig, Filtr = "", ByRef outvalue) As %Sta
 
 /// todo set Filtr="%gn[""install""&&(@%gn'[""ERROR"")" ; 
 /// do ##class(apptools.core.json).ExportGlobals("^ZPM.Dev.ModuleD","/tmp/zpm-glob.json",.json, $Get(Filtr)) write ##class(apptools.core.json).Pretty(json)
-ClassMethod ExportGlobals(gn, filename = "", ByRef json, Filtr = "", erros) As %Status
+ClassMethod ExportGlobals(gn, filename = "", ByRef json, Filtr = "", erros, JsonAsString = 0) As %Status
 {
 	set (igg,ig)=gn
 	set st=$$$OK
@@ -74,7 +74,21 @@ ClassMethod ExportGlobals(gn, filename = "", ByRef json, Filtr = "", erros) As %
 	do json.%Set("Namespace",$namespace)
 	do json.%Set("Instances",jsonarray)
 	;w json
-	if filename'="" do json.%ToJSON(filename)
+	if filename'="" { ;do json.%ToJSON(filename)
+		if 'JsonAsString {
+			do json.%ToJSON(filename)
+		}
+		else {
+			set str=##class(apptools.core.json).Pretty(json)
+			set stream = ##class(%Stream.TmpCharacter).%New()
+			do stream.Write(str)
+			s File = ##class(%Stream.FileCharacter).%New()
+			s File.TranslateTable="UTF8"
+			s File.Filename=filename
+			s st=File.CopyFromAndSave(stream)
+			quit st
+		}
+	}
 	if erros quit $$$ERROR($$$GeneralError,"Found possible errors while restoring: "_erros)
 	quit $$$OK
 	##; Filter conditions on a node and values

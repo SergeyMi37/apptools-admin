@@ -173,6 +173,13 @@ ClassMethod OpenFile(file, time = 1, mode = "WNSK", code = "UTF8") As %Status
 	quit $test
 }
 
+/// Read file. if ##class(apptools.core.files).ReadFile("/irisdev/app/module.xml",.txt) write txt
+/// s f=##class(%File).%New("/irisdev/app/module.xml") if f.Open("RSU") {s t=f.Read() w !,t } else { w $System.Status.GetErrorText($g(%objlasterror)) } d f.%Close() k f
+ClassMethod ReadFile(filename = "/irisdev/app/module.xml", ByRef txt) As %Status
+{
+	set f=##class(%File).%New(filename) if f.Open("RSU") {s txt=f.Read() w !,txt } else { w !,$System.Status.GetErrorText($g(%objlasterror)) quit $g(%objlasterror) } d f.%Close() quit $$$OK
+}
+
 /// To read a file and write to global 
 /// w ##class(apptools.core.files).File2Arr("/backup/eaist/work/SPGZ.xml_2018-05-07_14.56.26.461","^tmpFile")
 ClassMethod File2Arr(file, Mas, Param = "RSU") As %Status
@@ -553,6 +560,33 @@ ClassMethod Export2CSV(aFileName = {$$$EMAILXLSPATH_"JrnCount*.csv"}, tmpGN = {$
 	WRITE !,$$$aText("Written to the file","")_" "_aFileName,!
 	KILL FileStream quit sc
 	q
+}
+
+/// do ##class(apptools.core.files).GetJournalFiles(13,.a,.average)
+ClassMethod GetJournalFiles(count = 1, ByRef list, ByRef Average)
+{
+	set file=##class(%SYS.Journal.System).GetCurrentFileName()
+	do ##class(%SYS.Journal.File).GetPrev(file,.file)
+	set summ=0
+	for i=1:1:count {
+		set h=##class(%File).GetFileDateCreated(file)
+		set secs=##class(apptools.core.type).GetCountSec(h)
+		do ##class(%SYS.Journal.File).GetPrev(file,.file2)
+		;write !,i," ",h," ",file," -> ",file2
+		if file2="" {
+			set count=i 
+			set:h>0 list(file)=$lb(h,secs,##class(apptools.core.type).GetDateTime(h," "))	
+			quit
+		}
+		set h2=##class(%File).GetFileDateCreated(file2)
+		set secs2=##class(apptools.core.type).GetCountSec(h2)
+		set div=secs-secs2
+		set summ=summ+div
+		set list(file)=$lb(h,secs,##class(apptools.core.type).GetDateTime(h," "),div)
+		set file=file2	
+	}
+	set Average=$j(summ\count/60,"",2)
+	quit $$$OK
 }
 
 /// Get all files in a directory and subdirectories

@@ -324,8 +324,78 @@ Storage Default
 </Data>
 <DataLocation>^apptools.core.LogD</DataLocation>
 <DefaultData>LogDefaultData</DefaultData>
+<ExtentSize>4</ExtentSize>
 <IdLocation>^apptools.core.LogD</IdLocation>
 <IndexLocation>^apptools.core.LogI</IndexLocation>
+<Property name="%%CLASSNAME">
+<AverageFieldSize>2</AverageFieldSize>
+<Selectivity>100.0000%</Selectivity>
+</Property>
+<Property name="%%ID">
+<AverageFieldSize>3</AverageFieldSize>
+<Selectivity>1</Selectivity>
+</Property>
+<Property name="Arguments">
+<AverageFieldSize>44.75</AverageFieldSize>
+<Selectivity>25.0000%</Selectivity>
+</Property>
+<Property name="ClassName">
+<AverageFieldSize>23</AverageFieldSize>
+<Selectivity>100.0000%</Selectivity>
+</Property>
+<Property name="ClientIPAddress">
+<AverageFieldSize>7.75</AverageFieldSize>
+<Selectivity>25.0000%</Selectivity>
+</Property>
+<Property name="EventType">
+<AverageFieldSize>6</AverageFieldSize>
+<Selectivity>100.0000%</Selectivity>
+</Property>
+<Property name="Job">
+<AverageFieldSize>8.25</AverageFieldSize>
+<Selectivity>25.0000%</Selectivity>
+</Property>
+<Property name="Message">
+<AverageFieldSize>21.25</AverageFieldSize>
+<Selectivity>33.3333%</Selectivity>
+</Property>
+<Property name="MethodName">
+<AverageFieldSize>8</AverageFieldSize>
+<Selectivity>50.0000%</Selectivity>
+</Property>
+<Property name="Source">
+<AverageFieldSize>23</AverageFieldSize>
+<Selectivity>50.0000%</Selectivity>
+</Property>
+<Property name="TimeStamp">
+<AverageFieldSize>12.5</AverageFieldSize>
+<Selectivity>33.3333%</Selectivity>
+</Property>
+<Property name="UserName">
+<AverageFieldSize>84</AverageFieldSize>
+<Selectivity>33.3333%</Selectivity>
+</Property>
+<SQLMap name="$Log">
+<BlockCount>-4</BlockCount>
+</SQLMap>
+<SQLMap name="IDKEY">
+<BlockCount>-4</BlockCount>
+</SQLMap>
+<SQLMap name="idxClassName">
+<BlockCount>-4</BlockCount>
+</SQLMap>
+<SQLMap name="idxClientIPAddress">
+<BlockCount>-4</BlockCount>
+</SQLMap>
+<SQLMap name="idxEventType">
+<BlockCount>-4</BlockCount>
+</SQLMap>
+<SQLMap name="idxTimeStamp">
+<BlockCount>-4</BlockCount>
+</SQLMap>
+<SQLMap name="idxUserName">
+<BlockCount>-4</BlockCount>
+</SQLMap>
 <StreamLocation>^apptools.core.LogS</StreamLocation>
 <Type>%Storage.Persistent</Type>
 }

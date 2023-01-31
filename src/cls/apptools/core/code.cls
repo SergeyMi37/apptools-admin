@@ -554,5 +554,23 @@ ClassMethod ExportOneResource(dir, flags = "00000", code = "", ByRef item)
 	quit $$$OK
 }
 
+/// do ##class(apptools.core.code).DrawNS4vc()
+ClassMethod DrawNS4vc(name = {$zu(110)})
+{
+	set listns= ##class(apptools.core.sys).ListNS(.info)
+    set ns=""
+    	write !," {"
+      	write !,"   ""name"": """_name_""","
+      	write !,"   ""path"": ""."","
+      	write !," },"
+    for { set ns=$o(info(ns)) quit:ns=""  
+    	write !,"    {"
+      	write !,"      ""uri"": ""isfs://"_name_"?ns="_ns_""","
+      	write !,"      ""name"": """_ns_""","
+      	write !,"    },"
+     }
+     quit $$$OK
+}
+
 }
 
