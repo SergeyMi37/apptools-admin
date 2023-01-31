@@ -18,14 +18,19 @@
 
 [![license](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Platform for creating applications for administration and tools for technical support and DBMS administrator.
+## A platform for creating applications for administration and tools for technical support and a database administrator.
 
-View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files. A few simple graphs on the protocols of the system.
-This solution can be installed in earlier versions of Caché and Ensemble (tested 2016.1+). This can be done by importing xml.
+Viewing and editing global arrays, executing queries, including JDBC / ODBC, generating results in XLS, XLSX, JSON formats, sending results by e-mail in the form of XLS files. Execution of queries and IRIS commands in the interface for any namespace. Summary analysis and error viewing for all namespaces.
 
 ## What's new
 
-An application has been implemented for monitoring and [ administering the products ](https://appadmin.demo.community.intersystems.com/apptoolsrest/a/info) of the entire instance at once.
+Added fileserver module for report execution results.
+
+Implemented file deletion mode in the fileserver module.
+
+Formation of results in XLS, XLSX formats has been implemented.
+
+In the interface, the mode of exporting globals in the JSON format has been added.
 
 ![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_info2.png)
 
