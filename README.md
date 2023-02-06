@@ -5,7 +5,7 @@
 
 ## apptools-admin
 [![OEX](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/apptools-admin) 
-[![Demo](https://img.shields.io/badge/Demo%20on-Cloud%20Run%20Deploy-F4A460)](https://apptools.demo.community.intersystems.com/apptools/apptools.core.LogInfo.cls)
+[![Demo](https://img.shields.io/badge/Demo%20on-Cloud%20Run%20Deploy-F4A460)](https://appadmin.demo.community.intersystems.com/apptoolsrest/a/info)
 
 [![Habr](https://img.shields.io/badge/Available%20article%20on-Intersystems%20Community-orange)](https://community.intersystems.com/post/intersystems-solution-technical-support-and-dbms-interoperability-administration)
 [![Habr](https://img.shields.io/badge/Есть%20статья%20на-Хабре-blue)](https://habr.com/en/post/436042/)
