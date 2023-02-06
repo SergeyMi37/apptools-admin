@@ -32,7 +32,7 @@ Formation of results in XLS, XLSX formats has been implemented.
 
 In the interface, the mode of exporting globals in the JSON format has been added.
 
-![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_info2.png)
+![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_10-at.png)
 
 ## Applications based on this platform
 
