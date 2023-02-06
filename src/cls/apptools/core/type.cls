@@ -104,7 +104,10 @@ ClassMethod GetYear(h) As %String
 /// w ##class(apptools.core.type).GetDateTime($h)
 ClassMethod GetDateTime(h, delim = "T") As %String
 {
-	q $zd(h,3)_delim_##class(apptools.core.type).GetValidZT(h)
+    try {
+	set ret=$zd(h,3)_delim_##class(apptools.core.type).GetValidZT(h)
+    } catch e {}
+    quit $g(ret)
 }
 
 /// To check the validity and display the time
