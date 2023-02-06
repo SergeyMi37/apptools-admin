@@ -3,13 +3,13 @@
   <Document name="apptools-admin.ZPM">
     <Module>
       <Name>apptools-admin</Name>
-      <Version>1.1.31</Version>
+      <Version>1.1.32</Version>
       <Description>Application tools for technical support and DBMS administrator. View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files</Description>
       <Packaging>module</Packaging>
   <Keywords>Application tools admin</Keywords>
 <Author>
 <Person>Mikhaylenko Sergey</Person>
-<CopyrightDate>2022</CopyrightDate>
+<CopyrightDate>2023</CopyrightDate>
 <License>MIT</License>
 <Notes>
 repository:
