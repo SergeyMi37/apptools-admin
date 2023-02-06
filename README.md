@@ -36,17 +36,17 @@ In the interface, the mode of exporting globals in the JSON format has been adde
 
 ## Applications based on this platform
 
-* Module for exporting IRIS requests [to excel file using python openpyxl library.](https://app*msw-sql2xlsx.demo.community.intersystems.com/apptoolsrest/a/rate&class=appmsw.python.demo#)
+* Module for exporting IRIS requests [to excel file using python openpyxl library.](https://github.com/SergeyMi37/appmsw-sql2xlsx)
 
 * Informing support projects using telegram messenger bots. [Notification via telegram](https://github.com/SergeyMi37/appmsw-telealerts)
 
 * Web application [photo album, music player and personal e-book library.](https://github.com/SergeyMi37/apptools-infochest)
 
-* Application of products forming a database of [exchange rates of the Central Bank of the Russian Federation.](https://cbrf.demo.community.intersystems.com/apptoolsrest/a/rate&class=appmsw.cbrf.rateinfo&namespace=USER#)
+* Application of products forming a database of [exchange rates of the Central Bank of the Russian Federation.](https://github.com/SergeyMi37/exchange-rate-cbrf-ui)
 
 * An example of a backup [ task with preliminary deletion of old files.](https://github.com/SergeyMi37/apptools-task)
 
-* User interface for selecting IRIS resources and creating a zpm package. [UI for basic commands from module generation, loading, installation, uninstallation](https://zpm-ui.demo.community.intersystems.com/apptoolsrest/a/zapm) to publishing to the registry.
+* User interface for selecting IRIS resources and creating a zpm package. [UI for basic commands from module generation, loading, installation, uninstallation](https://github.com/SergeyMi37/zapm) to publishing to the registry.
 ---
 ## Installation with ZPM
 
