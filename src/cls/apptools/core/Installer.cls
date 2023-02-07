@@ -39,8 +39,6 @@ ClassMethod CreateProjection(cls As %String, ByRef params) As %Status
 	 set @$$$GNEnsConf@("EMAILSUPPORT")="user_to_send_mail@server.com"
 	 set @$$$GNEnsConf@("EMAILXLSPATH")=##class(%File).GetDirectory(##class(%File).TempFilename())
          set @$$$GNEnsConf@("EXPORTPROJPATH")=^("EMAILXLSPATH")
-	 set @$$$GNEnsConf@("EMAILXLSPATH")="c:\temp\"
-	 set @$$$GNEnsConf@("EXPORTPROJPATH")="c:\temp\source\"
 	 set @$$$GNEnsConf@("Language")="en"
 	 set @$$$GNEnsConf@("PATHCSP")="/"_..#AppCSP_"/"
 	 ;set @$$$GNEnsConf@("EnsProductStatusRun")="Run" 
