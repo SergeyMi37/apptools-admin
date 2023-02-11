@@ -455,8 +455,9 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 		<tr>
 			<td>
 				#(selectNS)# #(selectDSN)# 
-				 | <a name='Gateways' href='#("/csp/sys/mgr/UtilSqlGateways.csp"_"")#' id='Gateways'>Gateways</a>
-				 | <a name='Hist' href='#("apptools.core.LogInfo.cls?NSP="_$Namespace_"&Next=-1&WHAT="_$zconvert($$$HISTORYGN,"O","URL")_"")#' id='Hist'>#($$$aText("History",""))#</a>
+				 | <a name='Gateways' target=_blank href='#("/csp/sys/mgr/UtilSqlGateways.csp"_"")#' id='Gateways'>Gateways</a>
+				 | <a name='ExternalLanguageServers' target=_blank  href='#("/csp/sys/mgr/%25CSP.UI.Portal.ExternalLanguageServers.zen"_"")#' id='ExternalLanguageServers'>ExternalLanguageServers</a>
+				 | <a name='Hist' target=_blank  href='#("apptools.core.LogInfo.cls?NSP="_$Namespace_"&Next=-1&WHAT="_$zconvert($$$HISTORYGN,"O","URL")_"")#' id='Hist'>#($$$aText("History",""))#</a>
 				 | <a target='Explore' name='Explore' href='#("apptools.Form.Exp.cls?NSP="_$Namespace)#' id='Explorer'>#($$$aText("Selection Classes",""))#</a>
 				 | <a target='ExploreTab' name='ExploreTab' href='#("apptools.Form.Exp.cls?panel=AccordionExp&NSP="_$Namespace)#'  id='ExplorerTab'>#($$$aText("Explorer tables",""))#</a>
 				 | <a target='Param' name='Param' href='#("apptools.Form.Exp.cls?NSP="_$Namespace_"&SelClass=apptools.core.Parameter")#' title='#($$$aText("Go to the options table",""))#' id='Param'>#($$$aText("Parameters",""))#</a>

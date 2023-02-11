@@ -104,10 +104,10 @@ ClassMethod GetYear(h) As %String
 /// w ##class(apptools.core.type).GetDateTime($h)
 ClassMethod GetDateTime(h, delim = "T") As %String
 {
-    try {
-	set ret=$zd(h,3)_delim_##class(apptools.core.type).GetValidZT(h)
-    } catch e {}
-    quit $g(ret)
+	try {
+		set ret=$zd(h,3)_delim_##class(apptools.core.type).GetValidZT(h)
+	} catch e {}
+	quit $g(ret)
 }
 
 /// To check the validity and display the time
@@ -244,6 +244,15 @@ ClassMethod GetValidNumeric(price) As %String
 	i price[","&&(price[".") s price=$tr(price,",")
 	i price["," s price=$tr(price,",",".")
 	q $tr(price," "_$c(160)) ;remove the spaces
+}
+
+/// Digit combining enclosing keycap ;https://apps.timwhitlock.info/emoji/tables/unicode
+/// w ##class(apptools.core.type).UD("45")
+ClassMethod UD(num) As %String
+{
+	set ret=""
+	for i=1:1 quit:$e(num,i)=""  set ret=ret_$wc($zhex("003"_(+$e(num,i))))_$wc($zhex("20E3"))
+	quit ret
 }
 
 }

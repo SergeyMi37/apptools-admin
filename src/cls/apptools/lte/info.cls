@@ -457,9 +457,9 @@ ClassMethod NSpaceResult(Par = "") As %Status
 		quit $$$OK
 	}
 	write "<form id='"_divId_"FormContentExpo'>"
-	write $$$appInputHidden(divId_"OutFormat","",outFormat)
+	write $$$appInputHidden(divId_"OutFormat","",$g(outFormat))
 	write $$$appInputHidden(divId_"OutFormatGN","",$g(gn))
-	write $$$appInputHidden(divId_"OutFilter","",Filtr)
+	write $$$appInputHidden(divId_"OutFilter","",$g(Filtr))
 	// Execute	-------------------------------------
 	;merge aaa=%request ;.GetMimeData ;GetCgiEnv ;Data
 	#; arbitrary query

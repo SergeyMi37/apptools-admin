@@ -33,12 +33,12 @@ ClassMethod CreateProjection(cls As %String, ByRef params) As %Status
 	if $g(@$$$GNEnsConf@("HomeNamespace"))="" {
 	;Filling the global default values
 	 set @$$$GNEnsConf@("EMAILAUTH")="user_from_send_mail@server.com"
-	 set @$$$GNEnsConf@("EMAILAUTHPASS")=12345
+	 set @$$$GNEnsConf@("EMAILAUTHPASS")="some_password"
 	 set @$$$GNEnsConf@("EMAILSERVERIP")="127.0.0.1"
 	 set @$$$GNEnsConf@("EMAILSERVERPORT")=25
 	 set @$$$GNEnsConf@("EMAILSUPPORT")="user_to_send_mail@server.com"
 	 set @$$$GNEnsConf@("EMAILXLSPATH")=##class(%File).GetDirectory(##class(%File).TempFilename())
-         set @$$$GNEnsConf@("EXPORTPROJPATH")=^("EMAILXLSPATH")
+	 set @$$$GNEnsConf@("EXPORTPROJPATH")=^("EMAILXLSPATH")
 	 set @$$$GNEnsConf@("Language")="en"
 	 set @$$$GNEnsConf@("PATHCSP")="/"_..#AppCSP_"/"
 	 ;set @$$$GNEnsConf@("EnsProductStatusRun")="Run" 

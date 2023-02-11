@@ -10,6 +10,8 @@ Parameter CHARSET = "UTF-8";
 
 Parameter ISCPREFIX = "isc_cache";
 
+Parameter GN = "^%apptools.Task";
+
 XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 {
 <Routes>
@@ -36,6 +38,7 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 <Route Url="/productslist/:ns" Method="GET" Call="getListErrProducts"/>
 <Route Url="/alerts/:count" Method="GET" Call="GetAlerts"/>
 <Route Url="/status-journal/:count" Method="GET" Call="GetJourSysSummary"/>
+<Route Url="/custom-task/:count" Method="GET" Call="CustomTask"/>
 
 <Route Url="/proj/:proj/:metrics/:mode" Method="GET" Call="apptools.MVK.Metrics:getProj"/>
 </Routes>
@@ -480,6 +483,53 @@ ClassMethod AddNodeJson(obj, icon = "", text = "") As %Status
 	set arr.text=text
 	do obj.array.%Push(arr)
 	quit $$$OK
+}
+
+/// do ##class(apptools.core.rest).CustomTask(1)
+ClassMethod CustomTask(par = "10") As %Status
+{
+	new $namespace
+	set gn=..#GN
+	set task=""
+	set st=$$$OK
+	try {
+		if $G(par)="test" {
+				set json = {}
+				set json.status="OK"
+				set json.array = []
+				do ..AddNodeJson(json,$wc($zhex("2705")),"<b>Run: </b>"_par)
+				quit
+		}
+		for {
+			set task=$o(@gn@(task),1,data) quit:task=""
+			if data'="" {
+				set ns=$lg(data,1)
+				set:ns'="" $namespace=ns
+				set class=$lg(data,2)
+				set met=$lg(data,3)
+				set rou=$lg(data,4)
+				if rou'="" {;TODO
+				}
+				else {
+					set st=$classmethod(class,method,par,.json)	
+					set run=1					
+				} 
+			}
+		}
+		if '$d(run) {
+				set json = {}
+				set json.status="OK"
+				set json.array = []
+				do ..AddNodeJson(json,$wc($zhex("1F6AB")),"<b>Not found </b>"_$g(par))
+		}
+	}
+	catch ex {
+	   	Set st = $g(%objlasterror, $$$OK)
+	   	Set st = $$$ADDSC(st, ex.AsStatus())
+	}
+
+	if $d(json),$iso(json) do json.%ToJSON()
+  	quit st
 }
 
 /// do ##class(apptools.core.rest).GetJourSysSummary(1)

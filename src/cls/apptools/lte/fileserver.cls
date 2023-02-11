@@ -131,14 +131,17 @@ ClassMethod FirstHead(Par = "") As %Status
 	set key=Par("key")
 	set divId=Par("divId")
 	set app=$G(Par("app"))
+	set GN=..#GNStore
 	set %ui=1
 	set onclick=$$$blockui("Wait...")_";"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainContent",..%ClassName(1),divId_"Result","~key="_key_"~divId="_divId_"~app="_app_"~mode=*")
-	s dataFrom=$zd($h,3) ;##class(apptools.core.type).GetYear($h-30)_"-"_##class(apptools.core.type).GetMonth($h-30)_"-01"
-	s dataTo=$zd($h+1,3) ;##class(apptools.core.type).GetYear($h)_"-12-31"
+	s dataFrom=$zd($h-1,3) ;##class(apptools.core.type).GetYear($h-30)_"-"_##class(apptools.core.type).GetMonth($h-30)_"-01"
+	s dataTo=$zd($h,3) ;##class(apptools.core.type).GetYear($h)_"-12-31"
 	if $roles["%All" {
 		set onclick2=$$$blockui("Wait...")_";"_##class(apptools.core.Action).WriteActJs(%request,divId_"FormContentSave",divId_"MainContent",..%ClassName(1),divId_"Result","~key="_key_"~divId="_divId_"~app="_app_"~mode=*")
 		set ButtDel=$$$appButton(divId_"appButtonClenResult"," title='Delete files' onclick="""_$replace(onclick2,"*","del")_"""","delete")
-		set selectNS=..GetSelectNSpace(divId)
+		set dfltns=$g(@GN@("Namespace",$username))
+		w dfltns
+		set selectNS=..GetSelectNSpace(divId,dfltns)
 		set checkboxDel=$$$appCheck(divId_"Dele","no-checked title='mark all for deletion' ","")
 	}
 	&html<
@@ -194,6 +197,7 @@ ClassMethod Result(Par = "") As %Status
 	write "<form id='"_divId_"FormContentSave'>"
 	if NSpace'="",$namespace'=NSpace set $namespace=NSpace
 	write $$$appInputHidden(divId_"NSpace","",$namespace)
+	set @GN@("Namespace",$username)=$namespace
     if mode="del" {
 	    set count=0,i="",deleted=0
 		for { set i=$o(Par("%request.Data",i)) quit:i=""
