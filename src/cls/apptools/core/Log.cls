@@ -67,6 +67,7 @@ ClassMethod GetClientAddress()
 /// Add new log event
 /// Use via $$$LogEventTYPE().
 /// Return ID log
+///         write ##class(apptools.core.Log).AddRecord(ClassName, MethodName, Source, EventType, Arguments, Message)
 /// Example do ##class(apptools.core.Log).AddRecord("I want", "log", "everything", "INFO", "actions", "users")
 ClassMethod AddRecord(ClassName As %String = "", MethodName As %String = "", Source As %String = "", EventType As %String = "", Arguments As %String = "", Message As %String = "")
 {

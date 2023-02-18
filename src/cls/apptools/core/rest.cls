@@ -38,7 +38,7 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 <Route Url="/productslist/:ns" Method="GET" Call="getListErrProducts"/>
 <Route Url="/alerts/:count" Method="GET" Call="GetAlerts"/>
 <Route Url="/status-journal/:count" Method="GET" Call="GetJourSysSummary"/>
-<Route Url="/custom-task/:count" Method="GET" Call="CustomTask"/>
+<Route Url="/custom-task/:namespace/:args" Method="GET" Call="CustomTask"/>
 
 <Route Url="/proj/:proj/:metrics/:mode" Method="GET" Call="apptools.MVK.Metrics:getProj"/>
 </Routes>
@@ -475,61 +475,154 @@ ClassMethod GetAlertsSys(count = 10, ByRef sys) As %Status
  quit $$$OK
 }
 
-/// do ##class(apptools.core.rest).AddNodeJson(1)
-ClassMethod AddNodeJson(obj, icon = "", text = "") As %Status
+/// do ##class(apptools.core.rest).AddNodeJson(jsom,"g","test")
+ClassMethod AddNodeJson(obj, icon = "", text = "", arg = "") As %Status
 {
 	set arr={}
 	set arr.icon=icon ;"y" ;yellow, green, red, - HR
 	set arr.text=text
+	if arg'="" set arr.arg=arg
 	do obj.array.%Push(arr)
 	quit $$$OK
 }
 
-/// do ##class(apptools.core.rest).CustomTask(1)
-ClassMethod CustomTask(par = "10") As %Status
+/// Test custom module
+/// set ^%apptools.Task("test")=$lb($namespace,"apptools.core.rest","CustomTaskTest")
+/// set ^%apptools.Task("show_logs")=$lb($namespace,,,,"http://iris-test:52773/apptoolsrest/custom-task/test?a=1&b=2","username","pas$w0rd")
+ClassMethod CustomTaskTest(par = "10", ByRef json) As %Status
 {
 	new $namespace
 	set gn=..#GN
-	set task=""
 	set st=$$$OK
 	try {
+		set json.status=json.status_"- OK - Custom Task Test -"
+		set json.array = []
+		do ..AddNodeJson(json,$wc($zhex("2705")),"Run: CustomTaskTest "_$g(par))
+		do ..AddNodeJson(json,"g","Test1:   <b>Тест</b>")
+		do ..AddNodeJson(json,"y","Test2:   <b>Тест</b>")
+		do ..AddNodeJson(json,"r","Test3:   <b>Тест</b>")
+		do ..AddNodeJson(json,"")
+		set digit=""
+		for i=0:1:11 set digit=digit_##class(apptools.core.type).UD(i)_","
+		do ..AddNodeJson(json,"-",digit)
+		quit
+	}
+	catch ex {
+	   	Set st = $g(%objlasterror, $$$OK)
+	   	Set st = $$$ADDSC(st, ex.AsStatus())
+	   set json.status=json.status_$tr($System.Status.GetErrorText(st),"<>")
+	}
+  	quit $$$OK
+}
+
+/// http://iris-test:52773/apptoolsrest/custom-task/user/test 
+/// http://iris-test:52773/apptoolsrest/custom-task/user/get-item 
+/// do ##class(apptools.core.rest).CustomTask(1)
+ClassMethod CustomTask(ns, par = "10") As %Status
+{
+	new $namespace
+	set gn=..#GN
+	set st=$$$OK
+	set json = {}
+	try {
+		if $zconvert(ns,"L")="_sys" set ns="%SYS"
+		set $namespace=ns
+		/// http://iris-test:52773/apptoolsrest/custom-task/test
 		if $G(par)="test" {
-				set json = {}
-				set json.status="OK"
-				set json.array = []
-				do ..AddNodeJson(json,$wc($zhex("2705")),"<b>Run: </b>"_par)
-				quit
+			set json.status="OK test"
+			set json.array = []
+			do ..AddNodeJson(json,$wc($zhex("2705")),"Run: "_par)
+			quit
 		}
-		for {
-			set task=$o(@gn@(task),1,data) quit:task=""
-			if data'="" {
-				set ns=$lg(data,1)
-				set:ns'="" $namespace=ns
-				set class=$lg(data,2)
-				set met=$lg(data,3)
-				set rou=$lg(data,4)
-				if rou'="" {;TODO
+		elseif $G(par)="get-item" {
+			set json.status="OK get-item"
+			set json.array = []
+				,task=""
+			for {	set task=$o(@gn@(task),1,data) quit:task=""
+				if data'="" {
+					KILL jsonreturn
+					set stat=##class(apptools.core.rest).RunCustomTask(data,.jsonreturn)
+					set status="OK"
+					if 'stat set status=$System.Status.GetErrorText(stat)
+					if $d(jsonreturn),$iso(jsonreturn) set status=status_" "_jsonreturn.status
+					set arg=$SYSTEM.Encryption.Base64Encode(data)
+					do ..AddNodeJson(json,$wc($zhex("2705")),task_" "_status,arg)
 				}
-				else {
-					set st=$classmethod(class,method,par,.json)	
-					set run=1					
-				} 
 			}
+			quit
 		}
-		if '$d(run) {
-				set json = {}
-				set json.status="OK"
-				set json.array = []
-				do ..AddNodeJson(json,$wc($zhex("1F6AB")),"<b>Not found </b>"_$g(par))
+		elseif $e($G(par),1,4)="run&" {
+			set cgi=$p(par,"run&",2,*) ;w cgi
+			do ##class(apptools.core.type).ParseURL(cgi,.cgi,"&")
+			set data=$lb($namespace,$g(cgi("class")),$g(cgi("met")))
+			set $list(data,8)=$g(cgi("par"))
+			KILL jsonreturn
+			set stat=##class(apptools.core.rest).RunCustomTask(data,.jsonreturn)
+			set status="OK"
+			if 'stat set status=$System.Status.GetErrorText(stat)
+			if $d(jsonreturn),$iso(jsonreturn) set status=status_" "_jsonreturn.status
+			set json=jsonreturn
+			;set json.status=status
+		    quit
 		}
 	}
 	catch ex {
 	   	Set st = $g(%objlasterror, $$$OK)
 	   	Set st = $$$ADDSC(st, ex.AsStatus())
+	   	set $$$AppL("MSW","req")=$System.Status.GetErrorText(st)
+	   	set json = {}
+	   	set json.status=$tr($System.Status.GetErrorText(st),"<>","()")_" "_$g(cgi)
 	}
 
 	if $d(json),$iso(json) do json.%ToJSON()
-  	quit st
+  	quit $$$OK
+}
+
+/// set st=##class(apptools.core.rest).RunCustomTask(data,.json)
+ClassMethod RunCustomTask(data, ByRef json) As %Status
+{
+	new $namespace
+	set gn=..#GN
+	set st=$$$OK
+	set json = {}
+	try {	
+		set ns=$lg(data,1)
+		set:ns'="" $namespace=ns
+		set class=$lg(data,2)
+		set met=$lg(data,3)
+		set routine=$lg(data,4)
+		set url=$lg(data,5)
+		if url'="" {
+			set user=$lg(data,6)
+			set pass=$lg(data,7)
+			if ##class(apptools.core.net).GetHttp(url,.out2,,,user, pass) {
+				set stream1=out2("content")
+				set status=$g(out2("status"))
+				do stream1.Rewind() 
+				set ret=""
+				while '(stream1.AtEnd) {
+					set ret=ret_stream1.ReadLine()
+				}
+			 	set json={}.%FromJSON(ret)
+			}
+		}
+		elseif routine'="" {
+			;TODO
+		}
+		elseif met'="" {
+			set param=$lg(data,8)
+			set st=$classmethod(class,met,$g(param),.json)
+			set run=1					
+		}
+	}
+	catch ex {
+	   	Set st = $g(%objlasterror, $$$OK)
+	   	Set st = $$$ADDSC(st, ex.AsStatus())
+	   	set $$$AppL("MSW","req")=$System.Status.GetErrorText(st)
+	   	set json = {}
+	   	set json.status=$tr($System.Status.GetErrorText(st),"<>","()")
+	}
+  	quit $$$OK
 }
 
 /// do ##class(apptools.core.rest).GetJourSysSummary(1)
@@ -545,7 +638,6 @@ ClassMethod GetJourSysSummary(par = "10") As %Status
 	set sys.status="OK"
 	set sys.array = []
 	do ..AddNodeJson(sys,$wc($zhex("2705")),"<b>"_$ZU(110)_", inst: "_$P($ZU(86),"*",2)_"</b> <u>"_$$$NL_$zv_"</u>")
-
 	for i=1:1 { quit:'$d(@gn@(q,0,i))
 		set arr={}
 		do ..AddNodeJson(sys,"g",$GET(@gn@(q,0,i,1))_":   <b>"_$GET(@gn@(q,0,i,2))_"</b>")
@@ -569,6 +661,47 @@ ClassMethod GetJourSysSummary(par = "10") As %Status
 	}
 	do ..AddNodeJson(sys,"-","</pre>")
 	do sys.%ToJSON()
+  	quit $$$OK
+}
+
+/// http://iris-test:52773/apptoolsrest/custom-task/user/run&class=apptools.core.rest&met=GetLastLogs&par=5
+/// do ##class(apptools.core.rest).GetLastLogs(.par,.json)
+ClassMethod GetLastLogs(top, json) As %Status
+{
+	set sql="select top "_top_" * from apptools_core.Log order by id desc"
+	;set $namespace=ns
+	set gn="^||tmp"
+  	set st=##class(apptools.core.sys).sql2gn(sql,,gn)
+
+  	set div=$wc($zhex("27A1")) ; 27A1 black rightwards arrow   ; 2797 heavy division sign
+	set json = {}
+	set json.status="OK"
+	set json.sql=sql
+	set json.array = []
+	;do ..AddNodeJson(json,$wc($zhex("2705")),"<b>"_$ZU(110)_", inst: "_$P($ZU(86),"*",2)_"</b> <u>"_$$$NL_$zv_"</u>")
+	for i=1:1 { quit:'$d(@gn@(i))
+		do ..AddNodeJson(json,"g",##class(apptools.core.sys).GetValue(gn,i,"Message")_" <b>"_##class(apptools.core.sys).GetValue(gn,i,"Arguments")_"</b>")
+	}
+	;do json.%ToJSON()
+  	quit $$$OK
+}
+
+/// http://iris-test:52773/apptoolsrest/custom-task/user/run&class=apptools.core.rest&met=SaveLog&par=Text-logs
+/// do ##class(apptools.core.rest).SaveLog("text log",.json)
+ClassMethod SaveLog(text = "", ByRef json) As %Status
+{
+   	set json = {}
+  	set Message=$wc($zhex("27A1")) ;--> arrow
+	set id=##class(apptools.core.Log).AddRecord(,,,,text, Message)
+	if id {
+		set json.status="OK"
+	}
+	else { 
+		Set st = $g(%objlasterror, $$$OK)
+   		Set st = $$$ADDSC(st, ex.AsStatus())
+   		;set $$$AppL("MSW","req")=$System.Status.GetErrorText(st)
+   		set json.status=$tr($System.Status.GetErrorText(st),"<>","()")_" "_$g(text)
+	}
   	quit $$$OK
 }
 
