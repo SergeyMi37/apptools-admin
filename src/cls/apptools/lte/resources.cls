@@ -257,7 +257,7 @@ ClassMethod UiMatrixResources(key, divId, ns, mode, zpmname, GN, blockui = 1) As
 	set onclick=$GET(onclick)_$$$onclick(divId_"FormContentSave",divId_"ContentSave",ns,..%ClassName(1),"UiSaveResources","&key="_key_"&divId="_divId_"&ns="_ns_"&mode=*")
 	;set onclick=$GET(onclick)_$$$onclick(divId_"FormContentSave",divId_"FormContentSave",ns,..%ClassName(1),"UiSaveResources","&key="_key_"&divId="_divId_"&mode=*")
 	set DefaultNamePacket=$tr($zconvert(ns,"L"),"%","-")_"-"_..#DefaultNamePacket
-	set dirrepo="/backup/temp/"
+	set dirrepo="/iris-backup/temp/"
 	if $D(@GN@("dir"),data) set dirrepo=data
 	set dir=dirrepo_$s(zpmname="":DefaultNamePacket,1:zpmname)
 	if zpmname'="",$g(@GN@("prototype",ns,zpmname,"Application-module"))'="" set ListProperty=$g(@GN@("prototype",ns,zpmname,"Application-module")) set dir=$lg(ListProperty,1)

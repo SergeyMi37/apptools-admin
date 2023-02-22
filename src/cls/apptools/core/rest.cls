@@ -687,12 +687,24 @@ ClassMethod GetLastLogs(top, json) As %Status
 }
 
 /// http://iris-test:52773/apptoolsrest/custom-task/user/run&class=apptools.core.rest&met=SaveLog&par=Text-logs
+/// http://iris-test:52773/apptoolsrest/custom-task/user/run&class=apptools.core.rest&met=SaveLog&par=Text-logs~ClassName=123~MethodName=qwe~Source=345~EventType=asd~Arguments=789
 /// do ##class(apptools.core.rest).SaveLog("text log",.json)
 ClassMethod SaveLog(text = "", ByRef json) As %Status
 {
    	set json = {}
   	set Message=$wc($zhex("27A1")) ;--> arrow
-	set id=##class(apptools.core.Log).AddRecord(,,,,text, Message)
+  	if text["~" {
+	  	do ##class(apptools.core.type).ParseURL($p(text,"~",2,*),.Par,"~")  ;parse in array
+	  	set (i,ClassName, MethodName, Source, EventType, Arguments)=""
+	  	set Arguments=$p(text,"~",1)
+	  	for { set i=$o(Par(i),1,val) quit:i=""
+	  		set @i=val
+	  	}
+	  	set id=##class(apptools.core.Log).AddRecord(ClassName, MethodName, Source,, Arguments, Message)
+  	}
+  	else {
+		set id=##class(apptools.core.Log).AddRecord(,,,,text, Message)
+  	}
 	if id {
 		set json.status="OK"
 	}

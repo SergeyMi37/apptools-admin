@@ -337,7 +337,7 @@ ClassMethod OptionsFirstHead(Par = "") As %Status
 	set key=Par("key")
 	set divId=Par("divId")
 	set %ui=1
-	set dirrepo="/backup/temp/"
+	set dirrepo="/iris-backup/temp/"
 	if $D(@..#GNStore@("dir"),data) set dirrepo=data
 	
 	set onclick=$$$blockui("Load...")_
