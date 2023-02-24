@@ -25,7 +25,7 @@ Property UserName As %String(MAXLEN = 128) [ InitialExpression = {$username} ];
 Property Arguments As %String(MAXLEN = "", TRUNCATE = 1);
 
 /// Date and time
-Property TimeStamp As %TimeStamp [ InitialExpression = {$zdt($h, 3, 1)} ];
+Property TimeStamp As %TimeStamp(XMLTIMEZONE = "IGNORE") [ InitialExpression = {$zdt($h, 3, 1)} ];
 
 /// Identifies the job from which this event was logged.
 Property Job As %String [ InitialExpression = {$job} ];

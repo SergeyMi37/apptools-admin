@@ -214,7 +214,7 @@ ClassMethod ParseURL(str As %String, ByRef out, del = "&") As %Status
 	f i=1:1:$l(str,del) {
 		continue:$p(str,del,i)=""
 		continue:$p($p(str,del,i),"=")=""
-		s out($p($p(str,del,i),"="))=$p($p(str,del,i),"=",2)
+		s out($p($p(str,del,i),"="))=$p($p(str,del,i),"=",2,*)
 	}
 }
 
