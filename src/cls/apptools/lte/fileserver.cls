@@ -136,11 +136,15 @@ ClassMethod FirstHead(Par = "") As %Status
 	set onclick=$$$blockui("Wait...")_";"_##class(apptools.core.Action).WriteActJs(%request,divId_"MainForm",divId_"MainContent",..%ClassName(1),divId_"Result","~key="_key_"~divId="_divId_"~app="_app_"~mode=*")
 	s dataFrom=$zd($h-1,3) ;##class(apptools.core.type).GetYear($h-30)_"-"_##class(apptools.core.type).GetMonth($h-30)_"-01"
 	s dataTo=$zd($h,3) ;##class(apptools.core.type).GetYear($h)_"-12-31"
+	
+	set ref=%request.CgiEnvs("HTTP_REFERER")
+	set dfltns=$p($p(ref,"&namespace=",2),"&")
+	
 	if $roles["%All" {
 		set onclick2=$$$blockui("Wait...")_";"_##class(apptools.core.Action).WriteActJs(%request,divId_"FormContentSave",divId_"MainContent",..%ClassName(1),divId_"Result","~key="_key_"~divId="_divId_"~app="_app_"~mode=*")
 		set ButtDel=$$$appButton(divId_"appButtonClenResult"," title='Delete files' onclick="""_$replace(onclick2,"*","del")_"""","delete")
-		set dfltns=$g(@GN@("Namespace",$username))
-		w dfltns
+		set:dfltns="" dfltns=$g(@GN@("Namespace",$username))
+		write dfltns
 		set selectNS=..GetSelectNSpace(divId,dfltns)
 		set checkboxDel=$$$appCheck(divId_"Dele","no-checked title='mark all for deletion' ","")
 	}
