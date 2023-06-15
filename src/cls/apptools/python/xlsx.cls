@@ -1,5 +1,6 @@
 Include apptools.core
 
+/// d ##class(apptools.python.xlsx).test()
 Class apptools.python.xlsx
 {
 
@@ -13,8 +14,9 @@ ClassMethod sql2xlsx(sql, format = "", file As %String = "d:\_proj\python\sample
 	set st=myQuery.Execute()
 	if 'st q st
 	
+	set IsVer=($SYSTEM.Version.Format(5,$zv)'>2021.2)
+
 	;prepare XLSX
-	set file=$Replace(file,"*",$Tr($zts,".,"))
 	try {
         set openpyxl = ##class(%SYS.Python).Import("openpyxl") 
     } catch err {
@@ -29,7 +31,7 @@ ClassMethod sql2xlsx(sql, format = "", file As %String = "d:\_proj\python\sample
 	set pycols = pybuiltins.list()
 	do pycols.append(" ")
 	do ws.append(pycols)
-	set ws."__getitem__"("A2").value=$select(title'="":title,$D(format("title"),ds):ds,1:"")
+	if IsVer set ws."__getitem__"("A2").value=$select(title'="":title,$D(format("title"),ds):ds,1:"")
 
 	set pycols = pybuiltins.list()
 	set (count)=0
@@ -37,7 +39,7 @@ ClassMethod sql2xlsx(sql, format = "", file As %String = "d:\_proj\python\sample
 	for i=1:1:ColCount {	
 		do pycols.append(myQuery.GetColumnName(i))
 		set col=openpyxl.utils."get_column_letter"(i)
-		set ws."column_dimensions"."__getitem__"(col).width = "20"
+		if IsVer set ws."column_dimensions"."__getitem__"(col).width = "20"
 	}
 	do ws.append(pycols)
 
@@ -68,7 +70,7 @@ ClassMethod sql2xlsx(sql, format = "", file As %String = "d:\_proj\python\sample
 	else {
 		set ws."freeze_panes" = pybuiltins.str("B2") ;default
 	}
-
+	if file["*" set file=$replace(file,"*","-"_$zd($h,3)_"_"_$tr($zt($p($h,",",2),1),":"))
 	write !,"Save into "_file_" rows: "_count
 	do wb.save(file)
 	q $GET(count)
@@ -127,14 +129,22 @@ ClassMethod globals2xlsx(gn)
 	quit $G(stat)
 }
 
-/// d ##class(apptools.python.xlsx).testgn2xlsx()
-ClassMethod testgn2xlsx() As %Status
+/// d ##class(apptools.python.xlsx).test()
+ClassMethod test() As %Status
 {
- set gn="^||tmp",format="n,s150,,,,,,,,d," 
+ new $namespace
+ set $namespace="%SYS"
+ set sql="select * FROM Security.Applications"
+ set gn="^||tmp",format=",n,n,n,n,s5,s5,s40,s5,s50" 
  set format("freeze")="B3" ;freeze
- do ##class(apptools.core.sys).SaveSQL("select * from apptools_core.Log order by id desc",gn)
+ set format("title")="Title "_sql
+ set format("sheetname")="test"
+ do ##class(apptools.core.sys).SaveSQL(sql,gn)
  set exec="##class(apptools.python.xlsx).MarkRed(.%AppLogInfoVal, %AppLogInfoCol, %AppLogInfoHead, .%AppLogInfoTemp)"
- do ##class(apptools.python.xlsx).gn2xlsx(gn,.format,"/backup/temp/test*.xlsx","Test",,,,exec)
+ do ##class(apptools.python.xlsx).gn2xlsx(gn,.format,"/tmp/gn2xlsx*.xlsx","Title "_sql,,,,exec)
+ set format("freeze")="B4" ;freeze
+ do ##class(apptools.python.xlsx).sql2xlsx(sql,.format,"/tmp/sql2xlsx*.xlsx")
+ quit $$$OK
 }
 
 /// set gn="^||tmp",format="n,s150,,,,,,,,d," 
@@ -164,7 +174,7 @@ ClassMethod gn2xlsx(gn, ByRef format = "", file As %String, title = "", patternx
 	else {		
 		set wb = openpyxl.Workbook()
 	}
-	
+	set IsVer=($SYSTEM.Version.Format(5,$zv)'>2021.2)
 	set sheetname=$select(sheetname'="":sheetname,$D(format("sheetname"),ds):ds,$qs(gn,1)'="":$qs(gn,1),1:"Report")
 	
 	#; grab the active worksheet
@@ -175,7 +185,7 @@ ClassMethod gn2xlsx(gn, ByRef format = "", file As %String, title = "", patternx
 	
 	;do pycols.append(" ")
 	;do ws.append(pycols)
-	;;set ws."__getitem__"("A1").value=title
+	if IsVer set ws."__getitem__"("A1").value=title
 
 	set argsfont = {"color":"000000", "bold":true, "italic":false, "size":18}
 	set font = openpyxl.styles.Font(argsfont...)	
@@ -212,9 +222,9 @@ ClassMethod gn2xlsx(gn, ByRef format = "", file As %String, title = "", patternx
 		set type=$e($P(format,",",i),1)
 		set width=+$e($P(format,",",i),2,*)
 		if 'width set width=$select(type="d":20,type="n":10,1:30)
-		set ws."column_dimensions"."__getitem__"(col).width = width
+		if IsVer set ws."column_dimensions"."__getitem__"(col).width = width
 		;sheet.row_dimensions[1].height = 30
-		set ws."row_dimensions"."__getitem__"(2).height = 40
+		if IsVer set ws."row_dimensions"."__getitem__"(2).height = 40
 		;cell = ws.cell(column=col, row=freezerow)
 		set cell = ws.cell(2,i)
 		set cell.fill = fill        	
