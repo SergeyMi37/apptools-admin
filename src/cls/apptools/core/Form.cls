@@ -472,7 +472,7 @@ ClassMethod Show(obj, Mode = 0, PrefixIdDIV = "", orderProp = "")
 				if obj.%Id() w "&nbsp; " d ..ButtonMake($$$aText("Delete",""),"if (confirm('"_$$$aText("Delete, are you sure?","")_"')) { "_$replace(onclick,"*","ObjectDelete")_"}","appButtonDelete")
 			}
 			if obj.%Id(),Mode["WithCreate" {
-			  w "&nbsp; " do ..ButtonMake($$$aText("Save As New",""),$replace(onclick,"*","ObjectSaveAsNew"),"appButtonSaveAsNew")
+			  w "&nbsp; " do ..ButtonMake($$$aText("Copy",""),$replace(onclick,"*","ObjectSaveAsNew"),"appButtonSaveAsNew")
 			}
 		}
 		if Mode'["WithoutCancel" {

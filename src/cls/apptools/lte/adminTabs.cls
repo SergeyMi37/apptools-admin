@@ -348,8 +348,11 @@ ClassMethod ShowTab(Par) As %Status
 {
 	zw Par
 	if $g(Par("appPar"))'="" set Par=Par("appPar")
+	w $zn
 	zw Par
 	do ..GetAllApps(.opt) 
+	w $namespace
+	zw opt ;debugwrite
 	do ..ShowTabApps(.Par,.opt)
 }
 

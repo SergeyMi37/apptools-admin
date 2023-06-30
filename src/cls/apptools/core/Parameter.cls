@@ -3,7 +3,7 @@ Class apptools.core.Parameter Extends %Persistent
 {
 
 /// The order of the properties in the output in the form
-Parameter AppORDERPROPERTY = "Name,Description,Value,Types,Namespace,DateStart,DateFinish,File,isEnabled,isEnabledCheck,OfficeFile";
+Parameter AppORDERPROPERTY = "Name,Description,JSON,Value,Types,Namespace,DateStart,DateFinish,File,isEnabled,isEnabledCheck,OfficeFile";
 
 /// Namespace $zu(5) use parameter
 Property Namespace As %String(MAXLEN = "") [ InitialExpression = {$zu(5)} ];
@@ -17,6 +17,10 @@ Property Value As %String(MAXLEN = "");
 /// The description of the parameter
 /// {"displayname":"Description of option","title":"parameter Description","inputpattern":"textarea"}
 Property Description As %String(MAXLEN = "");
+
+/// JSON
+/// {"displayname":"JSON","title":"parameter Json","inputpattern":"textarea","attr":"cols=77 rows=6"}
+Property JSON As %String(MAXLEN = "");
 
 /// Date of sampling Protocol
 /// {"displayname":"date of sampling Protocol","title":"enter date","inputtype":"date"}
@@ -40,7 +44,7 @@ Property File As %String(MAXLEN = "");
 
 /// The list of parameter types
 /// {"displayname":"parameter Types","title":"Select a Type"}
-Property Types As %String(DISPLAYLIST = ",Project,Application Parameter,System Parameter", MAXLEN = 1, VALUELIST = ",Projecr,AppOption,SysOption") [ InitialExpression = "AppOption", Required ];
+Property Types As %String(DISPLAYLIST = ",Project,Application Parameter,System Parameter,Side Menu LTE", MAXLEN = 1, VALUELIST = ",Projecr,AppOption,SysOption,SideMenuLTE") [ InitialExpression = "AppOption", Required ];
 
 /// Select the file to download to disk TempDir
 /// {"displayname":"Select file","title":"Select file","inputpattern":"files"}
@@ -154,9 +158,13 @@ Storage Default
 <Value name="35">
 <Value>CustomFile</Value>
 </Value>
+<Value name="36">
+<Value>JSON</Value>
+</Value>
 </Data>
 <DataLocation>^%apptools.core.ParameterD</DataLocation>
 <DefaultData>ParameterDefaultData</DefaultData>
+<ExtentSize>0</ExtentSize>
 <IdLocation>^%apptools.core.ParameterD</IdLocation>
 <IndexLocation>^%apptools.core.ParameterI</IndexLocation>
 <StreamLocation>^%apptools.core.ParameterS</StreamLocation>

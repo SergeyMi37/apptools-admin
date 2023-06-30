@@ -364,7 +364,7 @@ ClassMethod WinOpenEditObj(Par, json)
 	set obj=##class(apptools.core.Form).GetObj(id_","_ClassName)
 	set PrefixIdDIV="WinOpenEditObj"
 	write "<form id='"_PrefixIdDIV_"MainForm'>"
-		do ##class(apptools.core.Form).Show(obj,"1,WithoutCancel,WithoutRef",PrefixIdDIV) 
+		do ##class(apptools.core.Form).Show(obj,"1,WithoutCancel,WithoutRef,WithCreate",PrefixIdDIV) 
 	write "</form><div id='"_PrefixIdDIV_"MainContent'></div>"
 	q $$$OK
 }

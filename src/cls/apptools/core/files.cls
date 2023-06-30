@@ -177,7 +177,7 @@ ClassMethod OpenFile(file, time = 1, mode = "WNSK", code = "UTF8") As %Status
 /// s f=##class(%File).%New("/irisdev/app/module.xml") if f.Open("RSU") {s t=f.Read() w !,t } else { w $System.Status.GetErrorText($g(%objlasterror)) } d f.%Close() k f
 ClassMethod ReadFile(filename = "/irisdev/app/module.xml", ByRef txt) As %Status
 {
-	set f=##class(%File).%New(filename) if f.Open("RSU") {s txt=f.Read() w !,txt } else { w !,$System.Status.GetErrorText($g(%objlasterror)) quit $g(%objlasterror) } d f.%Close() quit $$$OK
+	set f=##class(%File).%New(filename) if f.Open("RSU") {s txt=f.Read() } else { w !,$System.Status.GetErrorText($g(%objlasterror)) quit $g(%objlasterror) } d f.%Close() quit $$$OK
 }
 
 /// To read a file and write to global 
@@ -798,6 +798,48 @@ ClassMethod AlertDays(Line, ByRef bd, dt)
 		set bd($i(bd))=Line
 	}
 	q $$$OK
+}
+
+/// Write to file. Sample run: write ##class(apptools.core.files).Write2File("d:\!\log.txt","do 1^%SS") 
+ClassMethod Write2File(fn = "/tmp/log.txt", ByRef cmd) As %Status
+{
+	set:$g(fn)="" fn="/tmp/log.txt" open fn:("WNSK\UTF8\"):1 if $test { use fn xecute cmd close fn quit $$$OK } else { w !,$System.Status.GetErrorText($g(%objlasterror)) quit $g(%objlasterror) }
+}
+
+/// d ##class(apptools.core.files).WriteLog("/iris-backup/integrity/2023-03-03-err.log",.log)
+ClassMethod WriteLog(file, log) As %Status
+{
+	kill %log m %log=log
+	do ##class(apptools.core.files).Write2File(file,"zw %log") 
+	KILL %log
+	quit $$$OK
+}
+
+/// d ##class(apptools.core.files).CheckIntegFile("/iris-backup/integrity/2023-03-03-EIS.log",.log)
+ClassMethod CheckIntegFile(file, log) As %Status
+{
+	set st=$$$OK
+	set texterr(1)="**********" ;The following errors"
+	set texterr(2)="Errors found in "
+	set gn="tmpInteg" KILL @gn
+	set st=##class(apptools.core.files).ReadFile2Arr(file,"RSK",,gn)
+	if st,$d(@gn) {
+		set i=""
+		for { set i=$o(@gn@(i),1,str) quit:i=""
+			for i2=1:1 { quit:'$d(texterr(i2))  
+				if str[texterr(i2) {
+					write !,str
+					set count=$g(count)+1
+					set log(file,i)=str
+				}
+			}
+		}
+		write !,+$g(count)_ " errors found in file "_file
+	}
+	else {
+		write !,"File not found "_file
+	}
+	quit st
 }
 
 }

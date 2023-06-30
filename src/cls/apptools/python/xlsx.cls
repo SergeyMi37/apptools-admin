@@ -140,7 +140,7 @@ ClassMethod test() As %Status
  set format("title")="Title "_sql
  set format("sheetname")="test"
  do ##class(apptools.core.sys).SaveSQL(sql,gn)
- set exec="##class(apptools.python.xlsx).MarkRed(.%AppLogInfoVal, %AppLogInfoCol, %AppLogInfoHead, .%AppLogInfoTemp)"
+ set exec="##class(apptools.python.xlsx).MarkRed(.%AppLogInfoVal, .%AppLogInfoCol, .%AppLogInfoHead, .%AppLogInfoTemp)"
  do ##class(apptools.python.xlsx).gn2xlsx(gn,.format,"/tmp/gn2xlsx*.xlsx","Title "_sql,,,,exec)
  set format("freeze")="B4" ;freeze
  do ##class(apptools.python.xlsx).sql2xlsx(sql,.format,"/tmp/sql2xlsx*.xlsx")
@@ -222,9 +222,9 @@ ClassMethod gn2xlsx(gn, ByRef format = "", file As %String, title = "", patternx
 		set type=$e($P(format,",",i),1)
 		set width=+$e($P(format,",",i),2,*)
 		if 'width set width=$select(type="d":20,type="n":10,1:30)
-		if IsVer set ws."column_dimensions"."__getitem__"(col).width = width
+		set ws."column_dimensions"."__getitem__"(col).width = width
 		;sheet.row_dimensions[1].height = 30
-		if IsVer set ws."row_dimensions"."__getitem__"(2).height = 40
+		set ws."row_dimensions"."__getitem__"(2).height = 40
 		;cell = ws.cell(column=col, row=freezerow)
 		set cell = ws.cell(2,i)
 		set cell.fill = fill        	
@@ -323,17 +323,17 @@ ClassMethod gn2xlsx(gn, ByRef format = "", file As %String, title = "", patternx
 	quit $$$OK
 }
 
-/// Example coloring 4 column values if 0 is contained
+/// Example coloring a column values if is not null
 ///  set exec="##class(apptools.python.xlsx).MarkRed(.%AppLogInfoVal, %AppLogInfoCol, %AppLogInfoHead, .%AppLogInfoTemp)"
 ClassMethod MarkRed(Val, Col, Head, openpyxl)
 {
 	s res=Val
 	if $g(Head) {
-		;i $g(Val)="ColomName" s Temp("ColomName ",Col)=""
+		if res.value="DispatchClass" set Col("DispatchClass",Col)=""
 	}
 	else {
-		if Col=4 {
-			if res.value["0" {
+		if $Data(Col("DispatchClass",Col)) {
+			if res.value'="" {
 				;set argsfill = {"start_color":"D3D3D3", "end_color":"D3D3D3", "fill_type":"solid"}
     			;set fill = openpyxl.styles.PatternFill(argsfill...)	
 				set argsfont = {"color":"DC143C", "bold":true, "italic":false, "size":11} ;color Crimson

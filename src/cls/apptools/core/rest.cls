@@ -569,7 +569,7 @@ ClassMethod CustomTask(ns, par = "10") As %Status
 	catch ex {
 	   	Set st = $g(%objlasterror, $$$OK)
 	   	Set st = $$$ADDSC(st, ex.AsStatus())
-	   	set $$$AppL("MSW","req")=$System.Status.GetErrorText(st)
+	   	;set $$$AppL("MSW","req")=$System.Status.GetErrorText(st)
 	   	set json = {}
 	   	set json.status=$tr($System.Status.GetErrorText(st),"<>","()")_" "_$g(cgi)
 	}
@@ -618,7 +618,7 @@ ClassMethod RunCustomTask(data, ByRef json) As %Status
 	catch ex {
 	   	Set st = $g(%objlasterror, $$$OK)
 	   	Set st = $$$ADDSC(st, ex.AsStatus())
-	   	set $$$AppL("MSW","req")=$System.Status.GetErrorText(st)
+	   	;set $$$AppL("MSW","req")=$System.Status.GetErrorText(st)
 	   	set json = {}
 	   	set json.status=$tr($System.Status.GetErrorText(st),"<>","()")
 	}

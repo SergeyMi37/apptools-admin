@@ -220,9 +220,9 @@ ClassMethod GetTabInfo(gn, info) As %String
 /// set a=##class(apptools.core.sys).GetValue(gn,2,"QUANTITY")
 ClassMethod GetValue(gn, row, NameField) As %String
 {
- i $g(@gn@(-1,NameField))="" q "" ;undefined field: "_NameField
- i '$d(@gn@(row)) q "undefined row: "_row
- q $lg(@gn@(row),@gn@(-1,NameField))
+ if $g(@gn@(-1,NameField))="" quit "" ;undefined field: "_NameField
+ if '$d(@gn@(row)) q "undefined row: "_row
+ quit $lg(@gn@(row),@gn@(-1,NameField))
 }
 
 /// Procedure for calling from a regular job and storing reports in the global
@@ -340,8 +340,8 @@ ClassMethod IndBuild(gn, ByRef ListFields, empty = 0, clean = 0) As %Status
 		for ii=1:1:$ll(fn) { set i=$lg(fn,ii) continue:i="" 
 			set val=$lg(@gn@(row),i)
 			if clean {
-				set val=$zstrip(val,"<>WC") ;очистка от начальный и концевых пробелов и управляющих
-		 		set val=$translate(val,$c(13,10),"") ;убираем управляющие
+				set val=$zstrip(val,"<>WC")
+		 		set val=$translate(val,$c(13,10),"") ;remove control characters
 			}
 			if empty set val=" "_val
 			if val'="" {
@@ -758,6 +758,7 @@ ClassMethod GetRoles(mask = "", ByRef list) As %String
   elseif mask'="" {
 	  set sql=sql_" where NameLowerCase like '%"_mask_"%'"
   }
+  w sql
 	set result=##CLASS(%ResultSet).%New("%DynamicQuery:SQL")
 	set tSC=result.Prepare(sql)
 	set:tSC tSC=result.Execute()
@@ -1009,7 +1010,7 @@ ClassMethod GetDirDB(nspace, ByRef db, ByRef dirlist, IRIS = 1) As %Status
 }
 
 /// do ##class(apptools.core.sys).Integrity("APPTOOLS,APP,USER")
-ClassMethod Integrity(nspace, dir = "/backup/iris-backup/integrity/", adddir = "") As %Status
+ClassMethod Integrity(nspace, dir = "/backup/iris-backup/integrity/", adddir = "", ByRef filename) As %Status
 {
 	new $namespace
 	zn "%sys"
@@ -1018,8 +1019,9 @@ ClassMethod Integrity(nspace, dir = "/backup/iris-backup/integrity/", adddir = "
 	for i=1:1:$L(nspace,",") {
 		s ns=$P(nspace,",",i)
 		continue:ns=""
-		s st=##class(apptools.core.sys).GetDirDB(ns,.d,.dirlist,0)
+		s st=##class(apptools.core.sys).GetDirDB(ns,.dd,.dirlist,0)
 		if 'st write !,$System.Status.GetErrorText(st)
+		m d=dd
 	}
 	set d=""
 	for { set d=$o(d(d)) q:d=""
@@ -1032,6 +1034,15 @@ ClassMethod Integrity(nspace, dir = "/backup/iris-backup/integrity/", adddir = "
 	set st=$$Silent^Integrity(filename,result,0)
 	if 'st write !,$System.Status.GetErrorText(st)
 	quit st
+}
+
+/// d ##class(apptools.core.sys).ExportSecurity()
+ClassMethod ExportSecurity(dir = "/iris-backup/install/security/") As %Status
+{
+	new $namespace
+	zn "%SYS" 
+	$$$TOE(st, ##class(%File).CreateDirectoryChain(dir))
+	quit ##class(Security.System).ExportAll(dir_"SecurityExport"_$tr($zd($h,3)_$zt($p($h,",",2),-1),":- ")_".xml", .NumExported)
 }
 
 }

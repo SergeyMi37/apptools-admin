@@ -182,7 +182,7 @@ function AppRpc(FormId,ResultId,appAct,url,json){
 // The function of opening the dialog box
 function WinOpen(ns,classname,met,el,title,rest) {
 	
-	var titlename="Method "+met+" parameter "+decodeURIComponent(el);
+	var titlename="Method "+met+" parameter " //+decodeURIComponent(el);
 	if (title) {titlename=title;}
 
 	//$("#dialogContent").load("apptools.core.Action.cls","appClass="+classname+"&appMethod="+met+"&appNsp="+ns+"&appPar="+el);
@@ -552,6 +552,7 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 	#; arbitrary query
 	if $g(sql)'="" {
 		if DSN'="" {
+			set sql=$p(sql,";")
 			set gnTemp=$na(@"^tmpLogInfo"@($j))  ;$$$TEMPORYGN@($j))
 			KILL @gnTemp
 			if $G(listDSN(DSN))'="" {
@@ -1597,6 +1598,8 @@ ClassMethod GetHelp(help, ignor = 0)
 	;$$$sH(" "_$$$addAppL("query %SYS.GlobalQuery:Size /opt/isc/ensemble/mgr/USER/")_" --- "_$$$aText("to calculate the size globalaw our database USER",""))
 	$$$sH(" ")
 	$$$sH(" "_$$$addAppL("select * FROM apptools_core.Log order by id desc")_" --- "_$$$aText("To execute arbitrary sql query",""))
+	$$$sH(" "_$$$addAppL("select * FROM Security.Applications")_" --- "_$$$aText("Get all apps",""))
+
 	$$$sH(" ")
 	set fio=$g(@$$$MgtPortalSettings@($Username,"DeveloperName"),"DEV")
 	set gn=$$$logdevGN_fio

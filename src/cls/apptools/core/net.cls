@@ -158,25 +158,25 @@ ClassMethod GetHttp(aURL = "", aDATA, TempDir = "", tmpGN = "", user = "", pass 
 	set HttpResponse=HttpRequest.HttpResponse 
 	quit:('$isobject(HttpResponse)) $$$ERROR($$$GeneralError,$$$aText("the server does not return a response",""))
 	quit:(HttpResponse.StatusCode'=200) $$$ERROR($$$GeneralError,HttpResponse.ReasonPhrase)
-	s aDATA("status")=HttpResponse.StatusCode
+	set aDATA("status")=HttpResponse.StatusCode
 	#; Parse the response from the server, keeping the structure of the aDATA
 	set aDATA("contentType")=HttpResponse.ContentType
 	#; The name of the file received via the "content-disposition" as "attachment;filename="name.ext";"
-	s fileName=HttpResponse.GetHeader("content-disposition")
-	s aDATA("content-disposition")=fileName
+	set fileName=HttpResponse.GetHeader("content-disposition")
+	set aDATA("content-disposition")=fileName
 	if ($l(fileName,"*=utf-8''")>1) {
-		s fileName=$p(fileName,"*=utf-8''",2)
-		s fileName=##CLASS(%CSP.Page).UnescapeURL(fileName)
-		s fileName=$zcvt(fileName,"I","UTF8")
+		set fileName=$p(fileName,"*=utf-8''",2)
+		set fileName=##CLASS(%CSP.Page).UnescapeURL(fileName)
+		set fileName=$zcvt(fileName,"I","UTF8")
 	} else { s fileName=$p(fileName,"filename=",2),fileName=$tr($p(fileName,";",1),"""'","") }
 	
 	#; If the file name is not specified, use as the name of the piece of the link
-	s:(fileName="") fileName=$p(location,"/",$l(location,"/"))
-	s aDATA("content")=HttpResponse.Data
-	s aDATA("fileName")=$zcvt(fileName,"I","URL")
-	i tmpGN'="" M @tmpGN=aDATA
-	s sc=1
-	i TempDir'="" s sc=##class(apptools.core.files).Stream2Log(HttpResponse.Data, TempDir, fileName,.path) s aDATA("pathfileName")=$g(path)
+	set:(fileName="") fileName=$p(location,"/",$l(location,"/"))
+	set aDATA("content")=HttpResponse.Data
+	set aDATA("fileName")=$zcvt(fileName,"I","URL")
+	if tmpGN'="" M @tmpGN=aDATA
+	set sc=1
+	if TempDir'="" s sc=##class(apptools.core.files).Stream2Log(HttpResponse.Data, TempDir, fileName,.path) s aDATA("pathfileName")=$g(path)
 	quit sc
 }
 

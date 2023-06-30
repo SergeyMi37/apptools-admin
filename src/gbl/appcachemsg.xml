@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Export generator="IRIS" version="26" zv="IRIS for UNIX (Red Hat Enterprise Linux for x86-64) 2021.2 (Build 651U)" ts="2022-05-27 14:27:57">
+<Export generator="IRIS" version="26" zv="IRIS for UNIX (Red Hat Enterprise Linux for x86-64) 2021.2 (Build 651U)" ts="2023-06-30 14:27:45">
 <Global>
 <Node><Sub>^%AppCacheMsg</Sub>
 <Node><Sub>AppTools</Sub>
@@ -750,6 +750,9 @@
 <Node><Sub>269607721</Sub>
 <Data>Upload</Data>
 </Node>
+<Node><Sub>278545497</Sub>
+<Data>Export Json</Data>
+</Node>
 <Node><Sub>288062270</Sub>
 <Data>Send file</Data>
 </Node>
@@ -764,6 +767,9 @@
 </Node>
 <Node><Sub>426017985</Sub>
 <Data>Event Chart</Data>
+</Node>
+<Node><Sub>465602144</Sub>
+<Data>Create parameter</Data>
 </Node>
 <Node><Sub>478911237</Sub>
 <Data>This filter was</Data>
@@ -824,6 +830,9 @@
 </Node>
 <Node><Sub>837371971</Sub>
 <Data>Console log</Data>
+</Node>
+<Node><Sub>842184233</Sub>
+<Data>History Data Time</Data>
 </Node>
 <Node><Sub>851625156</Sub>
 <Data>Show call stack</Data>
@@ -887,6 +896,9 @@
 </Node>
 <Node><Sub>1098371912</Sub>
 <Data>Command</Data>
+</Node>
+<Node><Sub>1159730082</Sub>
+<Data>Export</Data>
 </Node>
 <Node><Sub>1171063584</Sub>
 <Data>Processed %1% 2 written in %3</Data>
@@ -986,6 +998,9 @@
 </Node>
 <Node><Sub>1652923473</Sub>
 <Data>Failed to open object </Data>
+</Node>
+<Node><Sub>1653801084</Sub>
+<Data>Command2</Data>
 </Node>
 <Node><Sub>1693440333</Sub>
 <Data>Query result</Data>
@@ -1128,8 +1143,14 @@
 <Node><Sub>2557992440</Sub>
 <Data>Unload in</Data>
 </Node>
+<Node><Sub>2560967168</Sub>
+<Data>History Command</Data>
+</Node>
 <Node><Sub>2565382535</Sub>
 <Data>To execute arbitrary sql query</Data>
+</Node>
+<Node><Sub>2598554411</Sub>
+<Data>Import</Data>
 </Node>
 <Node><Sub>2619118453</Sub>
 <Data>Error</Data>
@@ -1179,6 +1200,9 @@
 <Node><Sub>2905100799</Sub>
 <Data>ChartFtpEIS3</Data>
 </Node>
+<Node><Sub>2912527897</Sub>
+<Data>Discription3</Data>
+</Node>
 <Node><Sub>2923041294</Sub>
 <Data>Upload to file Excel</Data>
 </Node>
@@ -1205,6 +1229,9 @@
 </Node>
 <Node><Sub>3003771833</Sub>
 <Data>Load WebTerminal</Data>
+</Node>
+<Node><Sub>3008655043</Sub>
+<Data>Export XML</Data>
 </Node>
 <Node><Sub>3009207953</Sub>
 <Data>Search</Data>
@@ -1247,6 +1274,9 @@
 </Node>
 <Node><Sub>3147795756</Sub>
 <Data>More entries</Data>
+</Node>
+<Node><Sub>3154559740</Sub>
+<Data>Get all apps</Data>
 </Node>
 <Node><Sub>3154606495</Sub>
 <Data>Show formatted json</Data>
@@ -1434,6 +1464,9 @@
 <Node><Sub>3979112220</Sub>
 <Data>apptoolsSetting</Data>
 </Node>
+<Node><Sub>3985118396</Sub>
+<Data>Copy</Data>
+</Node>
 <Node><Sub>3999187681</Sub>
 <Data>To obtain information only on the object values</Data>
 </Node>
@@ -1478,6 +1511,9 @@
 </Node>
 <Node><Sub>4198491428</Sub>
 <Data>Run the query and show license usage</Data>
+</Node>
+<Node><Sub>4208502678</Sub>
+<Data>Command History</Data>
 </Node>
 <Node><Sub>4229927814</Sub>
 <Data>Exit complete</Data>
