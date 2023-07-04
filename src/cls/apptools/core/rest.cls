@@ -666,9 +666,17 @@ ClassMethod GetJourSysSummary(par = "10") As %Status
 
 /// http://iris-test:52773/apptoolsrest/custom-task/user/run&class=apptools.core.rest&met=GetLastLogs&par=5
 /// do ##class(apptools.core.rest).GetLastLogs(.par,.json)
-ClassMethod GetLastLogs(top, json) As %Status
+ClassMethod GetLastLogs(par = 5, json) As %Status
 {
-	set sql="select top "_top_" * from apptools_core.Log order by id desc"
+	if par=(+par) {
+		set sql="select top "_par_" * from apptools_core.Log order by id desc"
+	}
+	elseif par["!" {
+		set fromDate=$p(par,"!",1)
+		set toDate=$p(par,"!",2)
+		set toDate=toDate_" 23:59:59"
+		set sql="select * from apptools_core.Log where TimeStamp >='"_fromDate_"' and TimeStamp <='"_toDate_"' order by id desc"
+	}
 	;set $namespace=ns
 	set gn="^||tmp"
   	set st=##class(apptools.core.sys).sql2gn(sql,,gn)

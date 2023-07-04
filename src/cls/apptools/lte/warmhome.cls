@@ -269,7 +269,8 @@ ClassMethod NSpaceResult(Par = "") As %Status
 	set fromDate=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"fromDate")	
 	set toDate=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"toDate")	
 
-	set day=##class(apptools.core.type).GetHorYYYYMMDD(toDate)-##class(apptools.core.type).GetHorYYYYMMDD(fromDate)
+	;set day=##class(apptools.core.type).GetHorYYYYMMDD(toDate)-##class(apptools.core.type).GetHorYYYYMMDD(fromDate)
+	set day=fromDate_"!"_toDate
 	
 	set st=##class(apptools.core.net).GetHttp(pro(0,"URL")_day,.out2,"","",pro(0,"username"),pro(0,"password"))
 	if 'st  write $$$appError($System.Status.GetErrorText(st)) quit st
@@ -277,14 +278,17 @@ ClassMethod NSpaceResult(Par = "") As %Status
 	set st=##class(apptools.core.files).Stream2String(out2("content"),.str)
 	;zw str
 	set json={}.$$$jsonFromJSON(str) ;.$$$jsonGet("array")
-	;set arr=[].$$$jsonFromJSON(json)
-	for i=0:1:json.array.$$$jsonSize()-1 {
-		set item = json.array.$$$jsonGet(i)
-		;w $e($p(item.text," ",2),1,16)_" ----------- "_$e($p(item.text," ",4),1,6)_"<br>"
-		w item.text_"<br>"
-				
+	if 'json.array.$$$jsonSize() {
+		write $$$appError("No data")
 	}
-	;w [].$$$jsonFromJSON(json).cont
+	else {
+		for i=0:1:json.array.$$$jsonSize()-1 {
+			set item = json.array.$$$jsonGet(i)
+			;w $e($p(item.text," ",2),1,16)_" ----------- "_$e($p(item.text," ",4),1,6)_"<br>"
+			w item.text_"<br>"
+					
+		}
+	}
 	quit $$$OK
 }
 
