@@ -534,6 +534,16 @@ ClassMethod CustomTask(ns, par = "10") As %Status
 			do ..AddNodeJson(json,$wc($zhex("2705")),"Run: "_par)
 			quit
 		}
+		if $p($G(par),"-",1,2)="zpm-repo" {
+			set json.status="OK "_par
+			set name=$p($G(par),"-",3,*)
+			set url="https://pm.community.intersystems.com/packages/"_name
+			set st=##class(apptools.core.net).GetHttp(url,.out2)
+			if 'st set json.status=$System.Status.GetErrorText(st) quit
+			set st=##class(apptools.core.files).Stream2String(out2("content"),.str)
+			set json.repo={}.$$$jsonFromJSON(str)
+			quit
+		}
 		elseif $G(par)="get-item" {
 			set json.status="OK get-item"
 			set json.array = []
