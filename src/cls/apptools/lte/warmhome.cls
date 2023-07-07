@@ -10,6 +10,9 @@ Parameter HeaderText = "Home, warm Home";
 /// Global Name Store Referens files
 Parameter GNStore = "^appmsw.smarthome.ui";
 
+/// Class Parameter
+Parameter ClassParam = "apptools.core.Parameter";
+
 Parameter AppRoles = "%All";
 
 /// do ##class(apptools.lte.adminsample).Init()
@@ -18,13 +21,15 @@ ClassMethod Init() As %Status
 	set ServerPort=##class(apptools.core.net).GetURI(.prop)
 	write !,"Open in browser "
     do ##class(apptools.core.Installer).AddAndWriteFavorite(##class(apptools.core.Installer).#AppName_" SampleAdminPanel","/"_##class(apptools.core.Installer).#AppCSP_"rest/a/smarthome",ServerPort)
+    quit $$$OK
 }
 
 /// Replace parameters
 ClassMethod MainParameter(ByRef h, ByRef par) As %Status
 {
  set path=par("=path=")
- set base64=##class(apptools.core.rest).getStatic(..%ClassName(1)_":image")
+ ;set base64=##class(apptools.core.rest).getStatic(..%ClassName(1)_":image")
+ set base64=..GetIcon("IconBase64", .base64)
  set par("=path=")=path
  set par("=Brand-Text=")="Warm Home"
  set par("=Logo-image=")=base64
@@ -32,6 +37,19 @@ ClassMethod MainParameter(ByRef h, ByRef par) As %Status
  set par("<!--=LinkIcon=-->")=..GetAppIcon(,"png",base64)
  quit ..RepaceParameter(.h, .par)
  quit $$$OK
+}
+
+/// Get Icon from class parameter
+ClassMethod GetIcon(key, base64) As %Status
+{
+	set class=..#ClassParam,
+		base64=""
+	
+	set sql="select top 1 * from "_##class(apptools.core.type).GetTableName(class)_" where Name ='"_key_"'"
+	set gn="tmp"
+	do ##class(apptools.core.sys).sql2gn(sql,,gn)
+	if '$d(@gn@(1)) quit $$$ERROR($$$GeneralError,"Item is empty")
+	quit ##class(apptools.core.sys).GetValue(gn,1,"Description")
 }
 
 /// what modes are available
@@ -125,7 +143,7 @@ ClassMethod GetAllApps(opt) As %Status
 		sideMenuIcon="fa-solid fa-temperature-low" ;<i class="fa-solid fa-temperature-arrow-down"></i> fa-cube" ;"fa-cog"  //4  icon   https://fontawesome.com/icons?d=gallery&p=2&m=free
 		set sideMenu=$lb(sideMenuNumer,sideMenuName,sideMenuOpen,sideMenuIcon) 
  	
-		set class="apptools.core.Parameter"
+		set class=..#ClassParam
 		do ..GetAppsSideMenu(nspace, class, "CategorySideMenuSensors",sideMenu, .opt, "NS") ;methods - NSFirstHead -> NSResult
 
 		set sideMenuName="Cameras",
@@ -133,8 +151,6 @@ ClassMethod GetAllApps(opt) As %Status
 		sideMenuOpen=0,        //3 =1 open menu
 		sideMenuIcon="fa-solid fa-camera" ;<i class="fa-solid fa-camera-cctv"></i>  fa-cube" ;"fa-cog"  //4  icon   https://fontawesome.com/icons?d=gallery&p=2&m=free
 		set sideMenu=$lb(sideMenuNumer,sideMenuName,sideMenuOpen,sideMenuIcon) 
- 	
-		set class="apptools.core.Parameter"
 		do ..GetAppsSideMenu(nspace, class, "CategorySideMenuCam",sideMenu, .opt, "Cam") ; methods - CamFirstHead -> CamResult
 
 	;------------ one-level upper menu 
@@ -194,7 +210,7 @@ ClassMethod GetSensorProp(key, pro, ns) As %Status
 {
 	//----------
 	set (NS,ns)=$p(key,"NS",2,*)
-	set class="apptools.core.Parameter"
+	set class=..#ClassParam
 	set sql="select top 1 * from "_##class(apptools.core.type).GetTableName(class)_" where Name ='key:"_NS_"'"
 	set gn="tmp"
 	do ##class(apptools.core.sys).sql2gn(sql,,gn)
@@ -261,7 +277,7 @@ ClassMethod NSpaceResult(Par = "") As %Status
 	do ##class(apptools.core.Form).BlockUI(0)
 	set key=Par("key")
 	set divId=Par("divId")
-	set mode=Par("mode")
+	;set mode=Par("mode")
 	
 	do ..GetSensorProp(key, .pro,.sens) 
 	if '$d(pro) quit $$$OK
@@ -285,8 +301,9 @@ ClassMethod NSpaceResult(Par = "") As %Status
 		for i=0:1:json.array.$$$jsonSize()-1 {
 			set item = json.array.$$$jsonGet(i)
 			;w $e($p(item.text," ",2),1,16)_" ----------- "_$e($p(item.text," ",4),1,6)_"<br>"
-			w item.text_"<br>"
-					
+			set msg=$replace(item.text,"температура","temperature")_"<br>"
+			set msg=$replace(msg,"Внимание предельный верхний порог темпратуры","Attention upper temperature limit")
+			write msg
 		}
 	}
 	quit $$$OK
@@ -297,7 +314,7 @@ ClassMethod CamFirstHead(Par = "") As %Status
 {
 	do ##class(apptools.core.Form).BlockUI(0)
 	set key=Par("key")
-	set divId=Par("divId")
+	;set divId=Par("divId")
 	set %ui=1
 	set keyPref=$p(key,"Cam",2,*) ; PREFIX - Cam
 	set class="apptools.core.Parameter"
@@ -310,7 +327,7 @@ ClassMethod CamFirstHead(Par = "") As %Status
 	set obj=$ClassMethod(class,"%OpenId",id)
 	if '$IsO(obj) w $$$appError("Item is empty id "_id) quit $$$OK
 	
-	set ns=$p(obj.Name,"key:",2)
+	;set ns=$p(obj.Name,"key:",2)
 	set json=obj.JSON
 	do ..SetPropSideMenu(json,.pro,0,"URL","")
 	write $$$appError("No data")
@@ -352,7 +369,7 @@ ClassMethod ParamResult(Par = "") As %Status
 	set ref=%request.CgiEnvs("HTTP_REFERER")
 	set url=$p(ref,"/a/",1)_"/a/info&namespace="_$namespace_"&autoload=FS"
 	set urlfs=" Fileserver in new window <a target=findinfo href='"_url_"'> Fileserver tab </a>"
-	set urlfs=" Fileserver in new window <a href='#' onclick=""$('#MenuFS').click()""> Fileserver tab </a>"
+	set urlfs=" Fileserver in new window Namespace "_$namespace_" <a href='#' onclick=""$('#MenuFS').click()""> Fileserver tab </a>"
 	set NSpace=$namespace
 	if mode=5 {
 		set gn="%apptools.core.ParameterD.GBL"
@@ -418,7 +435,7 @@ Show(modeShow,order)
 }
 
 /// set base64 = ##class(apptools.core.rest).getStatic("apptools.lte.smarthome:image") w !,base64,!
-XData image [ MimeType = application/yaml ]
+XData image2 [ MimeType = application/yaml ]
 {
 data:image/x-png;base64,
 iVBORw0KGgoAAAANSUhEUgAAAJIAAACBCAYAAAArOeO7AAAAAXNSR0IArs4c6QAAAARnQU1BAACx
