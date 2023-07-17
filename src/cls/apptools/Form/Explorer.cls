@@ -341,7 +341,7 @@ ClassMethod EditObj(Val, Col, Head, Temp, nspace, DSN)
 }
 
 /// Forming an active link for editing in the window
-ClassMethod WinEditObj(Val, Col, Head, Temp, nspace, DSN)
+ClassMethod WinEditObj(Val, Col, Head, Temp, nspace, MaxLen = 55)
 {
 	set res=Val
 	if $g(Head) {
@@ -351,7 +351,7 @@ ClassMethod WinEditObj(Val, Col, Head, Temp, nspace, DSN)
 		if $D(Temp("ID",Col)) {
 			s %id=Val
 		}
-		set res=$replace(Val,Val,"<span title='"_$$$aText("Edit","")_"' style='"_$$$styleurl_"' onclick=""WinOpen('"_nspace_"','"_..%ClassName(1)_"','WinOpenEditObj','&SelectClass="_%SelectClass_"&ID="_$zconvert(%id,"O","URL")_"','','"_##class(apptools.core.Action).WriteWinOpenREST(%request)_"');"" >"_Val_"</span>")
+		set res=$replace(Val,Val,"<span title='"_$$$aText("Edit","")_"' style='"_$$$styleurl_"' onclick=""WinOpen('"_nspace_"','"_..%ClassName(1)_"','WinOpenEditObj','&SelectClass="_%SelectClass_"&ID="_$zconvert(%id,"O","URL")_"','','"_##class(apptools.core.Action).WriteWinOpenREST(%request)_"');"" >"_$e(Val,1,MaxLen)_$select($e(Val,MaxLen+1)'="":"...",1:"")_"</span>")
 	}
 	quit res
 }

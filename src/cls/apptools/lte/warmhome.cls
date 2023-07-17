@@ -39,12 +39,11 @@ ClassMethod MainParameter(ByRef h, ByRef par) As %Status
  quit $$$OK
 }
 
-/// Get Icon from class parameter
+/// Get Icon from class parameter (PNG)
 ClassMethod GetIcon(key, base64) As %Status
 {
 	set class=..#ClassParam,
 		base64=""
-	
 	set sql="select top 1 * from "_##class(apptools.core.type).GetTableName(class)_" where Name ='"_key_"'"
 	set gn="tmp"
 	do ##class(apptools.core.sys).sql2gn(sql,,gn)
@@ -419,7 +418,7 @@ ClassMethod ParamResult(Par = "") As %Status
 	} 
 	elseif mode=3 {
 		set sql="select * from apptools_core.Parameter"
-		set exec="##class(apptools.Form.Explorer).WinEditObj(.%AppLogInfoVal, %AppLogInfoCol, %AppLogInfoHead, .%AppLogInfoTemp,"""_$zu(5)_""")"
+		set exec="##class(apptools.Form.Explorer).WinEditObj(.%AppLogInfoVal, %AppLogInfoCol, %AppLogInfoHead, .%AppLogInfoTemp,"""_$zu(5)_""",15)"
 		set st=##class(apptools.Form.Explorer).SelectObjects(class,sql,exec)
 		if $$$ISERR(st) w $$$appError($System.Status.GetErrorText(st)) 
 	}
