@@ -71,8 +71,10 @@ ClassMethod CustomTask(ns, par = "10") As %Status
 			set url="https://pm.community.intersystems.com/packages/"_name
 			set st=##class(apptools.core.net).GetHttp(url,.out2)
 			if 'st set json.status=$System.Status.GetErrorText(st) quit
-			set st=##class(apptools.core.files).Stream2String(out2("content"),.str)
-			set json.repo={}.$$$jsonFromJSON(str)
+			;set st=##class(apptools.core.files).Stream2String(out2("content"),.str)
+			do out2("content").OutputToDevice()
+			kill json
+			;set json.repo={}.$$$jsonFromJSON(str)
 			quit
 		}
 		elseif $G(par)="get-item" {
