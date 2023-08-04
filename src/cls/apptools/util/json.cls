@@ -658,9 +658,12 @@ Do(input,fil,nl) public {
         } ElseIf jtyp="string" { S res=res_""""_$zcvt(val,"O","JSON")_""""
         } ElseIf jtyp="boolean" { S res=res_$s(val:"true",1:"false")
         } ElseIf jtyp="null" { S res=res_"null"
-        } Else { I $e(val)="." S val="0"_val
+        } Else { 
+        	I $e(val)="." S val="0"_val
             I $e(val,1,2)="-." S val="-0."_$e(val,3,*)
-            S res=res_val } }
+            S res=res_val 
+        } 
+       }
     Q res 
     }
 }

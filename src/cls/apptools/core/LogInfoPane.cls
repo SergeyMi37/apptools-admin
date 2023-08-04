@@ -623,23 +623,25 @@ ClassMethod GetCodeExtensionNamespace(Node, ByRef code) As %Status
 	quit $$$ERROR($$$GeneralError,"No find")
 }
 
-ClassMethod ListExtensionNamespace()
+/// do ##class(apptools.core.LogInfoPane).ListExtensionNamespace(0,.list)
+ClassMethod ListExtensionNamespace(write = 1, ByRef list)
 {
 	set ns=""
 	for { set ns=$order(@$$$GNExtentions@(ns)) quit:ns=""  
 		if ns["%All"||(ns=$Namespace) {
 			set extname=""
 			for { set extname=$order(@$$$GNExtentions@(ns,extname)) quit:extname=""  
-				if '$GET(already) write "<br><b>Favorites commands</b><br>" set already=1
+				if '$GET(already) write:write "<br><b>Favorites commands</b><br>" set already=1
 				try {
 					set name=$GET(@$$$GNExtentions@(ns,extname,"Desc"),"NoDesc")
 					set xec=$GET(@$$$GNExtentions@(ns,extname,"Xecute"))
-					write "<li>"_$$$addAppLog(name,"",xec,"target"_$h)
+					write:write "<li>"_$$$addAppLog(name,"",xec,"target"_$h)
+					set list($i(list))=$lb(xec,name)
 				} catch e {
-					write "<li>"_$$$quote($ze)
+					write:write "<li>"_$$$quote($ze)
 				}
 			}
-			write "<br><br>"
+			write:write "<br><br>"
 		}
 	}
  q ""

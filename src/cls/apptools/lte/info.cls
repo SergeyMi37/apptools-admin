@@ -33,6 +33,38 @@ ClassMethod MainParameter(ByRef h, ByRef par) As %Status
 /// what modes are available
 ClassMethod GetAllApps(opt) As %Status
 {
+	if $d(%request) {
+		set requesturi=%request.CgiEnvs("REQUEST_URI"), namespaceonly=$p($p(requesturi,"namespaceonly=",2),"&")
+		if requesturi["/a/info" s gns=..GetGN("URI"),@gns=requesturi
+	}
+ 
+	set sideMenuName="Namespaces",
+		sideMenuNumer=3,
+		sideMenuOpen=0,        //3 =1 open menu
+		sideMenuIcon="fa-solid fa-cube" ;"fa-cog"  //4  icon   https://fontawesome.com/icons?d=gallery&p=2&m=free
+		set sideMenu=$lb(sideMenuNumer,sideMenuName,sideMenuOpen,sideMenuIcon) 
+		if namespaceonly'="" set nslist=namespaceonly
+		else  set nslist=##class(apptools.core.sys).ListNS(.info)
+		for i=1:1:$l(nslist,",") {
+			set ns=$p(nslist,",",i)
+			if ns=""||(ns="%ALL") continue
+			if (ns="%SYS") set ns="-SYS"
+			set key="NS"_ns
+			set opt(key,"Menu")=sideMenu
+			set opt(key)=ns
+			set opt(key,"id")="NS"_ns
+			set opt(key,"ClassMetod")="NSFirstHead" ;class name is the same for all namespaces
+			set opt(key,"TabName")=$s(ns="-SYS":"%SYS",1:ns)
+			set opt(key,"ClassName")=..%ClassName(1)
+			set opt(key,"Role")="%All"
+			set opt(key,"Namespace")="%SYS"
+			set opt(key,"Method")="ShowTabSample"
+			set opt(key,"TabMenu","Close")=1 ;0 = the tab cannot be deleted
+			;set opt(key,"Active")=1 ;active menu item
+			set opt(key,"aw-icon")="fa-solid fa-angle-right" ;"fa-solid fa-angle-up"  ; https://fontawesome.com/icons?d
+		}
+	if namespaceonly'="" quit $$$OK
+	
 	;side menu
 	set sideMenuName="Configuration",
 		sideMenuNumer=1,
@@ -74,45 +106,7 @@ ClassMethod GetAllApps(opt) As %Status
 		set opt(key,"TabMenu","Close")=1
 		set opt(key,"Menu")=sideMenu
 		set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
-
-	set sideMenuName="Namespaces",
-		sideMenuNumer=3,
-		sideMenuOpen=0,        //3 =1 open menu
-		sideMenuIcon="fa-solid fa-cube" ;"fa-cog"  //4  icon   https://fontawesome.com/icons?d=gallery&p=2&m=free
-		set sideMenu=$lb(sideMenuNumer,sideMenuName,sideMenuOpen,sideMenuIcon) 
-		set nslist=##class(apptools.core.sys).ListNS(.info)
-		for i=1:1:$l(nslist,",") {
-			set ns=$p(nslist,",",i)
-			if ns=""||(ns="%ALL") continue
-			if (ns="%SYS") set ns="-SYS"
-			set key="NS"_ns
-			set opt(key,"Menu")=sideMenu
-			set opt(key)=ns
-			set opt(key,"id")="NS"_ns
-			set opt(key,"ClassMetod")="NSFirstHead" ;class name is the same for all namespaces
-			set opt(key,"TabName")=$s(ns="-SYS":"%SYS",1:ns)
-			set opt(key,"ClassName")=..%ClassName(1)
-			set opt(key,"Role")="%All"
-			set opt(key,"Namespace")="%SYS"
-			set opt(key,"Method")="ShowTabSample"
-			set opt(key,"TabMenu","Close")=1 ;0 = the tab cannot be deleted
-			;set opt(key,"Active")=1 ;active menu item
-			set opt(key,"aw-icon")="fa-solid fa-angle-right" ;"fa-solid fa-angle-up"  ; https://fontawesome.com/icons?d
-		}
 		
-		/*
-		set key="Databases"
-		set opt(key,"Menu")=sideMenu
-		set opt(key)=key
-		set opt(key,"id")=key
-		set opt(key,"TabName")=key
-		set opt(key,"ClassName")=..%ClassName(1)
-		set opt(key,"Role")="%All"
-		set opt(key,"Namespace")="%SYS"
-		set opt(key,"Method")="ShowTabSample"
-		set opt(key,"TabMenu","Close")=1 ;0 = the tab cannot be deleted
-		set opt(key,"aw-icon")="fa-list-alt" ;fa-table"   https://fontawesome.com/icons?d=gallery&p=2&m=free
-		*/
 	set sideMenuName="Permission",
 		sideMenuNumer=2,
 		sideMenuOpen=0,        //3 =1 open menu
@@ -269,6 +263,7 @@ ClassMethod NSFirstHead(Par = "") As %Status
 	set (NS,ns)=$p(key,"NS",2,*)
 	if $e(ns,1)="-" set NS="%"_$e(ns,2,*)
 	zn NS
+	set requesturi=$zconvert($g(@..GetGN("URI")),"I","URL")
 	set refhist=$g(Par("refhist")) 
 	if refhist'="" {
 		set hg=$$$HISTORYGN_"("_$zconvert(refhist,"I","URL")_")"
@@ -280,14 +275,26 @@ ClassMethod NSFirstHead(Par = "") As %Status
 		set hisnext=$lg(@hg,5)
 		set hisFiltr=$lg(@hg,6)
 	}
+	if 0,$g(Par("cmdlist"))'="" { //depricated 
+		set hg=Par("cmdlist")
+		set hiscmd=$lg(hg,1)
+		set hisns=$lg(hg,2)
+		set hisjdbc=$lg(hg,3)
+		set hismax=$lg(hg,4)
+		set hisnext=$lg(hg,5)
+		set hisFiltr=$lg(hg,6)
+	}
+	elseif requesturi'="" {
+		;set requesturi=$zconvert(requesturi,"I","URL")
+		set hiscmd=$p($p($g(requesturi),"cmd=",2),"&") //,"%20"," ") ;//  $zconvert(a,"O","URL") > %3E  < %3C
+		set hisjdbc=$p($p($g(requesturi),"jdbc=",2),"&")
+	}
+
 	set onclick=$$$blockui("Load...")_
 		$$$onclick(divId_"MainForm",divId_"MainContent",NS,..%ClassName(1),"NSpaceResult","&key="_key_"&divId="_divId_"&mode=*")
 
 	write $$$appButton(divId_"appButtonExe","title='Execute query' onclick="""_$replace(onclick,"*","exe&ns="_ns)_"""","Execute")
 	
-	;do ##class(apptools.core.Form).SelectField($lb("here","xls","xls+email","xlsx","json","xml"),"",$lb("Here","to XLS via ZEN","to XLS via ZEN + EMail","to XLSX via Python","to json","to xml"),.frm,1,divId_"outFormat","0",50,1,"title='Output format'")  
-	do ##class(apptools.core.Form).SelectField($lb("here","xlsx","json","xml"),"",$lb("Here","to XLSX via Python","to json","to xml"),.frm,1,divId_"outFormat","0",50,1,"title='Output format'")  
-	for i=1:1 quit:'$d(frm(i),s)  write s
 	;write $$$appButton(divId_"appButtonXls","title='Execute query and export to XLSX' onclick="""_$replace(onclick,"*","xlsx&ns="_ns)_"""","XLSX")
 	;write $$$appButton(divId_"appButtonXls","title='Execute query and export to JSON' onclick="""_$replace(onclick,"*","json&ns="_ns)_"""","JSON")
 	;write $$$appButton(divId_"appButtonZip","title='Execute query, export XLSX and packed to ZIP' onclick="""_$replace(onclick,"*","zip&ns="_ns)_"""","ZIP")
@@ -298,19 +305,23 @@ ClassMethod NSFirstHead(Par = "") As %Status
 	write " "_$$$appButton(divId_"appButtonHelp","title='View Help' onclick="""_js_$replace(onclick,"*","help&ns="_ns)_"""","Help")
 	write " "_$$$appButton(divId_"appButtonHist","title='History' onclick="""_$replace(js,"?",$$$HISTORYGN)_$replace(onclick,"*","history&ns="_ns)_"""","history")
 	write ..ButtonAgain(divId,key,"Clear","NS") ;refresh
-	
+
+	;do ##class(apptools.core.Form).SelectField($lb("here","xls","xls+email","xlsx","json","xml"),"",$lb("Here","to XLS via ZEN","to XLS via ZEN + EMail","to XLSX via Python","to json","to xml"),.frm,1,divId_"outFormat","0",50,1,"title='Output format'")  
+	do ##class(apptools.core.Form).SelectField($lb("here","xlsx","json","xml"),"",$lb("Here","to XLSX via Python","to json","to xml"),.frm,1,divId_"outFormat","0",50,1,"title='Output format'")  
+	for i=1:1 quit:'$d(frm(i),s)  write s
 	write " "_$$$appButton(divId_"appButtonExpo","title='Export' onclick="""_$replace($replace(onclick,"*","expo&ns="_ns),"MainForm","FormContentExpo")_"""","Export")
 	if $namespace="%SYS" {
 		write " "_$$$appButton(divId_"appButtonSQLConn","title='Export SQLConnections' onclick="""_$replace(js,"?","")_$replace(onclick,"*","expsqlconn&ns="_ns)_"""","SQL-Conn")
 	}
-
+	write " "_$$$appButton(divId_"appButtonFav","title='View favorite' onclick="""_js_$replace(onclick,"*","favorite&ns="_ns)_"""","favorites")
 	write "<br>"_$$$appTextarea(divId_"what","rows=3 cols=80 title='Enter command' placeholder='Enter the command and Ctrl-Enter or button EXECUTE' ",$g(hiscmd))_"<br>"
 
 	write $$$appText(divId_"MaxNode","size=8 title='Limit the number of nodes'",$g(hismax,"10000"))_"&#160;"
 	set checked="checked"	if $g(hisnext)="-1" s checked=""
 	write $$$appCheck(divId_"NextCheck",checked_" title='Direct enumeration of global nodes' ","")_"&#160;"
-	write $$$appText(divId_"Filtr","size=70 placeholder='Filter nodes' title='if command argument. %gn - current reference global. For example: %gn[""3)""||(@%gn[""123"")'",$g(hisFiltr))
-
+	write $$$appText(divId_"Filtr","size=62 placeholder='Filter nodes' title='if command argument. %gn - current reference global. For example: %gn[""3)""||(@%gn[""123"")'",$g(hisFiltr))
+	write "&#160;"_$$$appText(divId_"MaxCellView","size=6 title='How many characters to limit the display of data in the cell. If 0 then do not limit'",$g(hisMaxCellView,"50"))
+	
 	$$$jsstart
 	write "$('#"_divId_"what').keydown(function (e) { if (e.ctrlKey && e.keyCode == 13) { $('#"_divId_"appButtonExe').click(); }});"
 	$$$jsstop
@@ -330,6 +341,7 @@ ClassMethod NSpaceResult(Par = "") As %Status
 	set (DSN,%DSN)=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"selectDSN")
 	set what=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"what")
 	set MaxNode=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"MaxNode")
+	set MaxCellView=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"MaxCellView")
 	set exportXLS=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"exportXLS")
 	;set Next=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"Next")
 	set Next=$s($d(Par("%request.Data",divId_"NextCheck")):1,1:-1)
@@ -398,7 +410,18 @@ ClassMethod NSpaceResult(Par = "") As %Status
 		}
 		quit $$$OK
 	}
-	if what="?"||(mode="help") {
+	if (mode="favorite") {
+		;write ##class(apptools.core.LogInfoPane).ListExtensionNamespace()_##class(apptools.core.LogInfoPane).ListExtensionProjects()
+		KILL %help
+		do ##class(apptools.core.LogInfoPane).ListExtensionNamespace(0,.list)
+		do ##class(apptools.lte.info).GetCmdList(.%help,.list)
+		set gn="%help",what="",Message="<H5 style='color:Lightsteelblue' >"_$$$aText("Favorite","")_"</h5>"
+		set ExecuteDraw="##class(apptools.lte.info).ViewDrawHelp(.%AppLogInfoVal,%AppLogInfoCol,%AppLogInfoHead,.%AppLogInfoTemp,"""_NSpace_""","""_divId_""")"
+		set exportXLS=0,outFormat=""
+
+	}
+	elseif what="?"||(mode="help") {
+		KILL %help
 		do ##class(apptools.core.LogInfoPane).GetHelp(.%help,1)
 		// ExecuteArray = code for ison when outputting arrays
 		set gn="%help",what="",Message="<H5 style='color:Lightsteelblue' >"_$$$aText("help command","")_"</h5>"
@@ -464,6 +487,7 @@ ClassMethod NSpaceResult(Par = "") As %Status
 	;merge aaa=%request ;.GetMimeData ;GetCgiEnv ;Data
 	#; arbitrary query
 	if $g(sql)'="" {
+		if MaxCellView set ExecuteDraw="##class("_..%ClassName(1)_").View(.%AppLogInfoVal, %AppLogInfoCol, %AppLogInfoHead, .%AppLogInfoTemp,"""_MaxCellView_""")"
 		;w outFormat
 		if %DSN'="" {
 			set gnTemp=$na(@"^tmpLogInfo"@($j))  ;$$$TEMPORYGN@($j))
@@ -475,6 +499,7 @@ ClassMethod NSpaceResult(Par = "") As %Status
 				//do ##class(%SYS.System).WriteToConsoleLog("job "_$j_" sql "_$tr(sql,$c(13,10)," "),,0)
 				KILL %objlasterror
 				;set st=##class(apptools.core.sys).sql2gn(sql,DSN,gnTemp,MaxNode) ;no journal
+
 				set st=##class(apptools.core.sys).SqlToDSN(sql,DSN,gnTemp,MaxNode)
 				if 'st write "<font color=red>"_$System.Status.GetErrorText(st)_"</font>"
 				Set sc = $g(%objlasterror, $$$OK)
@@ -537,6 +562,20 @@ ClassMethod ExportGN(gn, filename, ext, filter = "", err)
 	write "<br>"_gn_" "_filename
 	do ##class(apptools.core.json).ExportGlobals(gn,filename,,filter,.err,1)
 	do ##class(apptools.lte.fileserver).AddRecord($namespace, $username, $p(filename,$$$slash,*), filename, gn_" "_filter,"apptools")
+	quit $$$OK
+}
+
+ClassMethod GetCmdList(help, list)
+{
+	#define sH(%msg) set help($i(help))=%msg
+	;$$$sH(" ")
+	set i=""
+	for { set i=$o(list(i),1,val) quit:i=""
+		set cmd=$lg(val,1)
+		;        (%text,%title,%input,%target)
+		set text=$replace($replace(cmd,"<","&lt;"),"<","&lt;")
+		$$$sH(" "_$$$addAppLog(text,"",cmd,"")_" --- "_$lg(val,2))
+	}
 	quit $$$OK
 }
 
@@ -615,12 +654,9 @@ ClassMethod ViewDrawHelp(Val, Col, Head, Temp, nspace, divId)
 		}
 		if Col=2 {
 			set res=$p(Temp,"---",1)
-			set res=$p($p(res,"</a>",1),">",*) ;$zconvert(res,"O","URL")
-			;;set res=$replace(res,$c(34),$c(34)_"/")
-			set onclick="try{document.getElementById('"_divId_"what"_"').value='"_res_"'}catch(e){};"
-			;set keys=$zconvert(res,"O","URL")
-			;set onclick="$('#"_divId_"MainContent"_"').empty();"_
-			;	$$$onclick(divId_"MainForm",divId_"MainHeader",$namespace,..%ClassName(1),"NSFirstHead","&keys="_keys_"&divId="_divId_"&ivId="_divId)
+			set res=$p($p(res,"</a>",1),">",*)
+			set cmd=$zconvert(res,"O","URL")
+			set onclick="try{document.getElementById('"_divId_"what"_"').value=decodeURIComponent('"_cmd_"')}catch(e){};"
 			set res="<a href='#' onclick="""_onclick_""">"_res_"</a>"
 		}
 		if Col=3 {
@@ -714,6 +750,7 @@ ClassMethod ProductsResult(Par = "") As %Status
 	quit $$$OK
 }
 
+/// do ##class(apptools.lte.info).GetGN(arg)
 ClassMethod GetGN(arg) As %Status
 {
 	quit $na(@..#GNStore@("sessions",+$h,$username,arg))
@@ -733,11 +770,23 @@ ClassMethod ShowTabSearch(key = "") As %Status
 	do ##class(apptools.core.LogInfoPane).DrawSQL(sql,1000,"")
 
  }
+ elseif $D(key("appPar"),data) {
+	 set gn=..GetGN(data)
+	 ;zw 444_$G(key("appPar")) zw @gn w !,"---" zw key
+	 set $lb(mode,namespace,class,method,param)=$g(@gn)
+	 if $g(mode)="run" {
+		 zn namespace
+		 do $classmethod(class,method,.key,param,gn)
+	 }
+	 else {
+		 w $zr w " "_gn
+	 }
+ }
  else {
  }
  write "</div>"
  $$$jsstart w $$$NL write "$('#"_divId_"MainContent').height($(window).height()-"_250_");"_$$$NL $$$jsstop w $$$NL
- q $$$OK
+ quit $$$OK
 }
 
 ///  do ##class(apptools.lte.info).FindAllErr(,,.result)
@@ -910,6 +959,17 @@ ClassMethod UserCopyResult(Par = "") As %Status
 		write $$$appMsg("Copied successfully") quit $$$OK
 	}
 	quit $$$OK
+}
+
+ClassMethod View(Val, Col, Head, Temp, MaxLen = 15) As %String
+{
+	set res=Val
+	if $g(Head) {
+	}
+	else {
+		if $e(res,MaxLen+1)'="" set res="<span style='color:blue' title='"_$zconvert(res,"O","JS")_"' >"_$e(res,1,MaxLen)_"...</span>"
+	}
+	quit res
 }
 
 /// set base64 = ##class(apptools.core.rest).getStatic("apptools.lte.info:info")

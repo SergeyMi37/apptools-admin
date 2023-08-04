@@ -233,7 +233,7 @@ ClassMethod GetTableName(SelectClass) As %String
 	set (tab,table)=$p(SelectClass,".",*)
 	//If the table name is the key words, frame it in quotation marks
 	set:$SYSTEM.SQL.IsReservedWord(table) table = """"_table_""""
-	set tab=$tr($p(SelectClass,"."_tab,1),".","_")_"."_table
+	set tab=$tr($p(SelectClass,"."_tab,1,*-1),".","_")_"."_table
 	q tab
 }
 
@@ -253,6 +253,12 @@ ClassMethod UD(num) As %String
 	set ret=""
 	for i=1:1 quit:$e(num,i)=""  set ret=ret_$wc($zhex("003"_(+$e(num,i))))_$wc($zhex("20E3"))
 	quit ret
+}
+
+/// w ##class(apptools.core.type).TagPre("va")
+ClassMethod TagPre(val = "") As %String
+{
+	quit "write ""<pre> "" "_val
 }
 
 }
