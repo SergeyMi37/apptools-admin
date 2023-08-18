@@ -8,7 +8,6 @@ RUN chown ${ISC_PACKAGE_MGRUSER}:${ISC_PACKAGE_IRISGROUP} /opt/irisapp
 USER ${ISC_PACKAGE_MGRUSER}
 
 COPY  src src
-COPY  web web
 COPY module.xml module.xml
 COPY iris.script /tmp/iris.script
 

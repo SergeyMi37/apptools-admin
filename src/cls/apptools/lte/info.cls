@@ -137,17 +137,16 @@ ClassMethod GetAllApps(opt) As %Status
 			set opt(key,"aw-icon")="fa-table"   ;https://fontawesome.com/icons?d=gallery&p=2&m=free
 	
 	;top menu
-		s LeftMenuName="Support",LeftMenuNumer=1
-		s key="menu-top-support"
-		s opt(key)="support"
-		s opt(key,"id")="Support"
-		s opt(key,"TabName")="Support" 
-		s opt(key,"ClassName")=..%ClassName(1)
-		s opt(key,"Method")="ShowTabAbout"
-		s opt(key,"TabMenu","Close")=1
-		s opt(key,"MenuTop")=$lb(LeftMenuNumer,LeftMenuName)
-	do ..GetAppsOpenWinPanel(.opt,"menu-top-zapm", "/apptoolsrest/a/zapm", "zapm", $lb(LeftMenuNumer,LeftMenuName))
-	do ..GetAppsOpenWinPanel(.opt,"menu-top-zinfo", "/apptoolsrest/a/info", "info", $lb(LeftMenuNumer,LeftMenuName))
+	set LeftMenuName="Support",LeftMenuNumer=1
+	set key="menu-top-support"
+	set opt(key)="support"
+	set opt(key,"id")="Support"
+	set opt(key,"TabName")="Support" 
+	set opt(key,"ClassName")=..%ClassName(1)
+	set opt(key,"Method")="ShowTabAbout"
+	set opt(key,"TabMenu","Close")=1
+	set opt(key,"MenuTop")=$lb(LeftMenuNumer,LeftMenuName)
+	do ##class(apptools.lte.info).GetTopMenuFavorites(.opt,$lb(LeftMenuNumer,LeftMenuName))
 	
 	set elem(1)="Productions",
 		elem(2)="EventLogs",
@@ -175,15 +174,30 @@ ClassMethod GetAllApps(opt) As %Status
 		set opt(key,"Method")="Logout"
 	
 	;----- Setup the search in the top menu
-	s key="Search"
-	s opt(key)="Search"
-	s opt(key,"id")="Search-"
-	s opt(key,"TabName")=""
-	s opt(key,"ClassName")=..%ClassName(1)
-	s opt(key,"Method")="ShowTabSearch"
-	s opt(key,"TabMenu","Mode")=11 ;1 - for each new search bar to make new tab, 0-tab is always the same, 11-not increment
+	set key="Search"
+	set opt(key)="Search"
+	set opt(key,"id")="Search-"
+	set opt(key,"TabName")=""
+	set opt(key,"ClassName")=..%ClassName(1)
+	set opt(key,"Method")="ShowTabSearch"
+	set opt(key,"TabMenu","Mode")=11 ;1 - for each new search bar to make new tab, 0-tab is always the same, 11-not increment
 	
 	do ..CheckRoleMenu(.opt)
+	quit $$$OK
+}
+
+/// Get for Top menu faforite ZPM modules interface
+/// do ##class(apptools.lte.info).GetTopMenuFavorites(.opt)
+ClassMethod GetTopMenuFavorites(opt, lb) As %Status
+{
+	if $$EXIST^%R("%ZAPM.ext.zpm.1") do ..GetAppsOpenWinPanel(.opt,"menu-top-zapm", "/apptoolsrest/a/zapm", "zapm", lb)
+	do ..GetAppsOpenWinPanel(.opt,"menu-top-zinfo", "/apptoolsrest/a/info", "info", lb)
+	do ##class(apptools.lte.resources).GetZpmNamespaces(.zpmList)
+	for name="webterminal:/terminal/","devbox:/devbox/DevBox.Index.cls" {
+		if $D(zpmList($p(name,":"))) {
+			do ..GetAppsOpenWinPanel(.opt,"menu-top-"_$p(name,":"), $p(name,":",2), $p(name,":"), lb)
+	    }
+	}	
 	quit $$$OK
 }
 
@@ -274,15 +288,6 @@ ClassMethod NSFirstHead(Par = "") As %Status
 		set hismax=$lg(@hg,4)
 		set hisnext=$lg(@hg,5)
 		set hisFiltr=$lg(@hg,6)
-	}
-	if 0,$g(Par("cmdlist"))'="" { //depricated 
-		set hg=Par("cmdlist")
-		set hiscmd=$lg(hg,1)
-		set hisns=$lg(hg,2)
-		set hisjdbc=$lg(hg,3)
-		set hismax=$lg(hg,4)
-		set hisnext=$lg(hg,5)
-		set hisFiltr=$lg(hg,6)
 	}
 	elseif requesturi'="" {
 		;set requesturi=$zconvert(requesturi,"I","URL")
