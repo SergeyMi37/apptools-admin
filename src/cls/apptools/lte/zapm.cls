@@ -93,7 +93,7 @@ ClassMethod GetAllApps(opt) As %Status
 			set opt(key,"aw-icon")="fa-solid fa-angle-right" ;"fa-solid fa-angle-up"  ; https://fontawesome.com/icons?d
 		}
 	;top menu
-		s LeftMenuName="Support",LeftMenuNumer=1
+		s LeftMenuName="Applications",LeftMenuNumer=1
 		s key="menu-top-support"
 		s opt(key)="support"
 		s opt(key,"id")="Support"

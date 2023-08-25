@@ -225,6 +225,16 @@ ClassMethod GetValue(gn, row, NameField) As %String
  quit $lg(@gn@(row),@gn@(-1,NameField))
 }
 
+/// Set one field value by its name from GN
+/// if ##class(apptools.core.sys).SetValue(gn,2,"QUANTITY","newval") zw @gn@(2)
+ClassMethod SetValue(gn, row, NameField, val) As %Status
+{
+ if $g(@gn@(-1,NameField))="" quit $$$ERROR($$$GeneralError,"undefined field: "_NameField)
+ if '$d(@gn@(row)) quit $$$ERROR($$$GeneralError,"undefined row: "_row)
+ set $list(@gn@(row),@gn@(-1,NameField))=val
+ quit $$$OK
+}
+
 /// Procedure for calling from a regular job and storing reports in the global
 /// %SYS>d ##class(apptools.core.sys).SaveQuery("SYS.Database:FreeSpace")
 /// %SYS>d ##class(apptools.core.sys).SaveQuery("%SYSTEM.License:Counts")
