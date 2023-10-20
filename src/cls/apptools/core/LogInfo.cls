@@ -102,7 +102,7 @@ ClassMethod SendEmail(supportemail = "", subj = "", msg = "", file = "") As %Sta
 			s path=$p(file,$$$slash,1,*-1)
 			s file=$lb($p(file,$$$slash,1,*-1)_$$$slash,$p(file,$$$slash,*))
 		}
-		set sc=##class(apptools.core.net).SendMail($$$EMAILSERVERIP,$$$EMAILSERVERPORT, 0, 0, "", authFrom, authFromPass, authFrom, email_","_supportemail, subj, text,.file)
+		set sc=##class(apptools.core.net).SendMail($$$EMAILSERVERIP,$$$EMAILSERVERPORT, 0, 0, "", authFrom, authFromPass, authFrom, email, subj, text,.file)
 		;set ^logMSW($i(^logMSW))=$lb(sc,$$$EMAILSERVERIP,$$$EMAILSERVERPORT, 0, 0, "", authFrom, authFromPass, authFrom, email_","_supportemail, subj)
 		if 'sc {
 			w !,"Error "_$System.Status.GetErrorText(sc) 
@@ -135,7 +135,7 @@ ClassMethod GetImgJqUi(code)
 }
 
 /// Export all projects to XML
-/// d ##class(apptools.core.LogInfo).ExportProjects("/backup/iris/source/",.file)
+/// d ##class(apptools.core.LogInfo).ExportProjects("/iris-backup/iris/source/",.file)
 ClassMethod ExportProjects(Dir, files, sent = 1, dirgitlab = "") As %Status
 {
 	$$$NspGoto(curNs,"apptools")
@@ -177,7 +177,7 @@ ClassMethod ExtSQL(gn, DSN = "", h = "", v = "") As %Status
 }
 
 /// Export all projects to XML
-/// d ##class(apptools.core.LogInfo).ExportProj("/backup/source/","app")
+/// d ##class(apptools.core.LogInfo).ExportProj("/iris-backup/source/","app")
 ClassMethod ExportAppProj(Dir, proj = "", files) As %Status
 {
 	/*

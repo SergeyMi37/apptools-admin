@@ -20,7 +20,7 @@ ClassMethod exp(dir = "", mask = "", ignoremask = "", ByRef list)
 }
 
 /// import 
-/// d ##class(apptools.core.code).imp("/backup/iris/distr/apptools-all/src/xml/")
+/// d ##class(apptools.core.code).imp("/iris-backup/iris/distr/apptools-all/src/xml/")
 ClassMethod imp(dir = "", mask = "")
 {
  d ..workdir(dir)
@@ -28,7 +28,7 @@ ClassMethod imp(dir = "", mask = "")
 }
 
 /// get or set working directory for export/import source
-/// d ##class(apptools.core.code).workdir("/backup/source")
+/// d ##class(apptools.core.code).workdir("/iris-backup/source")
 ClassMethod workdir(workdir)
 {
 	s gln = ..gln() s:$d(workdir) @gln = workdir
@@ -488,7 +488,7 @@ ClassMethod SetList(list, pos, val) As %Status
 	quit $lfs(str,$c(0,1,2))
 }
 
-/// do ##class(apptools.core.code).ExportOneResource("/backup/repo-iris-test-iris20203/new-pack",,"community.PKG",.app)
+/// do ##class(apptools.core.code).ExportOneResource("/iris-backup/repo-iris-test-iris20203/new-pack",,"community.PKG",.app)
 /// byte=1 isGenerated
 /// byte=2 isSystem
 /// byte=3 isPercented

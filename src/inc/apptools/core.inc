@@ -343,6 +343,19 @@ ROUTINE apptools.core [Type=INC]
 #; black down-pointing double triangle
 #define emojiDoubleTriangle $wc($zhex("23EC")) 
 
+#; https://fontawesome.com/v5/search?q=down&o=r&m=free
+#define fasDownload "<i class=""fas fa-download""></i>"
+#; >
+#define fasAR "<i class=""fas fa-solid fa-angle-right""></i>" 
+#define fasHist "<i class=""fas fa-history""></i>"
+#; ...
+#define fasPPP "<i class=""fas fa-ellipsis-h""></i>" 
+#define fasCupe "<i class=""fas fa-solid fa-cube""></i>" 
+#define fasAst "<i class=""fas fa-solid fa-asterisk""></i>"
+#define fasLogin "<i class=""fas fa-sign-in-alt""></i>"
+#define fasLogout "<i class=""fas fa-sign-out-alt""></i>" 
+#define fasOpt "<i class=""fas fa-cog""></i>"
+
 #define isGenerated(%code) ##class(%RoutineMgr).IsGenerated( %code )
 #define isPercented(%code) ("%" = $Extract(%code))
 #define isMapped(%code) ##class(%RoutineMgr).IsMapped( %code )

@@ -187,12 +187,12 @@ ClassMethod GetAllApps(opt) As %Status
 }
 
 /// Get for Top menu faforite ZPM modules interface
-/// do ##class(apptools.lte.info).GetTopMenuFavorites(.opt)
+/// do ##class(apptools.lte.info).GetTopMenuFavorites(.opt,$lb("1","name"))
 ClassMethod GetTopMenuFavorites(opt, lb) As %Status
 {
 	do ..GetAppsOpenWinPanel(.opt,"menu-top-apptools", "/apptools/apptools.core.LogInfo.cls", "admin-panel", lb)
-	if $$EXIST^%R("%ZAPM.ext.zpm.1") do ..GetAppsOpenWinPanel(.opt,"menu-top-zapm", "/apptoolsrest/a/zapm", "zapm", lb)
-	do ..GetAppsOpenWinPanel(.opt,"menu-top-zinfo", "/apptoolsrest/a/info", "info", lb)
+	if $$EXIST^%R("%ZAPM.ext.zpm.1") do ..GetAppsOpenWinPanel(.opt,"menu-top-zapm", "/apptoolsrest/a/zapm", "app-zapm", lb)
+	do ..GetAppsOpenWinPanel(.opt,"menu-top-zinfo", "/apptoolsrest/a/info", "app-info", lb)
 	do ##class(apptools.lte.resources).GetZpmNamespaces(.zpmList)
 	for name="webterminal:/terminal/","devbox:/devbox/DevBox.Index.cls" {
 		if $D(zpmList($p(name,":"))) {
@@ -440,7 +440,7 @@ ClassMethod NSpaceResult(Par = "") As %Status
 		set exportXLS=0,outFormat="",Next=-1
 	}
 	#; queries and query results
-	elseif ",query,result,select,call,delete,insert,s,q,r,begin,"[(","_$zconvert($p(what," ",1),"L")_",") {
+	elseif ",with,query,result,select,call,delete,insert,s,q,r,begin,"[(","_$zconvert($p(what," ",1),"L")_",") {
 			set sql=what
 			if sql["p.party_id( )" s sql=$replace(sql,"p.party_id( )","p.party_id(+)")
 	}

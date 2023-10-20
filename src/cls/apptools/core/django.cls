@@ -1,96 +1,12 @@
 Include apptools.core
 
-/// Utilities for working in Telegram
-Class apptools.core.telebot [ Abstract ]
+/// Utilities for Django
+Class apptools.core.django [ Abstract ]
 {
 
 /// Global Name Store Referens
-Parameter GN = "^%apptools.ref";
+Parameter GN = "^%apptools.django";
 
-/// Get info from telebot
-ClassMethod GetMe(botId) As %DynamicObject
-{
-	s ret=..ExecuteRequest(..GetRequestObj(), "getMe",botId)
-	q ret
-}
-
-/// $wc($zhex("1F6A8"))	;U+0038 U+20E3 =8;  U+0031 U+20E3 =1 ;* U+2744 snow  X - $wc($zhex("274C"))  ;https://apps.timwhitlock.info/emoji/tables/unicode
-/// w ##class(apptools.core.telebot).Send(5111112,"13333333:AHEАWAASDDDpepSSAA","Not recognized !!! Пример кириллицы "_$wc($zhex("1F6A8")))
-ClassMethod Send(chatId As %String, botId, text As %String, obj = 0) As %Integer
-{
-	if (obj'=0) {
-		;set obj = {"remove_keyboard":true}
-		set res = ..SendMessage(chatId,text,botId,obj)
-	} else {
-		set res = ..SendMessage(chatId,text,botId)
-	}
-	
-	if (res.ok) {
-		return res.result."message_id"
-	}
-	return $$$ERROR($$$GeneralError, "Error while sending a message")
-}
-
-ClassMethod GetRequestObj() As %Net.HttpRequest
-{
-	#dim request as %Net.HttpRequest
-	set request = ##class(%Net.HttpRequest).%New()
-	set request.Server = "api.telegram.org"
-	set request.SSLConfiguration = ..CheckSSLCertificate("TelegramSSL")
-	set request.Https = 1 
-	return request
-}
-
-ClassMethod ExecuteRequest(request As %Net.HttpRequest, method As %String, botId = "") As %DynamicObject
-{
-	set st = request.Post("bot"_botId_"/"_method)
-	if ($$$ISERR(st)) {
-		throw ##class(%Exception.StatusException).CreateFromStatus(st)
-	}
-	return ##class(%Library.DynamicObject).%FromJSON(request.HttpResponse.Data)
-}
-
-ClassMethod SendMessage(chatId As %Integer, text As %String, botId, replyMarkup As %DynamicObject = 0) As %DynamicObject
-{
-	#dim request as %Net.HttpRequest
-	set request = ..GetRequestObj()
-	do request.InsertFormData("chat_id",chatId)
-	do request.InsertFormData("text",text)
-	do request.InsertFormData("parse_mode","HTML") ;HTML ;MarkdownV2 ;Markdown https://core.telegram.org/bots/api#markdownv2-style
-	
-	if (replyMarkup'=0) {
-		do request.InsertFormData("reply_markup",replyMarkup.%ToJSON())
-	}
-	return ..ExecuteRequest(request, "sendMessage",botId)
-}
-
-ClassMethod GetUpdates(botId, offset As %Integer = "", limit As %Integer = 100, timeout As %Integer = 0) As %DynamicObject
-{
-	#dim request as %Net.HttpRequest
-	set request = ..GetRequestObj()
-	if (offset'="") {
-		do request.InsertFormData("offset",offset)
-	}
-	do request.InsertFormData("limit",limit)
-	do request.InsertFormData("timeout",timeout)
-	return ..ExecuteRequest(request, "getUpdates",botId)
-}
-
-/// The method checks for the existence of the configured SSL configuration
-/// and creates an empty configuration with that name if this yet
-/// to connect to a https server, that's enough
-ClassMethod CheckSSLCertificate(name) As %String
-{
-  NEW $NAMESPACE
-  SET $NAMESPACE = "%SYS"
-  
-  IF '##class(Security.SSLConfigs).Exists(name) {
-    DO ##class(Security.SSLConfigs).Create(name)
-  }
-  QUIT name
-}
-
-/// --------------Django modules
 /// Get base responce
 ClassMethod GetResp(arg = "") As %String
 {
@@ -103,7 +19,7 @@ ClassMethod GetResp(arg = "") As %String
 }
 
 /// TimeStamp
-/// w ##class(apptools.core.telebot).TS(,.json)
+/// w ##class(apptools.core.django).TS(,.json)
 ClassMethod TS(arg = "", js) As %String
 {
 	set js=..GetResp(arg)
@@ -113,7 +29,7 @@ ClassMethod TS(arg = "", js) As %String
 }
 
 /// Alerts Systems
-/// w ##class(apptools.core.telebot).Alerts(,.json)
+/// w ##class(apptools.core.django).Alerts(,.json)
 ClassMethod Alerts(arg = "", js = "") As %String
 {
 	set js=..GetResp(arg)
@@ -129,7 +45,7 @@ ClassMethod SS(arg = "", js) As %String
 }
 
 /// Get Info for Footer
-/// w ##class(apptools.core.telebot).GetFooter("")
+/// w ##class(apptools.core.django).GetFooter("")
 ClassMethod GetFooter(arg = "", js) As %String
 {
 	set js=..GetResp(arg)
@@ -171,7 +87,7 @@ ClassMethod GetFooter(arg = "", js) As %String
 }
 
 /// Get Info for Managment Portal
-/// w ##class(apptools.core.telebot).GetPortal("",.js)
+/// w ##class(apptools.core.django).GetPortal("",.js)
 ClassMethod GetPortal(arg = "", js) As %String
 {
 	set js=..GetResp(arg)
@@ -183,7 +99,7 @@ ClassMethod GetPortal(arg = "", js) As %String
 		
 		if %Param["iditem=" {
 			set iditem=$p(%Param,"iditem=",2)
-			set data=##class(apptools.core.telebot).AddIdItem(,iditem)
+			set data=##class(apptools.core.django).AddIdItem(,iditem)
 			set method=$lg(data,1),id=$lg(data,2),ns=$lg(data,3)
 			set js.title=ns_", "_method_", " _id
 			set js.draw="Form for "_%Param
@@ -191,72 +107,72 @@ ClassMethod GetPortal(arg = "", js) As %String
 		}
 		elseif %Param="" {
 			set js.prod={}
-			set js.prod.count=##class(apptools.core.telebot).GetPortalProd(0,gn)
+			set js.prod.count=##class(apptools.core.django).GetPortalProd(0,gn)
 			set js.proc={}
-			set js.proc.count=##class(apptools.core.telebot).GetPortalProc(0,gn)
+			set js.proc.count=##class(apptools.core.django).GetPortalProc(0,gn)
 			set js.lock={}
-			set js.lock.count=##class(apptools.core.telebot).GetPortalLock(0,gn,gnTab)
+			set js.lock.count=##class(apptools.core.django).GetPortalLock(0,gn,gnTab)
 			set js.db={}
-			set js.db.count=##class(apptools.core.telebot).GetPortalNS(0,gn,"Databases")
+			set js.db.count=##class(apptools.core.django).GetPortalNS(0,gn,"Databases")
 			set js.ns={}
-			set js.ns.count=##class(apptools.core.telebot).GetPortalNS(0,gn,"Namespaces")
+			set js.ns.count=##class(apptools.core.django).GetPortalNS(0,gn,"Namespaces")
 			set js.roles={}
-			set js.roles.count=##class(apptools.core.telebot).GetPortalApps(0,gn,"Security.Roles"," ")
+			set js.roles.count=##class(apptools.core.django).GetPortalApps(0,gn,"Security.Roles"," ")
 			set js.users={}
-			set js.users.count=##class(apptools.core.telebot).GetPortalApps(0,gn,"Security.Users"," ")
+			set js.users.count=##class(apptools.core.django).GetPortalApps(0,gn,"Security.Users"," ")
 			set js.apps={}
-			set js.apps.count=##class(apptools.core.telebot).GetPortalApps(0,gn,"Security.Applications"," ")
+			set js.apps.count=##class(apptools.core.django).GetPortalApps(0,gn,"Security.Applications"," ")
 			set js.serv={}
-			set js.serv.count=##class(apptools.core.telebot).GetPortalApps(0,gn,"Security.Service"," ")
+			set js.serv.count=##class(apptools.core.django).GetPortalApps(0,gn,"Security.Service"," ")
 			set js.res={}
-			set js.res.count=##class(apptools.core.telebot).GetPortalApps(0,gn,"Security.Resources"," ")
+			set js.res.count=##class(apptools.core.django).GetPortalApps(0,gn,"Security.Resources"," ")
 			set js.tasks={}
-			set js.tasks.count=##class(apptools.core.telebot).GetPortalApps(0,gn,"%SYS.Task"," ")
+			set js.tasks.count=##class(apptools.core.django).GetPortalApps(0,gn,"%SYS.Task"," ")
 			set js.alerts={}
 			do ##class(%SYSTEM.Monitor).GetAlerts(,.str,.last)
 			set st=$o(str(""),-1)
 			set js.alerts.count=+st
 		}
 		elseif %Param["Namespaces" {
-			do ##class(apptools.core.telebot).GetPortalNS(1,gn,"Namespaces"," ",gnTab)
+			do ##class(apptools.core.django).GetPortalNS(1,gn,"Namespaces"," ",gnTab)
 		}
 		elseif %Param["Databases" {
-			do ##class(apptools.core.telebot).GetPortalNS(1,gn,"Databases"," ",gnTab)
+			do ##class(apptools.core.django).GetPortalNS(1,gn,"Databases"," ",gnTab)
 		}
 		elseif %Param["Process" {
-			do ##class(apptools.core.telebot).GetPortalProc(1,gn,,,gnTab)
+			do ##class(apptools.core.django).GetPortalProc(1,gn,,,gnTab)
 		}
 		elseif %Param["Products" {
-			do ##class(apptools.core.telebot).GetPortalProd(1,gn,,gnTab)
+			do ##class(apptools.core.django).GetPortalProd(1,gn,,gnTab)
 		}
 		elseif %Param["Locktab" {
-			do ##class(apptools.core.telebot).GetPortalLock(1,gn, gnTab)
+			do ##class(apptools.core.django).GetPortalLock(1,gn, gnTab)
 		}
 		elseif %Param["Apps" {
-			do ##class(apptools.core.telebot).GetPortalApps(1,gn,"Security.Applications"," ",gnTab)
+			do ##class(apptools.core.django).GetPortalApps(1,gn,"Security.Applications"," ",gnTab)
 		}
 		elseif %Param["Roles" {
-			do ##class(apptools.core.telebot).GetPortalApps(1,gn,"Security.Roles"," ",gnTab)
+			do ##class(apptools.core.django).GetPortalApps(1,gn,"Security.Roles"," ",gnTab)
 		}
 		elseif %Param["Users" {
-			do ##class(apptools.core.telebot).GetPortalApps(1,gn,"Security.Users"," ",gnTab)
+			do ##class(apptools.core.django).GetPortalApps(1,gn,"Security.Users"," ",gnTab)
 		}
 		elseif %Param["Services" {
-			do ##class(apptools.core.telebot).GetPortalApps(1,gn,"Security.Service"," ",gnTab)
+			do ##class(apptools.core.django).GetPortalApps(1,gn,"Security.Service"," ",gnTab)
 		}
 		elseif %Param["Resources" {
-			do ##class(apptools.core.telebot).GetPortalApps(1,gn,"Security.Resources"," ",gnTab)
+			do ##class(apptools.core.django).GetPortalApps(1,gn,"Security.Resources"," ",gnTab)
 		}
 		elseif %Param["Tasks" {
-			do ##class(apptools.core.telebot).GetPortalApps(1,gn,"%SYS.Task"," ",gnTab)
+			do ##class(apptools.core.django).GetPortalApps(1,gn,"%SYS.Task"," ",gnTab)
 		}
 		elseif %Param["cpf" {
 			set path=$p($ZU(86),"*")
-			do ##class(apptools.core.telebot).GetPortalFile(path,gn, gnTab)
+			do ##class(apptools.core.django).GetPortalFile(path,gn, gnTab)
 		}
 		elseif %Param["Messages" {
 			set path=##class(apptools.core.files).getPathcconsole() ;$ZU(12)
-			do ##class(apptools.core.telebot).GetPortalFile(path,gn, gnTab)
+			do ##class(apptools.core.django).GetPortalFile(path,gn, gnTab)
 		}
 		elseif %Param["Alerts" {
 			do ##class(%SYSTEM.Monitor).GetAlerts(,.str,.last)
@@ -283,7 +199,7 @@ ClassMethod GetPortal(arg = "", js) As %String
 	quit ##class(apptools.util.json).ZPretty(js,"","")
 }
 
-/// set js={} do ##class(apptools.core.telebot).Table2Json(js,"^||test")
+/// set js={} do ##class(apptools.core.django).Table2Json(js,"^||test")
 ClassMethod Table2Json(obj, gn) As %Status
 {
 	set cols=@gn@(0)
@@ -300,7 +216,7 @@ ClassMethod Table2Json(obj, gn) As %Status
 	quit $$$OK
 }
 
-/// do ##class(apptools.core.telebot).GetPortalApps(1,"^tmpNS","Namespaces"," ")
+/// do ##class(apptools.core.django).GetPortalApps(1,"^tmpNS","Namespaces"," ")
 ClassMethod GetPortalApps(count, gn, mode = "Security.Applications", %Param = "", gnTab) As %String
 {
 	new $namespace
@@ -326,13 +242,13 @@ ClassMethod GetPortalApps(count, gn, mode = "Security.Applications", %Param = ""
 	do ##class(apptools.core.sys).sql2gn(%sql,"",gnTab)
 	if gn="" quit 1
 	set %AppLogInfoTemp("colomn")="Name",%AppLogInfoTemp("method")=mode
-	set %exec="##class(apptools.core.telebot).AddUrl(.%AppLogInfoVal, .%AppLogInfoCol, .%AppLogInfoHead, .%AppLogInfoTemp)"
+	set %exec="##class(apptools.core.django).AddUrl(.%AppLogInfoVal, .%AppLogInfoCol, .%AppLogInfoHead, .%AppLogInfoTemp)"
 	set run="set st=##class(apptools.core.LogInfoPane).DrawSQL(""r "_gnTab_""",10000,$zu(5),%Param,%exec,,"""")"
 	do ##class(apptools.core.sys).Run2Spool(run,gn)
 	quit 0
 }
 
-/// w ##class(apptools.core.telebot).GetPortalFile("C:\InterSystems\IRISHealth\mgr\messages.log","^||tmpL","^||tmpL2")
+/// w ##class(apptools.core.django).GetPortalFile("C:\InterSystems\IRISHealth\mgr\messages.log","^||tmpL","^||tmpL2")
 ClassMethod GetPortalFile(path, gn, gnTab) As %String
 {
 	kill @gn
@@ -344,14 +260,14 @@ ClassMethod GetPortalFile(path, gn, gnTab) As %String
  	quit $$$OK
 }
 
-/// w ##class(apptools.core.telebot).GetPortalLock(1,"^||tmpL")
+/// w ##class(apptools.core.django).GetPortalLock(1,"^||tmpL")
 ClassMethod GetPortalLock(count, gn, gnTab) As %String
 {
 	new $namespace
 	set $namespace= "%SYS" 
 	do ##class(apptools.core.sys).SaveQueryTab("%SYS.LockQuery:List",gnTab)
 	set %AppLogInfoTemp("colomn")="DelKey",%AppLogInfoTemp("method")="Locktab"
-	set %exec="##class(apptools.core.telebot).AddUrl(.%AppLogInfoVal, .%AppLogInfoCol, .%AppLogInfoHead, .%AppLogInfoTemp)"
+	set %exec="##class(apptools.core.django).AddUrl(.%AppLogInfoVal, .%AppLogInfoCol, .%AppLogInfoHead, .%AppLogInfoTemp)"
 	set run="set st=##class(apptools.core.LogInfoPane).DrawSQL(""r "_gnTab_""",100000,$zu(5),"" "",%exec,,"""")"
 	do ##class(apptools.core.sys).Run2Spool(run,gn,,.counts)
 	if 'count {
@@ -360,7 +276,7 @@ ClassMethod GetPortalLock(count, gn, gnTab) As %String
 	quit 0
 }
 
-/// do ##class(apptools.core.telebot).GetPortalProd(1,"^tmpNSoutpot"," ")
+/// do ##class(apptools.core.django).GetPortalProd(1,"^tmpNSoutpot"," ")
 ClassMethod GetPortalProd(count, gn, %Param = " ", gnTab) As %String
 {
 	new $namespace
@@ -370,13 +286,13 @@ ClassMethod GetPortalProd(count, gn, %Param = " ", gnTab) As %String
 	}
 	d ..GetPortalProds(1,gnTab)
 	set %AppLogInfoTemp("colomn")="ProductName",%AppLogInfoTemp("method")="Products"
-	set %exec="##class(apptools.core.telebot).AddUrl(.%AppLogInfoVal, .%AppLogInfoCol, .%AppLogInfoHead, .%AppLogInfoTemp)"
+	set %exec="##class(apptools.core.django).AddUrl(.%AppLogInfoVal, .%AppLogInfoCol, .%AppLogInfoHead, .%AppLogInfoTemp)"
 	set run="set st=##class(apptools.core.LogInfoPane).DrawSQL(""r "_gnTab_""",10000,$zu(5),%Param,%exec,,"""")"
 	do ##class(apptools.core.sys).Run2Spool(run,gn)
 	quit 0
 }
 
-/// do ##class(apptools.core.telebot).GetPortalProds(1,"^tmpNSoutpot"," ")
+/// do ##class(apptools.core.django).GetPortalProds(1,"^tmpNSoutpot"," ")
 ClassMethod GetPortalProds(count, gn, %Param = " ") As %String
 {
 	new $namespace
@@ -404,7 +320,7 @@ ClassMethod GetPortalProds(count, gn, %Param = " ") As %String
 	quit coun
 }
 
-/// do ##class(apptools.core.telebot).GetPortalProc(1,"^tmpNSoutpot","Namespaces"," ")
+/// do ##class(apptools.core.django).GetPortalProc(1,"^tmpNSoutpot","Namespaces"," ")
 ClassMethod GetPortalProc(count, gn, SectionHeader = "Namespaces", %Param = " ", gnTab) As %String
 {
 	new $namespace
@@ -420,13 +336,13 @@ ClassMethod GetPortalProc(count, gn, SectionHeader = "Namespaces", %Param = " ",
 	}
 	do ##class(apptools.core.sys).sql2gn(%sql,"",gnTab,100000)
 	set %AppLogInfoTemp("colomn")="Pid",%AppLogInfoTemp("method")="Process"
-	set %exec="##class(apptools.core.telebot).AddUrl(.%AppLogInfoVal, .%AppLogInfoCol, .%AppLogInfoHead, .%AppLogInfoTemp)"
+	set %exec="##class(apptools.core.django).AddUrl(.%AppLogInfoVal, .%AppLogInfoCol, .%AppLogInfoHead, .%AppLogInfoTemp)"
 	set run="set st=##class(apptools.core.LogInfoPane).DrawSQL(""r "_gnTab_""",10000,$zu(5),%Param,%exec,,"""")"
 	do ##class(apptools.core.sys).Run2Spool(run,gn)
 	quit 0
 }
 
-/// Procedure for ##class(apptools.core.telebot).AddUrl
+/// Procedure for ##class(apptools.core.django).AddUrl
 ClassMethod AddUrl(Val, Col, Head, Temp, Del = 0) As %String
 {
 	set res=Val
@@ -444,7 +360,7 @@ ClassMethod AddUrl(Val, Col, Head, Temp, Del = 0) As %String
 	quit res
 }
 
-/// Procedure for ##class(apptools.core.telebot).AddIdItem("temp",123)
+/// Procedure for ##class(apptools.core.django).AddIdItem("temp",123)
 ClassMethod AddIdItem(lb = "", iditem = "") As %String
 {
 	set gn=$na(@..#GN@(+$h))
@@ -457,7 +373,7 @@ ClassMethod AddIdItem(lb = "", iditem = "") As %String
 	quit item
 }
 
-/// do ##class(apptools.core.telebot).GetPortalNS(1,"^tmpNS","Namespaces"," ")
+/// do ##class(apptools.core.django).GetPortalNS(1,"^tmpNS","Namespaces"," ")
 ClassMethod GetPortalNS(count, gn, SectionHeader = "Namespaces", %Param = "", gnTab) As %String
 {
 	new $namespace
@@ -475,7 +391,7 @@ ClassMethod GetPortalNS(count, gn, SectionHeader = "Namespaces", %Param = "", gn
 	;set st=##class(apptools.core.LogInfoPane).DrawSQL(%sql,10000,$zu(5),%Param,%exec,,"""")
 	do ##class(apptools.core.sys).sql2gn(%sql,"",gnTab,100000)
 	set %AppLogInfoTemp("colomn")="Name",%AppLogInfoTemp("method")=SectionHeader
-	set %exec="##class(apptools.core.telebot).AddUrl(.%AppLogInfoVal, .%AppLogInfoCol, .%AppLogInfoHead, .%AppLogInfoTemp)"
+	set %exec="##class(apptools.core.django).AddUrl(.%AppLogInfoVal, .%AppLogInfoCol, .%AppLogInfoHead, .%AppLogInfoTemp)"
 	set run="set st=##class(apptools.core.LogInfoPane).DrawSQL(""r "_gnTab_""",10000,$zu(5),%Param,%exec,,"""")"
 	do ##class(apptools.core.sys).Run2Spool(run,gn)
 	quit 0

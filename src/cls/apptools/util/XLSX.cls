@@ -5,7 +5,7 @@ Class apptools.util.XLSX
 {
 
 /// Report generation in a given directory upon request with a given field format
-/// set sc = ##class(apptools.util.XLSX).Report2xlsx("/backup/temp/reports","select top 10 id,ClassName  FROM apptools.core.Log order by id desc","AppLogReport",",N")
+/// set sc = ##class(apptools.util.XLSX).Report2xlsx("/iris-backup/temp/reports","select top 10 id,ClassName  FROM apptools.core.Log order by id desc","AppLogReport",",N")
 ClassMethod Report2xlsx(directory As %String, sql = "", filename = "", format = "", args...) As %Status
 {
 	q:sql="" $$$OK

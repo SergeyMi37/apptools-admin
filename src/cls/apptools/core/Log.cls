@@ -174,12 +174,14 @@ ClassMethod WriteJSONFromObject(obj, format As %String = "tw", alt = 1) As %Stri
         use $io::("^" _ $ZNAME)
         do ##class(%Device).ReDirectIO(1)
 		if $$$IsNewJSON {
+			;##class(Form.JSON.OBJ).%ObjectToJSON(obj,,,"aeloqtwc")
 			if alt {set jsobj = ##class(%ZEN.Auxiliary.altJSONProvider).%ObjectToAET(obj,,format)}
 			else {set jsobj = ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToAET(obj,,format)}
 			;write jsobj.%ToJSON()
         	set formatter = ##class(%JSON.Formatter).%New()
         	set sc = formatter.Format(jsobj)
 		} else {
+        	;##class(Form.JSON.OBJ).%ObjectToJSON(obj,,,$$$formatJSON)
         	if alt {do ##class(%ZEN.Auxiliary.altJSONProvider).%ObjectToJSON(obj,,,format)}
         	else {do ##class(%ZEN.Auxiliary.jsonProvider).%ObjectToJSON(obj,,,format)}
 		}

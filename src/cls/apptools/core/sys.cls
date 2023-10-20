@@ -140,7 +140,7 @@ ClassMethod ListNS(info, Flag = "")
 }
 
 /// Function to call the OS command in the result output
-/// %SYS>d ##class(apptools.core.sys).RunCmd("sudo du -sm /opt/isc/ensemble/mgr/*| sort -nr",$na(^%apptools.Cmd("mgr",$zd($h,3))),1,"/backup/temp/snmp/")
+/// %SYS>d ##class(apptools.core.sys).RunCmd("sudo du -sm /opt/isc/ensemble/mgr/*| sort -nr",$na(^%apptools.Cmd("mgr",$zd($h,3))),1,"/iris-backup/temp/snmp/")
 ClassMethod RunCmd(cmdOs = "free", gn = "^TaskGN", AddDateTime = 0, dir = {##class(%File).GetDirectory(##class(%File).TempFilename())})
 {
 	s gnTask=gn
@@ -153,7 +153,7 @@ ClassMethod RunCmd(cmdOs = "free", gn = "^TaskGN", AddDateTime = 0, dir = {##cla
 }
 
 /// Function to call from a regular task
-/// %SYS>d ##class(apptools.core.sys).RunTask("snmpwalk -v 1 server.ru -c public 1.3.6.1.4.1.16563.1.1.1.1.10","^%apptools.TaskLic","%SYSTEM.License:Counts","/backup/temp/snmp/")
+/// %SYS>d ##class(apptools.core.sys).RunTask("snmpwalk -v 1 server.ru -c public 1.3.6.1.4.1.16563.1.1.1.1.10","^%apptools.TaskLic","%SYSTEM.License:Counts","/iris-backup/temp/snmp/")
 ClassMethod RunTask(cmdOs = "free", gn = "^TaskGN", query = "%SYSTEM.License:Counts", dir = {##class(%File).GetDirectory(##class(%File).TempFilename())})
 {
 	set datetime=$tr($$$AppDT($h)," ","_")
@@ -267,7 +267,9 @@ ClassMethod SaveQueryTab(query = "%SYSTEM.License:Counts", gn = "^||q")
 	else { Set status=rset.Execute()}
 	If $$$ISERR(status) quit status
 	Set colcnt=rset.GetColumnCount()
-	For i=1:1:colcnt set @gn@(0,i)=rset.GetColumnName(i),@gn@(-1,rset.GetColumnName(i))=i
+	set GetColumnName=""
+	For i=1:1:colcnt set @gn@(0,i)=rset.GetColumnName(i),@gn@(-1,rset.GetColumnName(i))=i,GetColumnName=GetColumnName_$lb(rset.GetColumnName(i))
+	set @gn@(0)=GetColumnName
 	while rset.Next() {	if $I(row)
 		set str=""
 	   	For i=1:1:colcnt set str=str_$lb(rset.GetData(i))
@@ -392,46 +394,56 @@ ClassMethod IndGetRows(gn, ByRef FieldsValue, ByRef out) As %Status
 				set FieldName=$lg(@gn@(0,FieldNumber),1)
 			}
 		}
-		;w !,gn_"---",FieldNumber,"---",FieldName,"---",data
 		MERGE:data'="" out(i)=@gn@(-4,"ind",FieldNumber,data)
 	}
 	quit st
 }
 
-/// do ##class(apptools.core.sys).SetTableHeader("gn","Head1","Head222","Head3333")
+/// do ##class(apptools.core.sys).SetTableHeader("^||gn","Head1","Head222","Head3333")
 ClassMethod SetTableHeader(gn = "^mtempSQLGN", arg...) As %String
 {
 	set @gn@(-3,"timestamp")=$lb($$$AppDT($h))
 	if $d(arg(1))>9 {
-		for i=1:1 quit:'$d(arg(1,i),data)  do SetCol(i,data)
+		for i=1:1 quit:'$d(arg(1,i),data)  do SetCol(gn,data,i)
 	}
 	else {
-		for i=1:1 quit:'$d(arg(i),data)  do SetCol(i,data)
+		if $lv(arg(1)) { 
+			for i=1:1 quit:$lg(arg(1),i)=""  do SetCol(gn,$lg(arg(1),i),i)
+		}
+		else {
+			for i=1:1 quit:'$d(arg(i),data)  do SetCol(gn,data,i)
+		}
 	}
 	quit $$$OK
-SetCol(i,data)
+SetCol(gn,data,i)
 	set @gn@(0)=$g(@gn@(0))_$lb(data)
 	set @gn@(-1,$ZStrip(data,"<>WCP"))=i //Name = Number
 	quit
 }
 
-/// for i=1:1:10 do ##class(apptools.core.sys).SetTableRow("gn",i,"row"_i,"row222-"_i,"row3333-"_i)
+/// for i=1:1:10 do ##class(apptools.core.sys).SetTableRow("^||gn",i,"row"_i,"row222-"_i,"row3333-"_i)
 ClassMethod SetTableRow(gn = "^mtempSQLGN", row, arg...) As %String
 {
 	set @gn@(row)=""
 	if $d(arg(1))>9 {
-		for i=1:1 quit:'$d(arg(1,i),data)  do SetRow(row,i,data)
+		for i=1:1 quit:'$d(arg(1,i),data)  do SetRow(gn,row,data)
 	}
 	else {
-		for i=1:1 quit:'$d(arg(i),data)  do SetRow(row,i,data)
+		if $lv(arg(1)) {
+			set @gn@(row)=arg(1)
+		}
+		else {		
+			for i=1:1 quit:'$d(arg(i),data)  do SetRow(gn,row,data)
+		}
 	}
 	quit $$$OK
-SetRow(row,i,data)
+SetRow(gn,row,data)
 	set @gn@(row)=$g(@gn@(row))_$lb(data)
 	quit
 }
 
-/// do ##class(apptools.core.sys).SetTableFooter("gn")
+/// do ##class(apptools.core.sys).SetTableFooter("^||gn")
+/// set st=##class(apptools.core.LogInfoPane).DrawSQL("result ^||gn")
 ClassMethod SetTableFooter(gn = "^mtempSQLGN") As %String
 {
 	set ts=$lg(@gn@(-3,"timestamp"),1)
@@ -1020,7 +1032,7 @@ ClassMethod GetDirDB(nspace, ByRef db, ByRef dirlist, IRIS = 1) As %Status
 }
 
 /// do ##class(apptools.core.sys).Integrity("APPTOOLS,APP,USER")
-ClassMethod Integrity(nspace, dir = "/backup/iris-backup/integrity/", adddir = "", ByRef filename) As %Status
+ClassMethod Integrity(nspace, dir = "/iris-backup/iris-backup/integrity/", adddir = "", ByRef filename) As %Status
 {
 	new $namespace
 	zn "%sys"
@@ -1053,6 +1065,22 @@ ClassMethod ExportSecurity(dir = "/iris-backup/install/security/") As %Status
 	zn "%SYS" 
 	$$$TOE(st, ##class(%File).CreateDirectoryChain(dir))
 	quit ##class(Security.System).ExportAll(dir_"SecurityExport"_$tr($zd($h,3)_$zt($p($h,",",2),-1),":- ")_".xml", .NumExported)
+}
+
+/// do ##class(apptools.core.sys).Run2Spool("zw ^%apptools.Setting","^||gnTmp")
+ClassMethod Run2Spool(exe, Output gn, oneline = 1, count) As %Status
+{
+ OPEN 2:$job USE 2 
+ xecute exe
+ CLOSE 2
+ KILL @gn
+ set (@gn,i,count)=""
+ for { set i=$order(^SPOOL($job,i),1,s) quit:i=""
+ 	if oneline set @gn=@gn_s
+ 	else  set @gn@(i)=s
+ 	set count=count+1
+ }
+ KILL ^SPOOL($job)
 }
 
 }

@@ -70,7 +70,7 @@ ClassMethod GetClientAddress()
 }
 
 /// select * from apptools_lte.fileserver
-/// Example do ##class(apptools.lte.fileserver).AddRecord($namespace, $username, "file.xml", "/backup/temp/file.xml", "Description file","app")
+/// Example do ##class(apptools.lte.fileserver).AddRecord($namespace, $username, "file.xml", "/iris-backup/temp/file.xml", "Description file","app")
 ClassMethod AddRecord(Namespace As %String = "", UserName As %String = "", Filename As %String = "", PathFilename As %String = "", Description As %String = "", app = "", size = "")
 {
 	new $namespace

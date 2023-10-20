@@ -107,11 +107,11 @@ ClassMethod rest(par)
 	q $$$OK
 }
 
-/// do ##class(apptools.python.xlsx).globals2xlsx("^tmpQuery","/backup/temp/giszkh-*.xlsx")
+/// do ##class(apptools.python.xlsx).globals2xlsx("^tmpQuery","/iris-backup/temp/giszkh-*.xlsx")
 ClassMethod globals2xlsx(gn)
 {
 	set patternxlsx=$lg(@gn,9)
-	set paternfile=$lg(@gn,1) //;set pattern="/backup/temp/reports/gis-*.xlsx"
+	set paternfile=$lg(@gn,1) //;set pattern="/iris-backup/temp/reports/gis-*.xlsx"
 	set transname=$lg(@gn,10)
 	set q=""
 	for { set q=$o(@gn@(q)) q:q=""
@@ -150,7 +150,7 @@ ClassMethod test() As %Status
 /// set gn="^||tmp",format="n,s150,,,,,,,,d," 
 /// set format("freeze")="B5" ;freeze
 /// d ##class(apptools.core.sys).SaveSQL("select * from apptools_core.Log order by id desc",gn)
-/// d ##class(apptools.python.xlsx).gn2xlsx(gn,.format,"/backup/temp/test*.xlsx","Test")
+/// d ##class(apptools.python.xlsx).gn2xlsx(gn,.format,"/iris-backup/temp/test*.xlsx","Test")
 ClassMethod gn2xlsx(gn, ByRef format = "", file As %String, title = "", patternxlsx = "", sheetname = "", ByRef info, Execute = "") As %Status
 {
 	set st=$$$OK
@@ -393,12 +393,12 @@ ClassMethod testxlsx2gn() As %Status
 {
   set gn="^tmpXlsXread"
   set info("fields-name-rowcol")="3,1"
-  set st=##class(apptools.python.xlsx).xlsx2gn("/backup/temp/2022-07-18_182506.xlsx",gn,.info)
+  set st=##class(apptools.python.xlsx).xlsx2gn("/iris-backup/temp/2022-07-18_182506.xlsx",gn,.info)
   if 'st write $System.Status.GetErrorText(st) quit
   zw @gn
 }
 
-/// d ##class(apptools.python.xlsx).xlsx2gn("/backup/temp/test.xlsx","^||tmp",.info)
+/// d ##class(apptools.python.xlsx).xlsx2gn("/iris-backup/temp/test.xlsx","^||tmp",.info)
 /// set info("fields-name-rowcol")="3,1"
 ClassMethod xlsx2gn(filename As %String, gn, ByRef info) As %Status
 {

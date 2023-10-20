@@ -331,7 +331,7 @@ ClassMethod CamFirstHead(Par = "") As %Status
 	do ..SetPropSideMenu(json,.pro,0,"URL","")
 	write $$$appError("No data")
 	;w json 
-	q $$$OK
+	quit $$$OK
 }
 
 /// to download a form for editing - SideMenu

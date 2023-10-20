@@ -25,7 +25,7 @@ ClassMethod Stream2String(resp As %Stream, StringValue As %String) As %Status
 }
 
 /// Unpack the archive to a directory
-/// w ##class(apptools.core.files).UnzipToDirectory("/backup/eaist/imported/3a308a20ff8e271ae3e063231a8df1ad.zip","/backup/eaist/last")
+/// w ##class(apptools.core.files).UnzipToDirectory("/iris-backup/eaist/imported/3a308a20ff8e271ae3e063231a8df1ad.zip","/iris-backup/eaist/last")
 ClassMethod UnzipToDirectory(fileName As %String, Output dirName As %String, cmd) As %Status
 {
 	set st = $$$OK
@@ -148,7 +148,7 @@ ClassMethod Stream2Log(aStream, aLogFolder, aFileName, ByRef filename) As %Statu
 }
 
 /// To open a file and write to the array 
-/// w ##class(apptools.core.files).ReadFile2Arr("/backup/temp/snmp/ruRunCmd2018-10-03_14:31:00.txt","RSK",,"%tmp")
+/// w ##class(apptools.core.files).ReadFile2Arr("/iris-backup/temp/snmp/ruRunCmd2018-10-03_14:31:00.txt","RSK",,"%tmp")
 /// w ##class(apptools.core.files).ReadFile2Arr(fn,"RSK","CP1251",gn)
 ClassMethod ReadFile2Arr(file, mode = "RSK", code = "UTF8", gn = "tmp") As %Status
 {
@@ -166,7 +166,7 @@ endoffile u io close file
 }
 
 /// To open a file for writing 
-/// set fn="/backup/temp/log.txt" if ##class(apptools.core.files).OpenFile(fn) use fn write "test",! close fn
+/// set fn="/iris-backup/temp/log.txt" if ##class(apptools.core.files).OpenFile(fn) use fn write "test",! close fn
 ClassMethod OpenFile(file, time = 1, mode = "WNSK", code = "UTF8") As %Status
 {
 	Open file:(mode_"\"_code_"\"):time
@@ -175,13 +175,13 @@ ClassMethod OpenFile(file, time = 1, mode = "WNSK", code = "UTF8") As %Status
 
 /// Read file. if ##class(apptools.core.files).ReadFile("/irisdev/app/module.xml",.txt) write txt
 /// s f=##class(%File).%New("/irisdev/app/module.xml") if f.Open("RSU") {s t=f.Read() w !,t } else { w $System.Status.GetErrorText($g(%objlasterror)) } d f.%Close() k f
-ClassMethod ReadFile(filename = "/irisdev/app/module.xml", ByRef txt) As %Status
+ClassMethod ReadFile(filename = "/irisdev/app/module.xml", ByRef txt, mute = 0, max = {$$$MaxStringLength}) As %Status
 {
-	set f=##class(%File).%New(filename) if f.Open("RSU") {s txt=f.Read() } else { w !,$System.Status.GetErrorText($g(%objlasterror)) quit $g(%objlasterror) } d f.%Close() quit $$$OK
+	set f=##class(%File).%New(filename) if f.Open("RSU") {s txt=f.Read(max) } else { write:'mute !,$System.Status.GetErrorText($g(%objlasterror)) quit $g(%objlasterror) } d f.%Close() quit $$$OK
 }
 
 /// To read a file and write to global 
-/// w ##class(apptools.core.files).File2Arr("/backup/eaist/work/SPGZ.xml_2018-05-07_14.56.26.461","^tmpFile")
+/// w ##class(apptools.core.files).File2Arr("/iris-backup/eaist/work/SPGZ.xml_2018-05-07_14.56.26.461","^tmpFile")
 ClassMethod File2Arr(file, Mas, Param = "RSU") As %Status
 {
  set f=##class(%File).%New(file)
@@ -219,7 +219,7 @@ ClassMethod getPathcconsole(ByRef dir, ByRef logname)
 {
 	s slash=$$$slash
 	Set path=$p($zu(86),"*",1) ;path cpf file * instance name
-	s dir=$p(path,slash,1,$l(path,slash)-1)_slash_"mgr"_slash
+	s dir=$p(path,slash,1,$l(path,slash)-1)_slash_"mgr"_slash ; $zu(12)
 	s logname=$s($zv["IRIS":"messages",1:"cconsole")
  quit dir_logname_".log"
 }
@@ -526,7 +526,7 @@ ClassMethod OneDayJournalCount(fileYYYYMMDD = "", tempGlob = {$$$TEMPJRNL})
 }
 
 /// Export to CSV file
-/// d ##class(apptools.core.files).Export2CSV("/backup/temp/JrnCount*.csv","^tmpJRN2")
+/// d ##class(apptools.core.files).Export2CSV("/iris-backup/temp/JrnCount*.csv","^tmpJRN2")
 ClassMethod Export2CSV(aFileName = {$$$EMAILXLSPATH_"JrnCount*.csv"}, tmpGN = {$$$TEMPJRNL}, aCharset = "CP1251")
 {
 	s:aFileName["*" aFileName=$replace(aFileName,"*",$tr($zd($h,3)_$zt($p($h,",",2),-1),":- "))
@@ -727,7 +727,7 @@ ClassMethod XlsxTransChoiceLotResult(f, node, ParamData, ParamClass, ParamField,
 	
 	i debug s msg=msg_"<br>fn="_fn_"<br>tempDir="_tempDir
 	;Archived again under a new name
-	;i ##class(apptools.core.files).zipFile(tempDir,tempDir,newfilename,"/backup/temp/spgz-zip")
+	;i ##class(apptools.core.files).zipFile(tempDir,tempDir,newfilename,"/iris-backup/temp/spgz-zip")
 	s newfile=..tempDir()_node_"-"_$username_"-"_$zd($h,3)_"-"_$tr($zt($p($h,",",2),1),":")_".xlsx"
 	set cmd="cd "_tempDir_"; zip -r "_newfile_" * ; rm -R "_tempDir
 	s gn=..tempGN(node_"Xlsx3") k @gn
