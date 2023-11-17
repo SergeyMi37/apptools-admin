@@ -2,8 +2,11 @@
 
 zn "%SYS"
 Do ##class(Security.Users).UnExpireUserPasswords("*")
-zn "USER"
 zpm "load https://github.com/SergeyMi37/zapm"
+
+zapm "newdb https://github.com/intersystems-community/webterminal.git"
+
+zn "USER"
 zpm "load /opt/irisapp/ -v":1
 ;zpm "load https://github.com/SergeyMi37/apptools-admin.git"
 zpm "load https://github.com/SergeyMi37/isc-passwordless.git"
