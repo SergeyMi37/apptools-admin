@@ -50,7 +50,7 @@ ClassMethod GetJDBC(Output pCaption As %String, Output pTopResults, Output pResu
 	Set jdbcName = $get(pParms("jdbcName"))
 	for ns=1:1:$l(listDSN,",") { 
 		continue:$p(listDSN,",",ns)=""
-		if jdbcName'="",$p(listDSN,",",ns)'[jdbcName continue
+		if jdbcName'="", ($zconvert($p(listDSN,",",ns),"U") '[ $zconvert(jdbcName,"U")) continue
 		Set tCount = tCount + 1
 		Set pResults(tCount) = $p(listDSN,",",ns)
 	}

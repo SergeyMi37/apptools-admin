@@ -77,6 +77,23 @@ ClassMethod CustomTask(ns, par = "10") As %Status
 			;set json.repo={}.$$$jsonFromJSON(str)
 			quit
 		}
+		//http://iris-test:port/apptoolsrest/custom-task/user/zapmrepolist-oex-rcemper
+		//http://iris-test:port/apptoolsrest/custom-task/user/zapmrepolist-pm-swergeymi
+		if $p($G(par),"-",1)="zapmrepolist" {
+			set json.status="OK "_par
+			set context=$p($G(par),"-",3,*)
+			set mode=$p($G(par),"-",2)
+			try {
+				if mode="pm" do ##class(%ZAPM.ext.zpm).PickApp(context,.num, .json, 1, .list) write list kill json quit
+				if mode="oex" do ##class(%ZAPM.ext.zpm).GetOexRepo(context) kill json quit
+				set json.status="OK "_par_" Not found"
+			}
+			catch e {
+				;if 'st set json.status=$System.Status.GetErrorText(st) quit
+				set json.status=$ze
+			}
+			quit
+		}
 		elseif $G(par)="get-item" {
 			set json.status="OK get-item"
 			set json.array = []
