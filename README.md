@@ -24,12 +24,11 @@ Viewing and editing global arrays, executing queries, including JDBC / ODBC, gen
 
 ## What's new
 
+Enabled support for [Django](https://github.com/SergeyMi37/django-adminlte) [projects](https://github.com/SergeyMi37/apptools-django) via the native Python API library.
+
 Added fileserver module for report execution results.
-
 Implemented file deletion mode in the fileserver module.
-
 Formation of results in XLS, XLSX formats has been implemented.
-
 In the interface, the mode of exporting globals in the JSON format has been added.
 
 ![](https://raw.githubusercontent.com/SergeyMi37/apptools-admin/master/doc/Screenshot_10-at.png)
