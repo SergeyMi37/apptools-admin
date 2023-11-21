@@ -47,6 +47,7 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 /// http://iris-test:52773/apptoolsrest/custom-task/user/test 
 /// http://iris-test:52773/apptoolsrest/custom-task/user/get-item 
 /// https://appadmin.demo.community.intersystems.com/apptoolsrest/custom-task/user/zpm-repo-zapm
+/// https://appadmin.demo.community.intersystems.com/apptoolsrest/custom-task/user/zapmrepolist-github-rcemper=repos=fork=0&name=glob
 /// do ##class(apptools.core.rest).CustomTask(1)
 ClassMethod CustomTask(ns, par = "10") As %Status
 {
@@ -77,15 +78,22 @@ ClassMethod CustomTask(ns, par = "10") As %Status
 			;set json.repo={}.$$$jsonFromJSON(str)
 			quit
 		}
-		//http://iris-test:port/apptoolsrest/custom-task/user/zapmrepolist-oex-rcemper
-		//http://iris-test:port/apptoolsrest/custom-task/user/zapmrepolist-pm-swergeymi
+		// apptoolsrest/custom-task/user/zapmrepolist-github-rcemper=repos=fork=0&name=glob
+		// http://iris-test:port/apptoolsrest/custom-task/user/zapmrepolist-github-SergeyMi37=repos?fork=0&name=msw
+		// #REPOSITORIES=$(curl -s https://api.github.com/users/SergeyMi37=/repos?per_page=1000 | jq -r '.[] | select(.fork == true).clone_url')
+		// #!/bin/bash
+		// REPOSITORIES=$(curl -s https://api.github.com/users/SergeyMi37/starred?per_page=1000 | jq -r '.[] | select(.fork == true).clone_url')
+		// for REPOSITORY in $REPOSITORIES; do
+  		//  git clone $REPOSITORY
+  		// done
 		if $p($G(par),"-",1)="zapmrepolist" {
 			set json.status="OK "_par
 			set context=$p($G(par),"-",3,*)
 			set mode=$p($G(par),"-",2)
 			try {
-				if mode="pm" do ##class(%ZAPM.ext.zpm).PickApp(context,.num, .json, 1, .list) write list kill json quit
+				if mode="pm" do ##class(%ZAPM.ext.zpm).PickApp(context,.num, .json, 1, .list) if $d(list) write list kill json quit
 				if mode="oex" do ##class(%ZAPM.ext.zpm).GetOexRepo(context) kill json quit
+				if mode="github" do ##class(%ZAPM.ext.zpm).GetgithubRepo(context,.list) if $d(list) kill json write list quit
 				set json.status="OK "_par_" Not found"
 			}
 			catch e {
