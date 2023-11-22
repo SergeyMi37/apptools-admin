@@ -78,9 +78,11 @@ ClassMethod CustomTask(ns, par = "10") As %Status
 			;set json.repo={}.$$$jsonFromJSON(str)
 			quit
 		}
+		// https://appadmin.demo.community.intersystems.com/apptoolsrest/custom-task/user/zapmrepolist-github-sergeymi37=starred
+		// https://appadmin.demo.community.intersystems.com/apptoolsrest/custom-task/user/zapmrepolist-github-rcemper=repos=fork=0&name=oex
 		// apptoolsrest/custom-task/user/zapmrepolist-github-rcemper=repos=fork=0&name=glob
 		// http://iris-test:port/apptoolsrest/custom-task/user/zapmrepolist-github-SergeyMi37=repos?fork=0&name=msw
-		// #REPOSITORIES=$(curl -s https://api.github.com/users/SergeyMi37=/repos?per_page=1000 | jq -r '.[] | select(.fork == true).clone_url')
+		// #REPOSITORIES=$(curl -s https://api.github.com/users/SergeyMi37/repos?per_page=1000 | jq -r '.[] | select(.fork == true).clone_url')
 		// #!/bin/bash
 		// REPOSITORIES=$(curl -s https://api.github.com/users/SergeyMi37/starred?per_page=1000 | jq -r '.[] | select(.fork == true).clone_url')
 		// for REPOSITORY in $REPOSITORIES; do
