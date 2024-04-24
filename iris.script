@@ -2,6 +2,16 @@
 
 zn "%SYS"
 Do ##class(Security.Users).UnExpireUserPasswords("*")
+    set gty=##class(%SQLConnection).%New()
+    set gty.Name="ns-user"
+    set gty.URL="jdbc:IRIS://localhost:1972/USER"
+    set gty.Usr="superuser"
+    set gty.pwd="SYS"
+    set gty.classpath=""
+    set gty.driver="com.intersystems.jdbc.IRISDriver"
+    set gty.isJDBC=1
+    set sc=gty.%Save()
+    ZWRITE gty,sc
 zpm "load https://github.com/SergeyMi37/zapm"
 
 zapm "newdb https://github.com/intersystems-community/webterminal.git"
