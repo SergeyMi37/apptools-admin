@@ -197,6 +197,7 @@ ClassMethod gn2xlsx(gn, ByRef format = "", file As %String, title = "", patternx
 	set pycols = pybuiltins.list()
 	set (count)=0
 	set ColCount=$ll(@gn@(0))
+
 	set argsfill = {"start_color":"D3D3D3", "end_color":"D3D3D3", "fill_type":"solid"}
     set fill = openpyxl.styles.PatternFill(argsfill...)	
 	set argsfont = {"color":"000000", "bold":true, "italic":false, "size":11}

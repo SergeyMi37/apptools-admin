@@ -599,6 +599,7 @@ ClassMethod SqlToDSN2(sql, DSN, result, top = 100000) As %Status
 
 /// write ##class(apptools.core.sys).sql2gn(sql,jdbc,gn)
 /// write ##class(apptools.core.sys).sql2gn("SYS.Database:FreeSpace","q","^||tmp")
+/// set a=##class(apptools.core.sys).GetValue(gn,3,"QUANTITY")
 ClassMethod sql2gn(sql, jdbc = "", gn, top = 100000, journl = 0) As %Status
 {
 	set st=$$$OK
@@ -645,24 +646,26 @@ ClassMethod SqlToDSN(sql, DSN, result, top = 100000) As %Status
 		;if $isObject($g(%JDBCGateway)) do %JDBCGateway.closeAll()
 		quit sc
 	}
-	i $g(result)'="" s gn=result k @gn
-	e  s gn="result" 
+	if $g(result)'="" s gn=result k @gn
+	else  s gn="result" 
 	
 	set columns = %JDBCGateway.getColumnCount(st)
 	
-	;set pos = 0
-	for i=1:1:columns 
-	{
+	set list = ""
+	for i=1:1:columns 	{
 	  set name = $ZStrip(%JDBCGateway.getColumnName(st,i),"<>WCP")
 	  set size = %JDBCGateway.getColumnDisplaySize(st,i)
 	  set Type= %JDBCGateway.getColumnType(st,i)
 	  set TypeName= %JDBCGateway.getColumnTypeName(st,i)
-	  s @gn@(0,i)=$lb(name,size,Type,TypeName)
+	  set @gn@(0,i)=$lb(name,size,Type,TypeName)
+	  set list=list_$lb(name)	
 	  set @gn@(-1,name)=i //	  ;s @gn@(-1)=$g(@gn@(-1))_$lb($lb(size,Type,TypeName))
 	  ;set pos(i) = pos
 	  ;set pos = pos + size + 1
 	  ;w name,!
 	}
+	set @gn@(0)=list
+
 
 	set cnt = 1
 	while %JDBCGateway.next(st)

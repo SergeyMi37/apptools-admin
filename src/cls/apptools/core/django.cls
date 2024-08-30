@@ -13,8 +13,10 @@ ClassMethod GetResp(arg = "") As %String
 	set js={}
 	set js.status="ok"
 	set js.instance = $ZU(86)
+	set js.instancename = $p($ZU(86),"*",2)
+	;set js.job = $job
 	set js.version=$zv
-	set:arg'="" js.django={}.%FromJSON(arg)   //"AnonymousUser"
+	set:$c(0)'[arg js.django={}.%FromJSON(arg)   //"AnonymousUser"
 	quit js
 }
 
@@ -92,6 +94,7 @@ ClassMethod GetPortal(arg = "", js) As %String
 {
 	set js=..GetResp(arg)
 	try {
+		set js.portal=[]
 		;if 'js.django.authenticated quit 
 		set gn="^||tmp",
 			gnTab="^||tmpTab"
@@ -106,32 +109,82 @@ ClassMethod GetPortal(arg = "", js) As %String
 			quit
 		}
 		elseif %Param="" {
+			set num=3
 			set js.prod={}
+			set js.prod.name="Products"
 			set js.prod.count=##class(apptools.core.django).GetPortalProd(0,gn)
+			set js.prod.sort=$$sort()
+			do js.portal.%Push(js.prod)
+						
 			set js.proc={}
+			set js.proc.name="Process"
 			set js.proc.count=##class(apptools.core.django).GetPortalProc(0,gn)
+			set js.proc.sort=$$sort()
+			do js.portal.%Push(js.proc)
+						
 			set js.lock={}
+			set js.lock.name="Locktab"
 			set js.lock.count=##class(apptools.core.django).GetPortalLock(0,gn,gnTab)
+			set js.lock.sort=$$sort()
+			do js.portal.%Push(js.lock)
+						
 			set js.db={}
+			set js.db.name="Databases"
 			set js.db.count=##class(apptools.core.django).GetPortalNS(0,gn,"Databases")
+			set js.db.sort=$$sort()
+			do js.portal.%Push(js.db)
+						
 			set js.ns={}
+			set js.ns.name="Namespaces"
 			set js.ns.count=##class(apptools.core.django).GetPortalNS(0,gn,"Namespaces")
+			set js.ns.sort=$$sort()
+			do js.portal.%Push(js.ns)
+						
 			set js.roles={}
+			set js.roles.name="Roles"
 			set js.roles.count=##class(apptools.core.django).GetPortalApps(0,gn,"Security.Roles"," ")
+			set js.roles.sort=$$sort()
+			do js.portal.%Push(js.roles)
+						
 			set js.users={}
+			set js.users.name="Users"
 			set js.users.count=##class(apptools.core.django).GetPortalApps(0,gn,"Security.Users"," ")
+			set js.users.sort=$$sort()
+			do js.portal.%Push(js.users)
+						
 			set js.apps={}
+			set js.apps.name="Apps"
 			set js.apps.count=##class(apptools.core.django).GetPortalApps(0,gn,"Security.Applications"," ")
+			set js.apps.sort=$$sort()
+			do js.portal.%Push(js.apps)
+						
 			set js.serv={}
+			set js.serv.name="Services"
 			set js.serv.count=##class(apptools.core.django).GetPortalApps(0,gn,"Security.Service"," ")
+			set js.serv.sort=$$sort()
+			do js.portal.%Push(js.serv)
+			
+			
 			set js.res={}
+			set js.res.name="Resources"
 			set js.res.count=##class(apptools.core.django).GetPortalApps(0,gn,"Security.Resources"," ")
+			set js.res.sort=$$sort()
+			do js.portal.%Push(js.res)
+						
 			set js.tasks={}
+			set js.tasks.name="Tasks"
 			set js.tasks.count=##class(apptools.core.django).GetPortalApps(0,gn,"%SYS.Task"," ")
+			set js.tasks.sort=$$sort()
+			do js.portal.%Push(js.tasks)
+						
 			set js.alerts={}
+			set js.alerts.name="Alerts"
 			do ##class(%SYSTEM.Monitor).GetAlerts(,.str,.last)
 			set st=$o(str(""),-1)
 			set js.alerts.count=+st
+			set js.alerts.sort=$$sort()
+			do js.portal.%Push(js.alerts)
+			
 		}
 		elseif %Param["Namespaces" {
 			do ##class(apptools.core.django).GetPortalNS(1,gn,"Namespaces"," ",gnTab)
@@ -197,6 +250,10 @@ ClassMethod GetPortal(arg = "", js) As %String
 		set js.status="error "_$ze
 	}
 	quit ##class(apptools.util.json).ZPretty(js,"","")
+sort()
+ 	set num=$g(num)+1
+	if '(num#4) quit 1
+	quit 0
 }
 
 /// set js={} do ##class(apptools.core.django).Table2Json(js,"^||test")
@@ -395,6 +452,23 @@ ClassMethod GetPortalNS(count, gn, SectionHeader = "Namespaces", %Param = "", gn
 	set run="set st=##class(apptools.core.LogInfoPane).DrawSQL(""r "_gnTab_""",10000,$zu(5),%Param,%exec,,"""")"
 	do ##class(apptools.core.sys).Run2Spool(run,gn)
 	quit 0
+}
+
+/// write ##class(apptools.core.django).GetResult("apptools.core.django","GetFooter","")
+/// write ##class(apptools.core.django).GetResult("apptools.core.django","GetPortal","") 
+/// select top 1 apptools_core.django_GetResult('apptools.core.django','GetFooter','{"basedir": "D:\\_proj\\_django\\appmsw-django-adminlte", "irishost": "192.168.1.168", "irisport": "51773", "irisnamespace": "USER", "arg": ""}') as result FROM apptools_core.Log
+/// select top 1 apptools_core.django_GetResult('apptools.core.django','GetPortal','{"basedir": "D:\\_proj\\_django\\appmsw-django-adminlte", "irishost": "192.168.1.168", "irisport": "51773", "irisnamespace": "USER", "arg": ""}') as result FROM apptools_core.Log
+ClassMethod GetResult(class, method, arg = "") As %String [ SqlProc ]
+{
+	if '$d(^apptools.core.LogD) do ##class(apptools.core.Log).AddRecord("I want", "log", "everything", "INFO", "actions", "users")
+	set res=""
+	try {
+		set res=$CLASSMETHOD(class, method, arg)
+	}
+	catch e {
+		set res="Error "_$ze
+	}
+    quit res
 }
 
 }

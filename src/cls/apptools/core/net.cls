@@ -473,7 +473,7 @@ ClassMethod SetProxy(tRequest) As %Status
 }
 
 /// Code from Robert Cemper https://github.com/rcemper/Zpipe
-/// write ##class(apptools.core.net).cpipe("ping -c 3 community.intersystems.com")
+/// write ##class(apptools.core.net).cpipe("ping -c 3 openexchange.intersystems.com")
 ClassMethod cpipe(command = "", test = 0) As %Status
 {
  //Zpipe  quit ; CPIPE example to run host console command

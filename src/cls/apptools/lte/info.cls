@@ -440,9 +440,10 @@ ClassMethod NSpaceResult(Par = "") As %Status
 		set exportXLS=0,outFormat="",Next=-1
 	}
 	#; queries and query results
-	elseif ",with,query,result,select,call,delete,insert,s,q,r,begin,"[(","_$zconvert($p(what," ",1),"L")_",") {
+	elseif ",with,query,result,select,call,delete,update,insert,s,q,r,begin,"[(","_$zconvert($p(what," ",1),"L")_",") {
 			set sql=what
 			if sql["p.party_id( )" s sql=$replace(sql,"p.party_id( )","p.party_id(+)")
+			if $e(sql,*)=";" set sql=$e(sql,1,*-1)
 	}
 	#; SQL table query 
 	elseif $e($zconvert($p(what," ",1),"L"),1,3)="log" {
@@ -485,7 +486,7 @@ ClassMethod NSpaceResult(Par = "") As %Status
 		}
 		quit $$$OK
 	}
-	write "<form id='"_divId_"FormContentExpo'>"
+	write "<form id='"_divId_"FormContentExpo'  method='post' >"
 	write $$$appInputHidden(divId_"OutFormat","",$g(outFormat))
 	write $$$appInputHidden(divId_"OutFormatGN","",$g(gn))
 	write $$$appInputHidden(divId_"OutFilter","",$g(Filtr))
@@ -675,6 +676,7 @@ ClassMethod ViewDrawHelp(Val, Col, Head, Temp, nspace, divId)
 ClassMethod ProductsFirstHead(Par = "") As %Status
 {
 	do ##class(apptools.core.Form).BlockUI(0)
+	set GNStore=$na(@..#GNStore@("users-var-Products",$username))
 	set key=Par("key")
 	set divId=Par("divId")
 	set %ui=1
@@ -682,8 +684,20 @@ ClassMethod ProductsFirstHead(Par = "") As %Status
 		$$$onclick(divId_"MainForm",divId_"MainContent",$namespace,..%ClassName(1),divId_"Result","&key="_key_"&divId="_divId_"&mode=*")
 	set DateTime=$ZDT($NOW()-1,3,1,3)_"T00:00:00"
 	write " "_$$$appDateTime(divId_"DateTime","title='The work directory for packet and publish'",DateTime)
-	write " "_$$$appCheck(divId_"OnlyRunning","checked title='Only Running'",1)
-	write " "_$$$appCheck(divId_"OnlyError","checked title='Only Error'",1)
+	
+	;write " "_$$$appCheck(divId_"OnlyRunning","checked title='Only Running'",1)
+	;write " "_$$$appCheck(divId_"OnlyError","checked title='Only Error'",1)
+	
+		if ##class(apptools.core.Action).GetVarFromGN(GNStore,divId_"MultiSelect",.MultiSelect)
+	set fo="" for { set fo=$o(MultiSelect(fo),1,data) quit:fo=""
+		set MultiSelectInx(data)=""
+	}
+	;zw MultiSelect
+	set for="" 
+	for fo="OnlyRunning","OnlyError" {
+		set for=for_"<option value="""_fo_""" "_$s($d(MultiSelectInx(fo)):"selected=""selected""",1:"")_" > "_fo_" </option>"
+	}
+	write " "_$$$appMultiSelect(divId_"MultiSelect","",for)_" "
 	write " "_$$$appButton(divId_"appButtonResult1","title='Refresh' onclick="""_$replace(onclick,"*","1")_"""","Refresh")
 
 	$$$SetHeightContent(divId,0)
@@ -695,12 +709,21 @@ ClassMethod ProductsResult(Par = "") As %Status
 {
 	set %ui=1
 	do ##class(apptools.core.Form).BlockUI(0)
+	set GNStore=$na(@..#GNStore@("users-var-Products",$username))
 	set key=Par("key")
 	set divId=Par("divId")
 	set mode=Par("mode")
 	set DateTime=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"DateTime")
-	set OnlyError=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"OnlyError")
-	set OnlyRunning=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"OnlyRunning")
+	;set OnlyError=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"OnlyError")
+	;set OnlyRunning=##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"OnlyRunning")
+	
+	set MultiSelect=divId_"MultiSelect"
+	do ##class(apptools.core.Action).GetElemForm(%request,.Par,divId_"MultiSelect",.MultiSelect)
+	zw MultiSelect
+	do ##class(apptools.core.Action).SetVarFromGN(GNStore,divId_"MultiSelect",.MultiSelect)
+	set fo="" for { set fo=$o(MultiSelect(fo),1,data) quit:fo=""
+		set MultiSelectInx(data)=""
+	}
 	if DateTime="" set DateTime=$ZDT($NOW()-1,3,1,3)_"T12:00"
 	if mode=1 {
 		set nspaces=##class(apptools.core.sys).ListNS(.info,"NotPre,Ens") ;^%apptools.core.Productions
@@ -716,7 +739,7 @@ ClassMethod ProductsResult(Par = "") As %Status
 			set cnt=$g(cnt)+1
 			;if $g(result(NS,"ProdUrl"))="" continue
 			set prodname=$g(result(NS,"ProdUrl"))
-			if OnlyRunning, $g(result(NS,"NoRun"))'="" continue
+			if $d(MultiSelectInx("OnlyRunning")), $g(result(NS,"NoRun"))'="" continue
 			set gns=..GetGN(NS)
 			KILL @gns
 			set @gns=$lb(DateTime,sqldef,sql2)
@@ -731,7 +754,7 @@ ClassMethod ProductsResult(Par = "") As %Status
 				if $g(result(NS,"Count")) {
 					set color="red"
 				}
-				else { if OnlyError continue 
+				else { if $d(MultiSelectInx("OnlyError")) continue 
 				}
 				set ErrMsg="Errors: "_$g(result(NS,"Count"))
 			}

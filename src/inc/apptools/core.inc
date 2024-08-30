@@ -210,6 +210,7 @@ ROUTINE apptools.core [Type=INC]
 #define addAppLog(%text,%title,%input,%target) "<a title='"_%title_"' "_$g(%target)_" href=""apptools.core.LogInfo.cls?NSP="_$zu(5)_"&WHAT="_$zconvert(%input,"O","URL")_""">"_%text_"</a>"
 #define addAppL(%text) "<a target="""_$ZCRC(%text,7)_""" href=""apptools.core.LogInfo.cls?NSP="_$zu(5)_"&WHAT="_$zconvert(%text,"O","URL")_""">"_%text_"</a>"
 #define addLoadLogInfo(%text,%title,%input,%http) "<a title='"_%title_"' target=LogInfo"_$tr($zts,",.")_" href="""_%http_"apptools.core.LogInfo.cls?NSP="_$zu(5)_"&WHAT="_$zconvert(%input,"O","URL")_""">"_%text_"</a>"
+#define addLoadLogInfoNSP(%text,%title,%input,%http,%nsp) "<a title='"_%title_"' target=_blank href="""_%http_"apptools.core.LogInfo.cls?NSP="_%nsp_"&WHAT="_$zconvert(%input,"O","URL")_""">"_%text_"</a>"
 
 #; To obtain the date and time YYYY-MM-DD HH:MM:SS
 #define AppDT(%h) $zd(+%h,3)_" "_##class(apptools.core.type).GetValidZT(%h)
@@ -231,7 +232,7 @@ ROUTINE apptools.core [Type=INC]
 #define appSpan(%id,%attr,%val) "<span "_%attr_" id='"_%id_"' name='"_%id_"'>"_%val_"</span>"
 #define appStyleInput " style='border: none;	background: none;	color: inherit;	padding: .222em 0;	margin: .2em 0;	vertical-align: middle;	margin-left: .4em;	margin-right: .4em;' "
 #define appInputHidden(%id,%attr,%val) "<input type=hidden "_%attr_" id='"_%id_"' name='"_%id_"' value='"_%val_"'>"
-#define appText(%id,%attr,%val) "<span class='ui-spinner ui-corner-all ui-widget ui-widget-content'><input autocomplete='off' "_$$$appStyleInput_" type=text "_%attr_" id='"_%id_"' name='"_%id_"' value='"_%val_"'></span>"
+#define appText(%id,%attr,%val) "<span class='ui-spinner ui-corner-all ui-widget ui-widget-content'><input "_$$$appStyleInput_" type=text "_%attr_" id='"_%id_"' name='"_%id_"' value='"_%val_"'></span>"
 #define appAutocomplete(%id,%attr,%val) "<span class='ui-spinner ui-corner-all ui-widget ui-widget-content'><input id='"_%id_"' name='"_%id_"' "_%attr_" "_$$$appStyleInput_" autocomplete='off' value='"_%val_"'>"
 #define appAutocomplete2(%id,%attr,%val) "<input id='"_%id_"' name='"_%id_"' "_%attr_" class='ui-autocomplete-input' autocomplete='off' value='"_%val_"'>"
 #define appInput(%id,%attr,%val) "<span class='ui-spinner ui-corner-all ui-widget ui-widget-content'><input autocomplete='off' "_$$$appStyleInput_" "_%attr_" id='"_%id_"' name='"_%id_"' value='"_%val_"'></span>"
@@ -241,7 +242,10 @@ ROUTINE apptools.core [Type=INC]
 #define appDateTime(%id,%attr,%val) "<span class='ui-spinner ui-corner-all ui-widget ui-widget-content'><input autocomplete='off' "_$$$appStyleInput_" type=datetime-local "_%attr_" id='"_%id_"' name='"_%id_"' value='"_%val_"'></span>"
 #;define appCheck(%id,%attr,%val) "<input class='ui-button ui-corner-all ui-widget' type=checkbox id='"_%id_"' name='"_%id_"' "_%attr_" value='"_%val_"'>"
 #define appCheck(%id,%attr,%val) "<input class='bigbox' type=checkbox id='"_%id_"' name='"_%id_"' "_%attr_" value='"_%val_"'>"
-#define appSelect(%id,%attr,%val) ""
+#; Selects
+#define appSelect(%id,%attr,%for,%onchange,%width) "<SELECT ONCHANGE='"_%onchange_"' id='"_%id_"' name='"_%id_"' "_%attr_" > "_%for_" </SELECT><script type='text/javascript'> $( '#"_%id_"' ).selectmenu({ change: function( event, data ) { "_%onchange_" }, width:"_%width_" }).selectmenu('menuWidget'); $('#"_%id_"-menu' ).css( 'max-height','500px'); </script>"
+#define appMultiSelect(%id,%attr,%for) "<select "_%attr_" id='"_%id_"' name='"_%id_"' multiple='multiple'> "_%for_" </select><script type='text/javascript'> $('#"_%id_"').multiselect({showSelectedValues: true}); </script>"
+
 #define appError(%val) "<div class='ui-widget'><div class='ui-state-error ui-corner-all' style='margin-top: 20px; padding: 1em;'><p><span class='ui-icon ui-icon-alert' style='float: left; margin-right: 3em;'></span>"_%val_"</p></div></div>"
 #define appMsg(%val) "<div class='ui-widget'><div class='ui-state-highlight ui-corner-all' style='margin-top: 20px; padding: 1em;'><p><span class='ui-icon ui-icon-info' style='float: left; margin-right: 3em;'></span>"_%val_"</p></div></div>"
 

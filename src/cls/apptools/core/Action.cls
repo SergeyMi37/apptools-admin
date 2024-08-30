@@ -207,36 +207,39 @@ ClassMethod WriteActJs(req, fornId, resultDivId, classname, method, CGIVar = "",
   		(req.URL[(req.Application_"post-json"))||
   		(req.URL[(req.Application_"a")) { //is static content
   		set:ns="" ns=$namespace
-  		q "AppRpc('"_fornId_"','"_resultDivId_"','"_ns_":"_classname_":"_method_":"_CGIVar_",'"_req.Application_"post-json');"
+  		quit "AppRpc('"_fornId_"','"_resultDivId_"','"_ns_":"_classname_":"_method_":"_CGIVar_",'"_req.Application_"post-json');"
   	} else {
-  		q "ActionJs('"_fornId_"','"_resultDivId_"','"_classname_"','"_method_"','"_CGIVar_");"
+  		quit "ActionJs('"_fornId_"','"_resultDivId_"','"_classname_"','"_method_"','"_CGIVar_");"
   	}
 	quit ""
 }
 
 /// Write Action Js 
 /// w ##class(apptools.core.Action).GetElemParseForm(form,.Par,pref_"text")
-ClassMethod GetElemParseForm(form, Par, divIdname, convert = 1) As %Status
+ClassMethod GetElemParseForm(form, Par, divIdname, convert = 1, multi = "") As %Status
 {
- i form'="" {
-	s aray=[].$$$jsonFromJSON(form)
+ if form'="" {
+	set aray=[].$$$jsonFromJSON(form)
 	for i=0:1:aray.$$$jsonSize()-1 {
 		set item = aray.$$$jsonGet(i)
-		i $isobject(item) {
+		if $isobject(item) {
 			;s $$$AppL("MML","%request-GetElemForm-item")=$zconvert(item.value,"I","UTF8")
-			s value=item.value
+			set value=item.value
 			if convert s value=$zconvert(item.value,"I","UTF8")
 			;if item.name=divIdname set val=value
-			s:item.name'="" Par("%request.Data",item.name)=value
+			if item.name'="" {
+				set Par("%request.Data",item.name)=value
+				if multi=item.name set multi(i)=value 
+			}
 		}
 	}
  }
- q $$$OK
+ quit $$$OK
 }
 
 /// Write Action Js 
 /// w ##class(apptools.core.Action).GetElemForm(%request,.Par,pref_"text")
-ClassMethod GetElemForm(req, Par, divIdname) As %Status
+ClassMethod GetElemForm(req, Par, divIdname, ByRef multi = "") As %Status
 {
   	;s $$$AppL("MML","%request-GetElemForm-")=$$$AppObJs(req)
 	;s $$$AppL("MML","%request.Cont")=$$$AppObJs(req.Content)
@@ -246,11 +249,11 @@ ClassMethod GetElemForm(req, Par, divIdname) As %Status
 	  		set stream=req.Content
 			set sc=##class(apptools.core.files).Stream2String(req.Content,.str)
 			if 'sc quit sc
-			;s $$$AppL("MML","%request.str")=str
+			;s ^tmpPar3(111)=str
 			if $g(str)["{" {
-				s form={}.$$$jsonFromJSON(str).params.form
+				set form={}.$$$jsonFromJSON(str).params.form
    				;s $$$AppL("MML","%request-GetElemForm-aray")=form
-				d ..GetElemParseForm(form,.Par,divIdname)
+				do ..GetElemParseForm(form,.Par,divIdname,,.multi)
 			}
 		 	;merge $$$AppL("MSW","Content")=str
   			;s val=req.Content.$$$jsonGet(name)
@@ -258,6 +261,26 @@ ClassMethod GetElemForm(req, Par, divIdname) As %Status
   	} else {	
   	}
 	quit $g(Par("%request.Data",divIdname))
+}
+
+/// 
+/// if ##class(apptools.core.Action).GetVarFromGN(gn,name,.val) zw val
+ClassMethod GetVarFromGN(gn, name, ByRef val) As %Status
+{
+  if '$d(@gn@(name)) quit $$$ERROR($$$GeneralError,"Not found")
+  MERGE val=@gn@(name)
+  ;w "GetVarFromGN "_$zr_"="_$g(val)
+  quit $$$OK
+}
+
+/// 
+/// do ##class(apptools.core.Action).SetVarFromGN(gn,name,.val) zw val
+ClassMethod SetVarFromGN(gn, name, ByRef val) As %Status
+{
+	KILL @gn@(name)
+	MERGE @gn@(name)=val
+   ;w "SetVarFromGN "_$zr_"="_$g(val)
+  	quit $$$OK
 }
 
 }

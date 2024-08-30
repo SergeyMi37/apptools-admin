@@ -289,6 +289,8 @@ XData html [ MimeType = application/yaml ]
   <!--<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">-->
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="=path=adminlte/plugins/fontawesome-free/css/all.min.css">
+  <!-- Bootstrap Multiselect https://davidstutz.github.io/bootstrap-multiselect/#methods -->
+  <link rel="stylesheet" href="=path=adminlte/plugins/multiselect/css/bootstrap-multiselect.css">
   <!-- overlayScrollbars -->
   <link rel="stylesheet" href="=path=adminlte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
   <!-- Theme style -->
@@ -461,6 +463,8 @@ XData html [ MimeType = application/yaml ]
 <script src="=path=adminlte/dist/js/adminlte.js"></script>
 
 <!-- PAGE PLUGINS -->
+<!-- Bootstrap Multiselect -->
+<script src="=path=adminlte/plugins/multiselect/js/bootstrap-multiselect.js"></script>
 <!-- jQuery Mapael -->
 <script src="=path=adminlte/plugins/jquery-mousewheel/jquery.mousewheel.js"></script>
 <script src="=path=adminlte/plugins/raphael/raphael.min.js"></script>

@@ -531,7 +531,7 @@ ToGB(size)
 ClassMethod getListErrProducts(nspace = "") As %Status
 {
 	;d ##class(apptools.core.Production).GetListErrProducts(1,nspace)
-	do ##class(apptools.core.Production).GetStatusProductsJson(1,"list-errors"_nspace,.res)
+	do ##class(apptools.core.Production).GetStatusProductsJson(1,"list-errors-"_nspace,.res)
 	do res.%ToJSON()
 	q $$$OK
 }
@@ -666,8 +666,9 @@ ClassMethod RunCustomTask(data, ByRef json) As %Status
   	quit $$$OK
 }
 
-/// do ##class(apptools.core.rest).GetJourSysSummary(1)
-ClassMethod GetJourSysSummary(par = "10") As %Status
+/// do ##class(apptools.core.rest).GetJourSysSummary(10)
+/// set st=##class(apptools.core.rest).GetJourSysSummary(10,0,.json) ;use as function
+ClassMethod GetJourSysSummary(par = "10", write = 1, ByRef sys) As %Status
 {
 	new $namespace
 	set $namespace="%SYS"
@@ -701,7 +702,7 @@ ClassMethod GetJourSysSummary(par = "10") As %Status
 		do ..AddNodeJson(sys,icon,$e(val,$l(fs),*))
 	}
 	do ..AddNodeJson(sys,"-","</pre>")
-	do sys.%ToJSON()
+	if write do sys.%ToJSON()
   	quit $$$OK
 }
 

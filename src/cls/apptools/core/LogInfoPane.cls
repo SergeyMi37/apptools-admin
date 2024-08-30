@@ -377,9 +377,11 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 		set ExecuteDraw="##class(apptools.core.LogInfoPane).DrawHelp(.%AppLogInfoVal,%AppLogInfoCol,%AppLogInfoHead,.%AppLogInfoTemp,"""_NSpace_""","""_DSN_""")"
 	}
 	#; queries and query results
-	elseif ",query,result,select,call,delete,insert,s,q,r,begin,"[(","_$zconvert($p(what," ",1),"L")_",") {
+	elseif ",query,result,select,call,delete,insert,update,s,q,r,begin,"[(","_$zconvert($p(what," ",1),"L")_",") {
 			set sql=what
+			;s ^tmp=sql
 			if sql["p.party_id( )" s sql=$replace(sql,"p.party_id( )","p.party_id(+)")
+			if $e(sql,*)=";" set sql=$e(sql,1,*-1)
 	}
 	#; SQL table query 
 	elseif $e($zconvert($p(what," ",1),"L"),1,3)="log" {
@@ -475,7 +477,7 @@ Method DrawBODY(pInstance As PageInstance) As %Status [ PublicList = (nsp, what,
 		</tr>
 		<tr>
 			<td>
-				<span class='ui-icon ui-icon-play' name="show" id="show" onclick="document.forms['loginfo'].submit();" >#($$$aText("Execute",""))#</span>
+				<span name="show" id="show" onclick="document.forms['loginfo'].submit();" >#($wc($zhex("25B6"))_$$$aText("Execute",""))#</span>
 				<input type="submit" name="show2" id="show2" value='#($$$aText("Execute",""))#'>
 				<!--<input type="button" name="exe2" id="exe2" value='#($$$aText("ExecutePost",""))#'>-->
 				#(##class(apptools.core.LogInfo).GetInfoImg("help"))# 
@@ -1026,7 +1028,7 @@ ClassMethod WinOpenEditNode(Par) As %String
 	set bkill=$$$appButton(PrefixIdDIV_"idButtKill","onclick=""if (prompt('Delete you sure ?','Yes')) {"_$replace(onclick,"*","Kill")_"}""","Delete")
 	&html<
 	<center>
-	<form id='#(PrefixIdDIV_"MainForm")#'>
+	<form id='#(PrefixIdDIV_"MainForm")#' method='post'>
 		<table>
 			<tr>
 				<td style='text-align: right;'>Globals Node</td>
@@ -1539,7 +1541,7 @@ ClassMethod AddAction(nameElem = "NSP,MaxNode,Filtr,Next,WHAT,tWHAT,exportXLS,ex
 	   <td>
 		<span class='ui-icon ui-icon-play' name="show" id="show" onclick="document.forms['loginfo'].submit();" title='#($$$aText("Execute and Show",""))#'></span>
 		<input type="submit" name="show" id="show" value='#($$$aText("Execute",""))#'>
-		<span class='ui-icon ui-icon-arrowreturnthick-1-w' onclick='window.history.back(); return false' title='#($$$aText("Go back",""))#'></span>
+		<span onclick='window.history.back(); return false' title='#($$$aText("Go back",""))#'>#($wc($zhex("1F519")))#</span>
 		#(##class(apptools.core.LogInfo).ClearFields(nameElem))# 
 	  </td>
 	  <td>

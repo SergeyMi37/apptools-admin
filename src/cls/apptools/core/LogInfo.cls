@@ -20,7 +20,7 @@ ClassMethod GetDetailPane(pInstance As %CSP.Util.PageInstance) As %CSP.Util.Pane
 /// w ##class(apptools.core.LogInfo).ClearFields("a,b")
 ClassMethod ClearFields(fields = "", onclick)
 {
-	set res="<span class='ui-icon ui-icon-trash' name='clearFields' id='clearFields' onclick=""#"" title='clear form fields'></span>"
+	set res="<span name='clearFields' id='clearFields' onclick=""#"" title='clear form fields'>"_$wc($zhex("274C"))_"</span>"
 	for f=1:1:$l(fields,",") {
 		continue:$p(fields,",",f)=""
 		s onclick=$g(onclick)_"try{document.getElementById('"_$p(fields,",",f)_"').value=''}catch(e){};"
@@ -123,6 +123,15 @@ ClassMethod GetInfoImg(code)
 /// w ##class(apptools.core.LogInfo).GetImgJqUi("help")
 ClassMethod GetImgJqUi(code)
 {
+	quit:code="help" "<span>"_$wc($zhex("2753"))_"</span>"
+	quit:code="search" "<span >"_$wc($zhex("1F50D"))_"</span>"
+	;quit:code="apptools" "<img src="""_$$$PATHCSP_"jqueryui/img/apptools-ico-lofel.ico"" width=""1%""/>" 
+	;quit:code="apptools" "<img src="""_$$$PATHCSP_"jqueryui/img/apptools-ico.ico"" width=""1%""/>" ;gear
+	quit:code="tools" "<span >"_$wc($zhex("1F527"))_"</span>" ;gear wrench
+	quit:code="trash" "<span >"_$wc($zhex("274C"))_"</span>"
+	quit:code="check" "<span >"_$wc($zhex("2705"))_"</span>" ;
+	quit:code="closethick" "<span >"_$wc($zhex("1F6AB"))_"</span>"
+	/*
 	quit:code="help" "<span class='ui-icon ui-icon-help'></span>"
 	quit:code="search" "<span class='ui-icon ui-icon-search'></span>"
 	;quit:code="apptools" "<img src="""_$$$PATHCSP_"jqueryui/img/apptools-ico-lofel.ico"" width=""1%""/>" 
@@ -131,6 +140,7 @@ ClassMethod GetImgJqUi(code)
 	quit:code="trash" "<span class='ui-icon ui-icon-trash'></span>"
 	quit:code="check" "<span class='ui-icon ui-icon-check'></span>"
 	quit:code="closethick" "<span class='ui-icon ui-icon-closethick'></span>"
+	*/
 	quit ""
 }
 

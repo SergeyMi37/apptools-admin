@@ -564,6 +564,7 @@ ClassMethod GetStatusProducts(day, result) As %String
 /// d ##class(apptools.core.Production).GetStatusProductsJson(1,"system-stat",.res) zw res
 /// d ##class(apptools.core.Production).GetStatusProductsJson(1,"count-errors",.res) zw res
 /// d ##class(apptools.core.Production).GetStatusProductsJson(1,"list-errors-SPGZ",.res) zw res
+/// d ##class(apptools.core.Production).GetStatusProductsJson(1,"list-errors-MVK-DOC",.res) zw res
 ClassMethod GetStatusProductsJson(day, mode = 0, result) As %String
 {
 	set result={} 
@@ -605,6 +606,7 @@ ClassMethod GetStatusProductsJson(day, mode = 0, result) As %String
 			set prod.counterrors = $lg(@gn@(1),1)
 		}
 		elseif mode["list-errors" {
+			
 			set prod.errors = []
 			for i=1:1:10 {  if $d(@gn@(i)) {
 				set err = {}
