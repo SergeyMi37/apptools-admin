@@ -1,5 +1,4 @@
-Include Ensemble
-
+/// Include Ensemble
 /// Ensemble-specific version of context search methods.
 Class apptools.core.ContextSearch Extends %ZEN.Portal.ContextSearch [ System = 4 ]
 {
