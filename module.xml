@@ -3,7 +3,7 @@
   <Document name="apptools-admin.ZPM">
     <Module>
       <Name>apptools-admin</Name>
-      <Version>1.2.5</Version>
+      <Version>1.2.6</Version>
       <Description>Application tools for technical support and DBMS administrator. View and edit arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files</Description>
       <Packaging>module</Packaging>
   <Keywords>Application tools admin</Keywords>
