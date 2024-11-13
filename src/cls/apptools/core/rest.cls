@@ -707,9 +707,13 @@ ClassMethod GetJourSysSummary(par = "10", write = 1, ByRef sys) As %Status
 }
 
 /// http://iris-test:52773/apptoolsrest/custom-task/user/run&class=apptools.core.rest&met=GetLastLogs&par=5
+/// http://iris-test:52773/apptoolsrest/custom-task/user/run&class=apptools.core.rest&met=GetLastLogs&par=2024-11-10!2024-11-10!
+/// http://iris-test:52773/apptoolsrest/custom-task/user/run&class=apptools.core.rest&met=GetLastLogs&par=5,yaml
 /// do ##class(apptools.core.rest).GetLastLogs(.par,.json)
 ClassMethod GetLastLogs(par = 5, json) As %Status
 {
+	set mode=$p(par,",",2,*)
+	set par=$p(par,",",1)
 	if par=(+par) {
 		set sql="select top "_par_" * from apptools_core.Log order by id desc"
 	}

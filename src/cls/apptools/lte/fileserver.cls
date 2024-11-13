@@ -159,6 +159,7 @@ ClassMethod FirstHead(Par = "") As %Status
 			<td>
 			#($$$appButton(divId_"appButtonResult","onclick="""_$replace(onclick,"*","find")_"""","find"))#		
 			#($get(ButtDel)_" "_$g(checkboxDel))#
+			#($$$appButton(divId_"appButtonResultLog","onclick="""_$replace(onclick,"*","log")_"""","log"))#		
 			</td>
 		</tr>
 		</table>
@@ -243,8 +244,29 @@ ClassMethod Result(Par = "") As %Status
 		set st=##class(apptools.core.LogInfoPane).DrawSQL(sql,10000,$zu(5),tit,$g(ExecuteDraw),,1)
 		write $System.Status.GetErrorText(st)
 	}
+	elseif mode="log" {
+		set sql="select top 5 * from apptools_core.Log where EventType = 'STAT' order by id desc"
+		if ($d(%request)) { set ref=%request.CgiEnvs("HTTP_REFERER")
+			set url="<a title='Load panel with request' href='"_$p(ref,"/",1,3)_"/csp/spgz/arest/a/info&autoload=NSSPGZ&namespaceonly="_$namespace_"&cmd=*sql*'>Loas log</a>"
+			set url=$replace(url,"*sql*",$replace($zconvert(sql,"O","URL"),"'","%27"))
+		}
+		set tit=$zu(5)_" "_sql_" "_##class(apptools.lte.fileserver).GetUrlLog()
+		set st=##class(apptools.core.LogInfoPane).DrawSQL(sql,10000,$zu(5),tit,$g(ExecuteDraw),,1)
+		write $System.Status.GetErrorText(st)
+	}
 	write "</form>"
 	quit $$$OK
+}
+
+/// write ##class(apptools.lte.fileserver).GetUrlLog()
+ClassMethod GetUrlLog(sql = "select top 5 * from apptools_core.Log where EventType = '?' order by id desc", mode = "STAT")
+{
+	if sql["?" set sql=$replace(sql,"?",mode)
+	if ($d(%request)) { set ref=%request.CgiEnvs("HTTP_REFERER")
+		set url="<a target=_blank title='Load panel with request' href='"_$p(ref,"/",1,3)_"/csp/spgz/arest/a/info&autoload=NSSPGZ&namespaceonly="_$namespace_"&cmd=*sql*'>Loas log</a>"
+		set url=$replace(url,"*sql*",$replace($zconvert(sql,"O","URL"),"'","%27"))
+	}
+	quit $g(url)
 }
 
 /// Generate active links for DownLoad files

@@ -272,8 +272,8 @@ ROUTINE apptools.core [Type=INC]
 #define blockui(%msg)  "$.blockUI( { message: '"_%msg_"' , css: { border: 'none', padding: '15px', backgroundColor: '#000', '-webkit-border-radius': '10px','-moz-border-radius': '10px', opacity: .5, color: '#fff' }} );"
 
 #define Msg(%c,%t) "<span class='brand-text font-weight-light' style='color:"_%c_"'>"_%t_"</span><br>"
-#define Message(%t) "<span class='brand-text font-weight-light'>"_%t_"</span><br>"
-#define MessErr(%t) "<span class='brand-text font-weight-light' style='color:hotpink'>"_%t_"</span><br>"
+#define Message(%t) "<span style='color:green'><b>"_%t_"</b></span><br>"
+#define MessErr(%t) "<span style='color:hotpink'><b>"_%t_"</b></span><br>"
 
 #;	Localization
 #define GNLangDOMAIN "AppTools"

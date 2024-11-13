@@ -499,6 +499,24 @@ ClassMethod ShowGlobals(gn, nspaces) As %String
 	}
 }
 
+/// do ##class(apptools.core.Production).ShowLogs(1,.out,"USER")
+ClassMethod ShowLogs(write = "1", ByRef gn, nspaces = "", flag = "NotPre,Ens", sql = "select top 5 * from apptools_core.Log order by id desc", exec = "") As %String
+{
+	new $namespace
+	if nspaces="" set nspaces=##class(apptools.core.sys).ListNS(.info,flag)
+	if $g(gn)="" set gn=$na(^tmpShowLogs($j)) kill @gn
+	for i=1:1:$l(nspaces,",") { continue:$p(nspaces,",",i)=""||("%All"[$p(nspaces,",",i))
+		$$$NspGoto(curNs,$p(nspaces,",",i))
+		if $Namespace'=$p(nspaces,",",i) continue
+		set gns=$na(@gn@($Namespace))
+		set st=##class(apptools.core.sys).sql2gn(sql,,gns)
+		;if 'st set msg="<br><br><b>Область "_$namespace_"</b>"_$System.Status.GetErrorText(st)_" "_sql write:write msg set @gns=msg continue
+		do:write ##class(apptools.core.LogInfoPane).DrawSQL("result "_gns,10000,$zu(5),"<br><b>Область "_$namespace_"</b> "_sql)
+		$$$NspReturn(curNs)
+	}
+	quit $$$OK
+}
+
 /// Get a list of product errors per day or more for one namespace
 /// d ##class(apptools.core.Production).GetListErrProducts(1,"USER".res)
 ClassMethod GetListErrProducts(day, NS, result) As %String
