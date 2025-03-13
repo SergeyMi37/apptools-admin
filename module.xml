@@ -31,7 +31,7 @@ Application tools for technical support and DBMS administrator. View and edit ar
 	<Resource Name="apptools.python.PKG"/>
         <Resource Name="apptools.Uikit.PKG"/>
 	<Resource Name="appcachemsg.GBL"/>
-    <WebApplication 
+    <CSPApplication 
             SourcePath="/src/csp"
             DeployPath="${cspdir}/apptools"
             Url="/apptools" 
@@ -41,7 +41,7 @@ Application tools for technical support and DBMS administrator. View and edit ar
             AuthenticationMethods="32" 
             MatchRoles=":%ALL"
             Recurse="1"/>
-    <WebApplication
+    <CSPApplication
             Url="/apptoolsrest"
             CookiePath="/apptools/"
             PasswordAuthEnabled="1"
