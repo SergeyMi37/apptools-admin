@@ -69,6 +69,7 @@ ClassMethod GetClientAddress()
 /// Return ID log
 ///         write ##class(apptools.core.Log).AddRecord(ClassName, MethodName, Source, EventType, Arguments, Message)
 /// Example do ##class(apptools.core.Log).AddRecord("I want", "log", "everything", "INFO", "actions", "users")
+/// Kill - Do ##class(apptools.core.Log).%KillExtent()
 ClassMethod AddRecord(ClassName As %String = "", MethodName As %String = "", Source As %String = "", EventType As %String = "", Arguments As %String = "", Message As %String = "")
 {
 	try {

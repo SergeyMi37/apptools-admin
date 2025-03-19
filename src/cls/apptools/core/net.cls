@@ -112,7 +112,7 @@ ClassMethod GetResult(url As %String, user = "", pass = "", ByRef result As %ZEN
 /// To receive from the data server at the URL
 /// If TempDir is specified, then the file will be written there 
 /// w ##class(apptools.core.net).GetHttp("https://codeload.github.com/SergeyMi37/cache-iris-app-tools/zip/master",.out2,"D:\temp\")
-ClassMethod GetHttp(aURL = "", aDATA, TempDir = "", tmpGN = "", user = "", pass = "", ByRef HttpRequest) As %Status
+ClassMethod GetHttp(aURL = "", aDATA, TempDir = "", tmpGN = "", user = "", pass = "", ByRef HttpRequest = "") As %Status
 {
 	set part1=$p(aURL,"/",3),part2=$p(aURL,"/",4,$l(aURL,"/")),params=$p(aURL,"?",2)
 	#; Server
@@ -122,7 +122,7 @@ ClassMethod GetHttp(aURL = "", aDATA, TempDir = "", tmpGN = "", user = "", pass 
 	#; Address
 	set location=$p(part2,"?",1) quit:(location="") $$$ERROR($$$GeneralError,"0:"_$$$aText("missing address","")_" - "_location)
 	#; Create HTTP request to download the file
-	set HttpRequest=##class(%Net.HttpRequest).%New()
+	if '$iso(HttpRequest) set HttpRequest=##class(%Net.HttpRequest).%New()
 	set HttpRequest.Server=server
 	if $f($zcvt(aURL,"L"),"https://") {
 		set:(port="") port=443

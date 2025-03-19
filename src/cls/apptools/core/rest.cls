@@ -693,7 +693,7 @@ ClassMethod GetJourSysSummary(par = "10", write = 1, ByRef sys) As %Status
 	do ..AddNodeJson(sys,"-","<pre>")
 
 	set gn="^||gn"
-	d ##class(apptools.core.sys).RunCmd("df -H",gn)
+	d ##class(apptools.core.sys).RunCmd("df -h",gn)
 	for i=1:1 { quit:'$d(@gn@(i),val)
 		if i=1 set fs=$p(val,"Size")
 		set icon="g"
@@ -701,7 +701,7 @@ ClassMethod GetJourSysSummary(par = "10", write = 1, ByRef sys) As %Status
 		if perc>80 set icon="r"
 		do ..AddNodeJson(sys,icon,$e(val,$l(fs),*))
 	}
-	do ..AddNodeJson(sys,"-","</pre>")
+	do ..AddNodeJson(sys,"►","</pre>")
 	if write do sys.%ToJSON()
   	quit $$$OK
 }

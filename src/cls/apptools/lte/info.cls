@@ -313,7 +313,7 @@ ClassMethod NSFirstHead(Par = "") As %Status
 	write ..ButtonAgain(divId,key,"Clear","NS") ;refresh
 
 	;do ##class(apptools.core.Form).SelectField($lb("here","xls","xls+email","xlsx","json","xml"),"",$lb("Here","to XLS via ZEN","to XLS via ZEN + EMail","to XLSX via Python","to json","to xml"),.frm,1,divId_"outFormat","0",50,1,"title='Output format'")  
-	do ##class(apptools.core.Form).SelectField($lb("here","xlsx","json","xml"),"",$lb("Here","to XLSX via Python","to json","to xml"),.frm,1,divId_"outFormat","0",50,1,"title='Output format'")  
+	do ##class(apptools.core.Form).SelectField($lb("here","xlsx","xlsx+bg","json","xml"),"",$lb("Here","to XLSX via Python","to XLSX via Python Background","to json","to xml"),.frm,1,divId_"outFormat","0",50,1,"title='Output format'")  
 	for i=1:1 quit:'$d(frm(i),s)  write s
 	write " "_$$$appButton(divId_"appButtonExpo","title='Export' onclick="""_$replace($replace(onclick,"*","expo&ns="_ns),"MainForm","FormContentExpo")_"""","Export")
 	if $namespace="%SYS" {
@@ -525,7 +525,13 @@ ClassMethod NSpaceResult(Par = "") As %Status
 			}
 		}
 		else {
-			if $e(outFormat,1,4)="xlsx" {
+			if outFormat="xlsx+bg" {
+				set title="Export XLSX Query: "_$g(sql)
+				job ##class(apptools.lte.info).BgSql2xlsx(sql,"",filexlsx)
+				set st=##class(apptools.lte.fileserver).AddRecord($namespace, $username, $p(filexlsx,$$$slash,*), filexlsx, title,"apptools",.size)
+				write "<br>The report will be saved to a file <b>"_$p(filexlsx,$$$slash,*)_"</b> and will be available via the <a target=_blank href='"_url_"'> link </a>"
+			}
+			elseif $e(outFormat,1,4)="xlsx" {
 				set title="Export XLSX Query: "_$g(sql)
 				set st=##class(apptools.python.xlsx).sql2xlsx(sql,.format,filexlsx)
 				set st=##class(apptools.lte.fileserver).AddRecord($namespace, $username, $p(filexlsx,$$$slash,*), filexlsx, title,"apptools",.size)
@@ -561,6 +567,15 @@ ClassMethod NSpaceResult(Par = "") As %Status
 drawhead(msg)
 		&html<<center><b>#(msg)#</b></center>>
 	quit $$$OK
+}
+
+/// Run to Background
+/// job ##class(apptools.lte.info).BgSql2xlsx(sql,"",filexlsx)
+ClassMethod BgSql2xlsx(sql, format = "", filexlsx)
+{
+	if format="" set format="",format("freeze")="B4",format("sheetname")=$username
+	set st=##class(apptools.python.xlsx).sql2xlsx(sql,.format,filexlsx)
+	quit st
 }
 
 ClassMethod ExportGN(gn, filename, ext, filter = "", err)

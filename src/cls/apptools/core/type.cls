@@ -261,5 +261,15 @@ ClassMethod TagPre(val = "") As %String
 	quit "write ""<pre> "" "_val
 }
 
+ClassMethod IsNumber(value As %String) As %Boolean
+{
+    Set num = +value
+    If $IsValidNum(num) {
+        Quit 1
+    } Else {
+        Quit 0
+    }
+}
+
 }
 
