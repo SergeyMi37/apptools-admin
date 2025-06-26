@@ -515,13 +515,33 @@ ClassMethod GetListModules(StartsWith As %String = "", ByRef pList) [ Internal ]
 	Set:$D(pList) pList=$G(maxlen)
 }
 
+/// Get list Namespace, example do ##class(apptools.lte.resources).GetListNamespace(.ns)
+ClassMethod GetListNamespace(ByRef namespace)
+{
+	New $Namespace
+	Set $Namespace="%SYS"
+	
+	Set tQuery = "select Nsp from %SYS.Namespace_List(0,0) where Status = 1"
+	Set tRes = ##class(%SQL.Statement).%ExecDirect(,tQuery)
+	
+	If (tRes.%SQLCODE < 0) {
+		Throw ##class(%Exception.SQL).CreateFromSQLCODE(tRes.%SQLCODE,tRes.%Message)
+	}
+	While tRes.%Next(.tSC) {
+		$$$ThrowOnError(tSC)
+		Set namespace(tRes.%Get("Nsp"))=""
+		Set:$Get(maxlen)<$Length(tRes.%Get("Nsp")) maxlen=$Length(tRes.%Get("Nsp"))
+	}
+	Set:$Data(namespace) namespace=$G(maxlen)
+}
+
 /// Get modules in Namespaces current instance
 /// do ##class(apptools.lte.resources).GetZpmNamespaces(.List)
 ClassMethod GetZpmNamespaces(ByRef out, text = "", ByRef nspace)
 {
 	new $Namespace
 	Set currentns=$Namespace
-	Do ##class(%ZPM.PackageManager).GetListNamespace(.namespace)
+	Do ##class(apptools.lte.resources).GetListNamespace(.namespace)
 	Set ns=""
 	For { set ns=$Order(namespace(ns)) Quit:ns=""
 		Set $Namespace=ns
@@ -541,4 +561,3 @@ ClassMethod GetZpmNamespaces(ByRef out, text = "", ByRef nspace)
 }
 
 }
-
