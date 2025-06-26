@@ -501,6 +501,7 @@ ClassMethod GetZPMRepo(List, FindMask = "") As %Status
 /// example d ##class(apptools.lte.resources).GetListModules("zpm",.list)
 ClassMethod GetListModules(StartsWith As %String = "", ByRef pList) [ Internal ]
 {
+	quit ;^^^
 	Set tQuery = "select Name,VersionString,Description,ExternalName from %ZPM_PackageManager_Developer.""MODULE"""
 	If StartsWith'="" { Set tRes = ##class(%SQL.Statement).%ExecDirect(,tQuery_ " where name %StartsWith ?",StartsWith) }
 	Else { Set tRes = ##class(%SQL.Statement).%ExecDirect(,tQuery)}
