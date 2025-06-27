@@ -14,10 +14,10 @@ Do ##class(Security.Users).UnExpireUserPasswords("*")
     ZWRITE gty,sc
 zpm "load https://github.com/SergeyMi37/zapm"
 
-zapm "newdb https://github.com/intersystems-community/webterminal.git"
+;;;zapm "newdb https://github.com/intersystems-community/webterminal.git"
 if $zf(-1,"echo ':zn ""%SYS"" zpm ""load https://github.com/SergeyMi37/zapm.git""' >> ~/.iris_history")
 zn "USER"
 zpm "load /opt/irisapp/ -v":1
 ;zpm "load https://github.com/SergeyMi37/apptools-admin.git"
-zpm "load https://github.com/SergeyMi37/isc-passwordless.git"
+;;;zpm "load https://github.com/SergeyMi37/isc-passwordless.git"
 halt
