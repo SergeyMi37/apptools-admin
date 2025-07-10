@@ -12,10 +12,9 @@ Do ##class(Security.Users).UnExpireUserPasswords("*")
     set gty.isJDBC=1
     set sc=gty.%Save()
     ZWRITE gty,sc
-zpm "load https://github.com/SergeyMi37/zapm"
-
-zapm "newdb https://github.com/intersystems-community/webterminal.git"
-zapm "newdb https://github.com/SergeyMi37/isc-apptools-lockdown"
+;zpm "load https://github.com/SergeyMi37/zapm"
+;zapm "newdb https://github.com/intersystems-community/webterminal.git"
+;zapm "newdb https://github.com/SergeyMi37/isc-apptools-lockdown"
 if $zf(-1,"echo ':zn ""%SYS"" zpm ""load https://github.com/SergeyMi37/zapm.git""' >> ~/.iris_history")
 zn "USER"
 zpm "load /opt/irisapp/ -v":1
